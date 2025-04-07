@@ -1,0 +1,415 @@
+
+
+
+
+    '===============================
+    Dim xlsht As Worksheet
+    Dim lastRow As Long
+    Dim i As Long
+
+
+    Dim BankCode As Variant
+    Dim CounterParty As String, Category As String
+    Dim Amount As Double
+
+    Dim targetRow As Long
+    Dim targetCol As String
+    
+    ' 設定第二部份記錄的起始列（Row 10）
+    targetRow = 10
+    
+    ' 逐列處理原始資料（從第二列開始）
+    For i = 2 To lastRow
+        ' 讀取原始資料欄位值（依照題目定義的欄位順序）
+        ' 原始資料欄位：
+        ' A: DataID
+        ' B: DataMonthString
+        ' C: DealDate
+        ' D: DealID
+        ' E: CounterParty
+        ' F: MaturityDate
+        ' G: CurrencyType
+        ' H: Amount
+        ' I: Category
+        ' J: BankCode
+        
+        '銀行代碼
+        BankCode = xlsht.Cells(i, "J").Value        
+        'CounterParty
+        CounterParty = xlsht.Cells(i, "E").Value
+        ' 金額
+        Amount = xlsht.Cells(i, "H").value
+        ' 類別 
+        Category = xlsht.Cells(i, "I").Value               
+        'TWTP_MP / OBU_MP / TWTP_MT / OBU_MT
+        
+        xlsht.Cells(i, "K").Value = BankCode             ' K：BankCode
+        xlsht.Cells(i, "L").Value = CounterParty         ' L：CounterParty
+        
+        ' 根據 Category 將金額填入對應分類欄位
+        Select Case Category
+            Case "TWTP_MP"
+                xlsht.Cells(i, "M").Value = Amount      ' M：TWTP_MP
+            Case "OBU_MP"
+                xlsht.Cells(i, "N").Value = Amount      ' N：OBU_MP
+            Case "TWTP_MT"
+                xlsht.Cells(i, "O").Value = Amount      ' O：TWTP_MT
+            Case "OBU_MT"
+                xlsht.Cells(i, "P").Value = Amount      ' P：OBU_MT
+        End Select
+        
+
+        ' 二、記錄儲存格位置和數值（輸出位置由 Row 10 開始）
+        ' 這邊假設：BankCode 記錄在 C 欄；金額根據 Category 記錄在 E (TWTP_MP) / F (OBU_MP) / G (TWTP_MT) / H (OBU_MT)
+
+        Select Case Category
+            Case "TWTP_MP"
+                targetCol = "E"
+            Case "OBU_MP"
+                targetCol = "F"
+            Case "TWTP_MT"
+                targetCol = "G"
+            Case "OBU_MT"
+                targetCol = "H"
+        End Select
+        
+        ' rpt.SetField "FOA", "FB3A_BankCode", "C" & CStr(targetRow), BankCode
+        ' rpt.SetField "FOA", "FB3A_Amount", targetCol & CStr(targetRow), Amount
+
+        AddDynamicField "FOA", "FB3A_BankCode", "C" & CStr(targetRow), BankCode
+        AddDynamicField "FOA", "FB3A_Amount", targetCol & CStr(targetRow), Amount
+        
+        InsertIntoTable gDBPath, "MonthlyDeclarationReport", gDataMonthString, "FB3A", "FOA|FB3A_BankCode", BankCode, "C" & CStr(targetRow)
+        InsertIntoTable gDBPath, "MonthlyDeclarationReport", gDataMonthString, "FB3A", "FOA|FB3A_Amount", Amount, targetCol & CStr(targetRow)
+        
+        targetRow = targetRow + 1
+    Next i
+
+
+
+
+
+
+    '==============================
+
+
+
+Module.bas
+
+Option Explicit
+
+'=== Global Config Settings ===
+Public gDataMonthString As String    ' 使用者輸入的資料月份
+Public gDBPath As String               ' 資料庫路徑
+Public gReportFolder As String         ' 原始申報報表 Excel 檔所在資料夾
+Public gOutputFolder As String         ' 更新後另存新檔的資料夾
+Public gReportNames As Variant         ' 報表名稱陣列
+Public gReports As Collection          ' Declare Collections that Save all instances of clsReport
+
+'=== 主流程入口 ===
+Public Sub Main()
+    '******
+    Dim controlSheet As Worksheet
+    Set controlSheet = ThisWorkbook.Sheets("ControlPanel")
+    
+    '****
+    gDBPath = ThisWorkbook.Path & "\" & controlSheet.Range("DBsPathFileName")
+    ' 調整為實際路徑
+    gReportFolder = ThisWorkbook.Path & "\" & controlSheet.Range("EmptyReportPath")
+    ' 調整為實際路徑
+    gOutputFolder = ThisWorkbook.Path & "\" & controlSheet.Range("OutputReport")
+
+    Dim isInputValid As Boolean
+    isInputValid = False
+    Do
+        gDataMonthString = InputBox("請輸入資料月份 (格式: yyyy/mm):", "輸入資料月份")
+        If IsValidDataMonth(gDataMonthString) Then
+            isInputValid = True
+        ElseIf Trim(gDataMonthString) = "" Then
+            MsgBox "請輸入報表資料所屬的年度/月份 (例如: 2024/01)", vbExclamation, "輸入錯誤"
+        Else
+            MsgBox "格式錯誤，請輸入正確格式 (yyyy/mm)", vbExclamation, "格式錯誤"
+        End If
+    Loop Until isInputValid
+    
+    ' 設定其他 config 參數（請根據實際環境調整）
+    gDBPath = ThisWorkbook.Path & "\" & Sheets("ControlPanel").Range("DBsPathFileName").value
+    gReportFolder = "C:\申報報表\原始檔\"      ' 調整為實際路徑
+    gOutputFolder = "C:\申報報表\Processed\"      ' 調整為實際路徑
+    gReportNames = Array("CNY1", "FB2", "FB3", "FB3A", "FM11", "FM13", "AI821", "Table2", "FB5_FB5A", "FM2", "FM10", "F1_F2", "Table41", "AI602", "AI240")
+    
+    ' (a) 先初始化所有報表，並將初始資料寫入 Access（例如寫入 ReportConfig 資料表）
+    Call InitializeReports
+    ' (b) 各報表分別進行資料處理（各自邏輯分離）
+    ' Call Process_CNY1
+    ' Call Process_MM4901B
+    ' Call Process_AC5601
+    ' Call Process_AC5602
+    ' ' (c) 最後更新申報 Excel 檔案並另存新檔
+    ' Call UpdateExcelReports
+    MsgBox "完成全部流程處理"
+End Sub
+
+'=== (a) 初始化所有報表並將初始資料寫入 Access ===
+Public Sub InitializeReports()
+    Dim rpt As clsReport
+    Dim rptName As Variant, key As Variant
+    Set gReports = New Collection
+    For Each rptName In gReportNames
+        Set rpt = New clsReport
+        rpt.Init rptName
+        gReports.Add rpt, rptName
+        ' 將各工作表內每個欄位初始設定寫入 Access（資料表名稱例如 ReportConfig）
+        Dim wsPositions As Object
+        Dim combinedPositions As Object
+        Set combinedPositions = rpt.GetAllFieldPositions ' 合併所有工作表，Key 格式 "wsName|fieldName"
+        For Each key In combinedPositions.Keys
+            Debug.Print "---------------------------------------------------"
+            Debug.Print "---------------------------------------------------"
+            Debug.Print "combinedPositions(key): " & CStr(combinedPositions(key))
+            Debug.Print "Key: " & key
+            Debug.Print "---------------------------------------------------"
+            Debug.Print "---------------------------------------------------"
+        Next key
+        ' For Each key In combinedPositions.Keys
+        '     InsertIntoTable gDBPath, "MonthlyDeclarationReport", gDataMonthString, rptName, key, 0, combinedPositions(key)
+        ' Next key
+    Next rptName
+    MsgBox "報表初始化及初始資料建立完成"
+End Sub
+
+
+
+
+
+'以下為物件類別模組
+'clsReport
+
+Option Explicit
+
+' Report Title
+Private clsReportName As String
+
+' Dictionary：key = Worksheet Name，value = Dictionary( Keys "Fiedl Values" 與 "Field Addresses" )
+Private clsWorksheets As Object
+
+'=== 初始化報表 (根據報表名稱建立各工作表的欄位定義) ===
+Public Sub Init(ByVal reportName As String)
+    clsReportName = reportName
+    Set clsWorksheets = CreateObject("Scripting.Dictionary")
+    
+    Select Case reportName
+        Case "CNY1"
+            ' 假設 CNY1 報表有三個工作表：X、Y、Z
+            ' 工作表 X 定義：
+            '   - "其他金融資產_淨額" 儲存格地址 "B2"
+            '   - "其他" 儲存格地址 "C2"
+            '   - "CNY1_資產總計" 儲存格地址 "D2"
+            AddWorksheetFields "CNY1", Array( _
+                Array("CNY1_其他金融資產_淨額", "G98", Null), _
+                Array("CNY1_其他", "G100", Null), _
+                Array("CNY1_資產總計", "G116", Null), _
+                Array("CNY1_其他金融負債", "G170", Null), _
+                Array("CNY1_其他什項金融負債", "G172", Null), _
+                Array("CNY1_負債總計", "G184", Null))
+
+            ' 工作表 Y 定義：
+            '   - "其他金融負債" 儲存格地址 "E2"
+            '   - "其他什項金融負債" 儲存格地址 "F2"
+            AddWorksheetFields "Y", Array( _
+                Array("其他金融負債", "E2", Null), _
+                Array("其他什項金融負債", "F2", Null))
+            ' 工作表 Z 定義：
+            '   - "CNY1_負債總計" 儲存格地址 "G2"
+            AddWorksheetFields "Z", Array( _
+                Array("CNY1_負債總計", "G2", Null))
+        Case "FB2"
+            AddWorksheetFields "FOA", Array( _
+                Array("FB2_存放及拆借同業", "F9", Null), _
+                Array("FB2_拆放銀行同業", "F13", Null), _
+                Array("FB2_應收款項_淨額", "F36", Null), _
+                Array("FB2_應收利息", "F41", Null), _
+                Array("FB2_資產總計", "F85", Null))
+        Case "FB3"
+            AddWorksheetFields "FOA", Array( _
+                Array("FB3_存放及拆借同業_資產面_台灣地區", "D9", Null), _
+                Array("FB3_同業存款及拆放_負債面_台灣地區", "D10", Null))
+        Case "FB3A"
+            '這邊要動態ADDWORKSHEETfIELDS
+            ' AddWorksheetFields "Sheet1", Array( _
+            '     Array("總收入", "B5", Null), _
+            '     Array("總支出", "C5", Null) )
+        Case "FM5"
+            ' No Data
+        Case "FM11"
+            AddWorksheetFields "FOA", Array( _
+                Array("FM11_一利息股息收入_利息_其他", "E15", Null), _
+                Array("FM11_五證券投資評價及減損迴轉利益_一年期以上之債權證券", "E25", Null), _
+                Array("FM11_五證券投資評價及減損損失_一年期以上之債權證券", "I25", Null), _
+                Array("FM11_一利息收入_自中華民國境內其他客戶", "E36", Null))
+        Case "FM13"
+            AddWorksheetFields "FOA", Array( _
+                Array("FM13_OBU_香港_債票券投資", "D9", Null), _
+                Array("FM13_OBU_韓國_債票券投資", "F9", Null), _
+                Array("FM13_OBU_泰國_債票券投資", "H9", Null), _
+                Array("FM13_OBU_馬來西亞_債票券投資", "J9", Null), _
+                Array("FM13_OBU_菲律賓_債票券投資", "L9", Null), _
+                Array("FM13_OBU_印尼_債票券投資", "N9", Null), _
+                Array("FM13_OBU_債票券投資_評價調整", "T9", Null), _
+                Array("FM13_OBU_債票券投資_累計減損", "U9", Null))
+        Case "AI821"
+            AddWorksheetFields "Table1", Array( _
+                Array("AI821_本國銀行", "D61", Null), _
+                Array("AI821_陸銀在臺分行", "D62", Null), _
+                Array("AI821_外商銀行在臺分行", "D63", Null), _
+                Array("AI821_大陸地區銀行", "D64", Null), _
+                Array("AI821_其他", "D65", Null))
+        Case "Table2"
+            AddWorksheetFields "FOA", Array( _
+                Array("Table2_其他", "D17", Null), _
+                Array("Table_美元_F1", "L7", Null), _
+                Array("Table2_美元_F3", "N7", Null), _
+                Array("Table2_美元_F4", "O7", Null))
+        Case "FB5_FB5A"
+            AddWorksheetFields "FOA", Array( _
+                Array("FB5_外匯交易_即期外匯_DBU", "G11", Null))
+        Case "FM2"
+            '這邊要動態ADDWORKSHEETfIELDS
+            ' AddWorksheetFields "FOA", Array( _
+            '     Array("總收入", "B5", Null), _
+            '     Array("總支出", "C5", Null) )
+        Case "FM10"
+            AddWorksheetFields "FOA", Array( _
+                Array("FM10_FVOCI_總額C", "F20", Null), _
+                Array("FM10_FVOCI_淨額D", "G20", Null), _
+                Array("FM10_AC_總額E", "H20", Null), _
+                Array("FM10_AC_淨額F", "I20", Null), _
+                Array("FM10_四其他_境內_總額H", "K28", Null), _
+                Array("FM10_四其他_境內_淨額I", "L28", Null))
+        Case "F1_F2"
+            Dim currencies As Variant, transactionTypes As Variant, startRows As Variant, colLetters As Variant
+            Dim i As Integer, j As Integer
+            currencies = Array("JPY", "GBP", "CHF", "CAD", "AUD", "NZD", "SGD", "HKD", "ZAR", "SEK", "THB", "RM", "EUR", "CNY", "OTHER")
+            transactionTypes = Array("F1_與國外金融機構及非金融機構間交易_SPOT", _
+                                        "F1_與國外金融機構及非金融機構間交易_SWAP", _
+                                        "F1_與國內金融機構間交易_SPOT", _
+                                        "F1_與國內金融機構間交易_SWAP", _
+                                        "F1_與國內顧客間交易_SPOT")
+            startRows = Array(8, 8, 8, 8, 8) ' 每組交易的起始儲存格列數
+            colLetters = Array("O", "Q", "I", "K", "B") ' 每組交易對應的欄位
+
+            Dim fieldList() As Variant
+            Dim index As Integer
+            index = 0
+
+            '修改這裡
+            'ReDim fieldList(UBound(transactionTypes) * UBound(currencies))
+            ReDim fieldList((UBound(transactionTypes) + 1) * (UBound(currencies) + 1) - 1)
+
+            For i = LBound(transactionTypes) To UBound(transactionTypes)
+                For j = LBound(currencies) To UBound(currencies)
+                    fieldList(index) = Array(transactionTypes(i) & "_" & currencies(j), colLetters(i) & (startRows(i) + j), Null)
+                    index = index + 1
+                Next j
+            Next i
+
+            ' Add to Worksheet Fields
+            AddWorksheetFields "f1", fieldList
+        Case "Table41"
+            AddWorksheetFields "FOA", Array( _
+                Array("Table41_四衍生工具處分利益", "D25", Null), _
+                Array("Table41_四衍生工具處分損失", "G25", Null))
+        Case "AI602"
+            AddWorksheetFields "Table1", Array( _
+                Array("AI602_政府公債_投資成本_FVOCI_F2", "D10", Null), _
+                Array("AI602_政府公債_投資成本_AC_F3", "E10", Null), _
+                Array("AI602_政府公債_投資成本_合計_F5", "G10", Null), _
+                Array("AI602_公司債_投資成本_FVOCI_F7", "I10", Null), _
+                Array("AI602_公司債_投資成本_AC_F8", "J10", Null), _
+                Array("AI602_公司債_投資成本_合計_F10", "L10", Null), _
+                Array("AI602_政府公債_帳面價值_FVOCI_F2", "D11", Null), _
+                Array("AI602_政府公債_帳面價值_AC_F3", "E11", Null), _
+                Array("AI602_政府公債_帳面價值_合計_F5", "G11", Null), _
+                Array("AI602_公司債_帳面價值_FVOCI_F7", "I11", Null), _
+                Array("AI602_公司債_帳面價值_AC_F8", "J11", Null), _
+                Array("AI602_公司債_帳面價值_合計_F10", "L11", Null))
+            AddWorksheetFields "Table2", Array( _
+                Array("AI602_金融債_投資成本_FVOCI_F2", "D10", Null), _
+                Array("AI602_金融債_投資成本_AC_F3", "E10", Null), _
+                Array("AI602_金融債_投資成本_合計_F5", "G10", Null), _
+                Array("AI602_金融債_帳面價值_FVOCI_F2", "D11", Null), _
+                Array("AI602_金融債_帳面價值_AC_F3", "E11", Null), _
+                Array("AI602_金融債_帳面價值_合計_F5", "G11", Null))
+        Case "AI240"
+            AddWorksheetFields "工作表1", Array( _
+                Array("AI240_其他到期資金流入項目_10天", "B5", Null), _
+                Array("AI240_其他到期資金流入項目_30天", "B5", Null), _
+                Array("AI240_其他到期資金流入項目_90天", "B5", Null), _
+                Array("AI240_其他到期資金流入項目_180天", "B5", Null), _
+                Array("AI240_其他到期資金流入項目_1年", "B5", Null), _
+                Array("AI240_其他到期資金流入項目_1年以上", "B5", Null), _
+                Array("AI240_其他到期資金流出項目_10天", "B5", Null), _
+                Array("AI240_其他到期資金流出項目_30天", "B5", Null), _
+                Array("AI240_其他到期資金流出項目_90天", "B5", Null), _
+                Array("AI240_其他到期資金流出項目_180天", "B5", Null), _
+                Array("AI240_其他到期資金流出項目_1年", "B5", Null), _
+                Array("AI240_其他到期資金流出項目_1年以上", "B5", Null))
+        ' 如有其他報表，依需求加入不同工作表及欄位定義
+    End Select
+End Sub
+
+'=== Private Method：Add Def for Worksheet Field ===
+' fieldDefs is array of fields(each field(Array) of fields(Array)), for each Index's Form => (FieldName, CellAddress, InitialVAlue(null))
+Private Sub AddWorksheetFields(ByVal wsName As String, _
+                                ByVal fieldDefs As Variant)
+    Dim wsDict As Object, dictValues As Object, dictAddresses As Object
+
+    Dim i As Long, arrField As Variant
+
+    Set dictValues = CreateObject("Scripting.Dictionary")
+    Set dictAddresses = CreateObject("Scripting.Dictionary")
+    
+    For i = LBound(fieldDefs) To UBound(fieldDefs)
+        arrField = fieldDefs(i)
+        dictValues.Add arrField(0), arrField(2)
+        dictAddresses.Add arrField(0), arrField(1)
+    Next i
+    
+    Set wsDict = CreateObject("Scripting.Dictionary")
+    wsDict.Add "Values", dictValues
+    wsDict.Add "Addresses", dictAddresses
+    
+    Debug.Print "wsDict('Values'): " & CStr(wsDict("Values"))
+    Debug.Print "wsDict('Addresses'): " & CStr(wsDict("Addresses"))
+
+    clsWorksheets.Add wsName, wsDict
+End Sub
+
+Public Function GetAllFieldPositions(Optional ByVal wsName As String = "") As Object
+    Dim result As Object
+    Set result = CreateObject("Scripting.Dictionary")
+    Dim wsKey As Variant, dictA As Object, fieldKey As Variant
+    If wsName <> "" Then
+        If Not clsWorksheets.Exists(wsName) Then
+            Err.Raise 1002, , "工作表 [" & wsName & "] 尚未定義於報表 " & clsReportName
+        End If
+        Set result = clsWorksheets(wsName)("Addresses")
+    Else
+        For Each wsKey In clsWorksheets.Keys
+            Set dictA = clsWorksheets(wsKey)("Addresses")
+            For Each fieldKey In dictA.Keys
+                result.Add wsKey & "|" & fieldKey, dictA(fieldKey)
+            Next fieldKey
+        Next wsKey
+    End If
+    Set GetAllFieldPositions = result
+End Function
+
+
+我有一個VBA專案如上，但是在執行到Module.bas中在call InitializeReports時，
+在執行 rpt.Init rptName時，出現了下面錯誤
+"引數的個數錯誤或指定了不正確的屬性"
+
+粗估應該是在執行Init中的select case中的 AddWorksheetFields時有問題
+請告訴我是什麼問題
+
