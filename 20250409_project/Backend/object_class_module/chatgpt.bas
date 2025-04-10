@@ -478,8 +478,14 @@ Public Sub ICleaner_additionalClean(ByVal fullFilePath As String, _
 End Sub
 
 
-請問我實際在執行主程序時，為什麼在cleaner階段中開啟excel進行清理，但是都沒辦法完整關掉由microsoft access操作Excel的使用，因為持續打開excel執行相關內容，導致開啟過多excel，變成我不能夠一次執行太多個cleaner，請問為什麼會這樣，要怎麼改善
+請問我實際在執行主程序時，為什麼在cleaner階段中開啟excel進行清理，但是都沒辦法完整關掉由microsoft access操作Excel的使用，
+因為持續打開excel執行相關內容，導致開啟過多excel，變成我不能夠一次執行太多個cleaner，請問為什麼會這樣，要怎麼改善
 
+
+請問我實際在執行主程序時，為什麼在cleaner階段中開啟excel進行清理，但是執行了幾個Excel檔案 Cleaner 清理動作之後，
+就會出現下面的錯誤
+因為 XXXX 應用程式 XXXX[唯獨][相容模式] - Excel正在忙碌中，導致無法完成這個動作，請選擇[切換至]來啟動xxxxx，並且修正這個問題
+請問為什麼會這樣，要怎麼改善
 
 
 
