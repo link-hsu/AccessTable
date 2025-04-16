@@ -1,6 +1,38 @@
 'HandleCloseRate
 Option Compare Database
 
+Private Sub Form_Load()
+    Me.inputCloseRateFilePath = ""
+    Me.inputCloseRateDate = Null
+
+    ' Check Label Notification
+    Me.lblCheckInputCloseRateLabel.Caption = "請輸入CloseRate日期" & vbCrLf & "(日期格式為 YYYY/MM/DD，例如: 2025/02/27)"
+    Me.lblCheckInputFilePathLabel.Caption = "請輸入檔案路徑"
+End Sub
+
+Private Sub inputCloseRateDate_AfterUpdate()
+    If IsDate(Me.inputCloseRateDate) Then
+        Me.lblCheckInputCloseRateLabel.Caption = ""
+    Else
+        Me.lblCheckInputCloseRateLabel.Caption = "請輸入有效日期" & vbCrLf & "(日期格式為 YYYY/MM/DD，例如: 2025/02/27)"
+        Me.inputCloseRateDate.SetFocus
+    End If
+End Sub
+
+Private Sub inputCloseRateFilePath_AfterUpdate()
+    If Me.inputCloseRateFilePath = "" Then
+        Me.lblCheckInputFilePathLabel.Caption = "請輸入檔案路徑"
+        Me.inputCloseRateFilePath.SetFocus
+    Else
+        If Dir(Me.inputCloseRateFilePath) = "" Then
+            Me.lblCheckInputFilePathLabel.Caption = "存取路徑資料發生問題，請確認路徑是否正確"
+            Me.inputCloseRateFilePath.SetFocus
+        Else
+            Me.lblCheckInputFilePathLabel.Caption = ""
+        End If
+    End If
+End Sub
+
 Private Sub btnUploadCloseRate_Click()
     Dim xlApp As Excel.Application
     Dim xlbk As Excel.Workbook
@@ -17,11 +49,14 @@ Private Sub btnUploadCloseRate_Click()
 
     Dim tableColumns As Variant
 
-    fullFilePath = "D:\DavidHsu\ReportCreator\RelationData\CopyData\1742956173629-cm2610.xls"
+    'Fetch Inputs
+    reportDataDate = Me.inputCloseRateDate
+    fullFilePath = Me.inputCloseRateFilePath
 
     ' 檢查檔案是否存在
     If Dir(fullFilePath) = "" Then
-        MsgBox "File does not exist in path: " & fullFilePath
+        MsgBox "File does ont exist in path: " & fullFilePath
+        WriteLog "File does not exist in path: " & fullFilePath
         Exit Sub
     End If
 
@@ -30,8 +65,6 @@ Private Sub btnUploadCloseRate_Click()
     Set xlbk = xlApp.Workbooks.Open(fullFilePath)
     Set xlsht = xlbk.Sheets("Sheet1")
 
-    'Fetch Dates
-    reportDataDate = Me.inputCloseRateDate
     reportMonth = DateSerial(Year(reportDataDate), Month(reportDataDate) + 1, 0)
     reportMonthString = Format(reportMonth, "yyyy/mm")
 
@@ -42,7 +75,7 @@ Private Sub btnUploadCloseRate_Click()
 
     lastRow = xlsht.Cells(xlsht.Rows.Count, "E").End(xlUp).Row
 
-    ' 反向遍歷以刪除符合條件的列
+    ' 反向遍歷刪除列
     For i = lastRow To 2 Step -1
         isRowDelete = False
         xlsht.Cells(i, "B").Value = reportDataDate
@@ -80,21 +113,23 @@ Private Sub btnUploadCloseRate_Click()
     xlApp.Quit
     Set xlApp = Nothing
 
-    MsgBox "完成清理 " & cleaningType & " ，路徑為: " & fullFilePath
-    Debug.Print "完成清理 " & cleaningType & " ，路徑為: " & fullFilePath
+    MsgBox "完成清理 CloseRate，路徑為: " & fullFilePath
+    WriteLog "完成清理 CloseRate，路徑為: " & fullFilePath
 
     Dim importer As IImporter
     Dim accessDBPath As String
-    Dim fullFilePath As String
 
     Set importer = New ImporterStandard
 
-    accessDBPath = "D:\DavidHsu\ReportCreator\closeRate\closeRate.accdb"
+    accessDBPath = CurrentProject.FullName
+
+    ' accessDBPath = "D:\DavidHsu\ReportCreator\closeRate\closeRate.accdb"
     ' accessDBPath = "D:\DavidHsu\ReportCreator\DB_MonthlyReport.accdb"
     ' fullFilePath = Me.inputCloseRateFilePath
 
     If importer Is Nothing Then
-        MsgBox "找不到對應的匯入程序: " & cleaningType
+        MsgBox "找不到更新 CloseRate 對應的匯入程序"
+        WriteLog "找不到更新 CloseRate 對應的匯入程序"
         Exit Sub
     End If
 
