@@ -3,15 +3,27 @@
     - (已修正) Button Click後執行程序
     - reportName使用class直接取得，不要再宣告新的參數
     - 測試dataMonthString用input輸入方式
-    -(已修正) FM2 FBA3 有空白欄位無法顯示 
+    - (已修正) FM2 FBA3 有空白欄位無法顯示 
+    - 前端以日期變數輸入抓access資料
+    - 前端加入log，log想說要不要存入資料庫
+    - 前端加入log
+    - FM10還要加入AC
+    - (已修正) CloseRate要篩選出DataDate的最後一天，FM2和表2
 
 
 - 其他項目，例如後端
     - (已修正) 整理資料庫匯入程式碼
     - (已嘗試改善) 解決開啟多個Excel檔案時會出錯的問題
+    - 後端增加 CloseRate
+    - 加入處理F2
+    - (已完成) 完成剩下後端資料彙入 (run 20240329的OBU_AC5601時，在.txt檔的250行應該是EUR，但是資料錯誤文字是 CNY，導致BUG)
     - 匯入這個月的資料庫跑看看有沒有問題
     - 將CloseRate併入後端相同檔案
+    - 核對Swiftcode
+    - 加入處理F2
+    - 建立 CloseRate Func
     - 測試在共用路徑能不能用
     - (已修正) 建立完整Log管理機制
     - 加入錯誤處理
     - (已修正) 清理欄位時，有些資料表會新增空白資料
+
