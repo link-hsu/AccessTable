@@ -14,7 +14,7 @@
     - 修改 Access SQL為以param方式抓取資料 修改到ai240
     - mm4901b swift 沒篩完全，剩下2024年開始之後貼，CTBC 中信swift code要再確認是不是不只一個
     - f1_f2 還要修正 bug
-
+    - Think 建立一個Swift Table Primary key is swift code for FM2 Report
 
 
 

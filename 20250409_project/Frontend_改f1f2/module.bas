@@ -302,7 +302,6 @@ Public Sub Process_FB2()
     If Err.Number <> 0 Or LBound(dataArr) > UBound(dataArr) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable & " 資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable & " 資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr, 2)
             For i = 0 To UBound(dataArr, 1)
@@ -730,7 +729,6 @@ Public Sub Process_FM11()
     If Err.Number <> 0 Or LBound(dataArr) > UBound(dataArr) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable & " 資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable & " 資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr, 2)
             For i = 0 To UBound(dataArr, 1)
@@ -1204,7 +1202,6 @@ Public Sub Process_Table2()
     If Err.Number <> 0 Or LBound(dataArr_2) > UBound(dataArr_2) Then
         MsgBox reportTitle & ": " & queryTable_2 & "資料表無資料"
         WriteLog reportTitle & ": " & queryTable_2 & "資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr_2, 2)
             For i = 0 To UBound(dataArr_2, 1)
@@ -1316,7 +1313,6 @@ Public Sub Process_FB5()
     If Err.Number <> 0 Or LBound(dataArr) > UBound(dataArr) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable & " 資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable & " 資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr, 2)
             For i = 0 To UBound(dataArr, 1)
@@ -1491,7 +1487,6 @@ Public Sub Process_FM2()
     If Err.Number <> 0 Or LBound(dataArr_1) > UBound(dataArr_1) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_1 & " 資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable_1 & " 資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr_1, 2)
             For i = 0 To UBound(dataArr_1, 1)
@@ -1504,7 +1499,6 @@ Public Sub Process_FM2()
     If Err.Number <> 0 Or LBound(dataArr_2) > UBound(dataArr_2) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_2 & " 資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable_2 & " 資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr_2, 2)
             For i = 0 To UBound(dataArr_2, 1)
@@ -1517,7 +1511,6 @@ Public Sub Process_FM2()
     If Err.Number <> 0 Or LBound(dataArr_3) > UBound(dataArr_3) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_3 & " 資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable_3 & " 資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr_3, 2)
             For i = 0 To UBound(dataArr_3, 1)
@@ -1666,7 +1659,6 @@ Public Sub Process_FM10()
     If Err.Number <> 0 Or LBound(dataArr_1) > UBound(dataArr_1) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_1 & " 資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable_1 & " 資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr_1, 2)
             For i = 0 To UBound(dataArr_1, 1)
@@ -1679,7 +1671,6 @@ Public Sub Process_FM10()
     If Err.Number <> 0 Or LBound(dataArr_2) > UBound(dataArr_2) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_2 & " 資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable_2 & " 資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr_2, 2)
             For i = 0 To UBound(dataArr_2, 1)
@@ -1902,7 +1893,6 @@ Public Sub Process_F1_F2()
     If Err.Number <> 0 Or LBound(dataArr_1) > UBound(dataArr_1) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_1 & "資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable_1 & "資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr_1, 2)
             For i = 0 To UBound(dataArr_1, 1)
@@ -1914,7 +1904,6 @@ Public Sub Process_F1_F2()
     If Err.Number <> 0 Or LBound(dataArr_2) > UBound(dataArr_2) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_2 & "資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable_2 & "資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr_2, 2)
             For i = 0 To UBound(dataArr_2, 1)
@@ -1926,7 +1915,6 @@ Public Sub Process_F1_F2()
     If Err.Number <> 0 Or LBound(dataArr_3) > UBound(dataArr_3) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_3 & "資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable_3 & "資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr_3, 2)
             For i = 0 To UBound(dataArr_3, 1)
@@ -1949,7 +1937,6 @@ Public Sub Process_F1_F2()
     If Err.Number <> 0 Or LBound(dataArr_5) > UBound(dataArr_5) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_5 & "資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable_5 & "資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr_5, 2)
             For i = 0 To UBound(dataArr_5, 1)
@@ -1961,7 +1948,6 @@ Public Sub Process_F1_F2()
     If Err.Number <> 0 Or LBound(dataArr_6) > UBound(dataArr_6) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_6 & "資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable_6 & "資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr_6, 2)
             For i = 0 To UBound(dataArr_6, 1)
@@ -1974,7 +1960,6 @@ Public Sub Process_F1_F2()
     If Err.Number <> 0 Or LBound(dataArr_7) > UBound(dataArr_7) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_7 & "資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable_7 & "資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr_7, 2)
             For i = 0 To UBound(dataArr_7, 1)
@@ -1986,7 +1971,6 @@ Public Sub Process_F1_F2()
     If Err.Number <> 0 Or LBound(dataArr_8) > UBound(dataArr_8) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_8 & "資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable_8 & "資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr_8, 2)
             For i = 0 To UBound(dataArr_8, 1)
@@ -1998,7 +1982,6 @@ Public Sub Process_F1_F2()
     If Err.Number <> 0 Or LBound(dataArr_9) > UBound(dataArr_9) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_9 & "資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable_9 & "資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr_9, 2)
             For i = 0 To UBound(dataArr_9, 1)
@@ -2009,8 +1992,7 @@ Public Sub Process_F1_F2()
 
     If Err.Number <> 0 Or LBound(dataArr_10) > UBound(dataArr_10) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_10 & "資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_10 & "資料表無資料"
-        Exit Sub
+        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_10 & "資料表無資料" 
     Else
         For j = 0 To UBound(dataArr_10, 2)
             For i = 0 To UBound(dataArr_10, 1)
@@ -2203,7 +2185,6 @@ Public Sub Process_Table41()
     If Err.Number <> 0 Or LBound(dataArr_1) > UBound(dataArr_1) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_1 & " 資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable_1 & " 資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr_1, 2)
             For i = 0 To UBound(dataArr_1, 1)
@@ -2215,7 +2196,6 @@ Public Sub Process_Table41()
     If Err.Number <> 0 Or LBound(dataArr_2) > UBound(dataArr_2) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_2 & " 資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable_2 & " 資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr_2, 2)
             For i = 0 To UBound(dataArr_2, 1)
@@ -2240,12 +2220,10 @@ Public Sub Process_Table41()
         Else
             MsgBox "Error: No Data for Derivative Profit"
             WriteLog "Error: No Data for Derivative Profit"
-            Exit Sub
         End If
     Else
         MsgBox "Error: No Data for Derivative Profit/Loss"
         WriteLog "Error: No Data for Derivative Profit/Loss"
-        Exit Sub
     End If
 
     If xlsht.Cells(1, "J").Value = "SumLoss" Then
@@ -2254,12 +2232,10 @@ Public Sub Process_Table41()
         Else
             MsgBox "Error: No Data for Derivative Loss"
             WriteLog "Error: No Data for Derivative Loss"
-            Exit Sub
         End If
     Else
         MsgBox "Error: No Data for Derivative Profit/Loss"
         WriteLog "Error: No Data for Derivative Profit/Loss"
-        Exit Sub
     End If
 
     derivativeGain = Round(derivativeGain / 1000, 0)
@@ -2335,7 +2311,6 @@ Public Sub Process_AI602()
     If Err.Number <> 0 Or LBound(dataArr_1) > UBound(dataArr_1) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_1 & " 資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable_1 & " 資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr_1, 2)
             For i = 0 To UBound(dataArr_1, 1)
@@ -2347,7 +2322,6 @@ Public Sub Process_AI602()
     If Err.Number <> 0 Or LBound(dataArr_2) > UBound(dataArr_2) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_2 & " 資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable_2 & " 資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr_2, 2)
             For i = 0 To UBound(dataArr_2, 1)
@@ -2359,7 +2333,6 @@ Public Sub Process_AI602()
     If Err.Number <> 0 Or LBound(dataArr_3) > UBound(dataArr_3) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_3 & " 資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable_3 & " 資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr_3, 2)
             For i = 0 To UBound(dataArr_3, 1)
@@ -2626,7 +2599,6 @@ Public Sub Process_AI240()
     If Err.Number <> 0 Or LBound(dataArr_1) > UBound(dataArr_1) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_1 & " 資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable_1 & " 資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr_1, 2)
             For i = 0 To UBound(dataArr_1, 1)
@@ -2638,7 +2610,6 @@ Public Sub Process_AI240()
     If Err.Number <> 0 Or LBound(dataArr_2) > UBound(dataArr_2) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_2 & " 資料表無資料"
         WriteLog "資料有誤: " & reportTitle & ": " & queryTable_2 & " 資料表無資料"
-        Exit Sub
     Else
         For j = 0 To UBound(dataArr_2, 2)
             For i = 0 To UBound(dataArr_2, 1)

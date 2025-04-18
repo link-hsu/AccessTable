@@ -372,23 +372,33 @@ Public Sub ApplyToWorkbook(ByRef wb As Workbook)
         On Error Resume Next
         Set ws = wb.Sheets(wsKey)
         On Error GoTo 0
-        If Not ws Is Nothing Then
-            Set wsDict = clsWorksheets(wsKey)
-            Set dictValues = wsDict("Values")
-            Set dictAddresses = wsDict("Addresses")
-            For Each fieldKey In dictValues.Keys
-                If Not IsNull(dictValues(fieldKey)) Then
-                    ws.Range(dictAddresses(fieldKey)).Value = dictValues(fieldKey)
-                Else
-                    MsgBox "工作表 [" & wsKey & "] 中找不到欄位: " & fieldKey , vbExclamation
-                    WriteLog "工作表 [" & wsKey & "] 中找不到欄位: " & fieldKey
-                End If
-            Next fieldKey
-        Else
+        If ws Is Nothing Then
             MsgBox "Workbook 中找不到工作表: " & wsKey, vbExclamation
             WriteLog "Workbook 中找不到工作表: " & wsKey
             Exit Sub
         End If
+        
+        Set wsDict = clsWorksheets(wsKey)
+        Set dictValues = wsDict("Values")
+        Set dictAddresses = wsDict("Addresses")
+        For Each fieldKey In dictValues.Keys
+            If Not IsNull(dictValues(fieldKey)) Then
+                On Error Resume Next
+                ws.Range(dictAddresses(fieldKey)).Value = dictValues(fieldKey)
+                If Err.Number <> 0 Then
+                    MsgBox "工作表 [" & wsKey & "] 找不到儲存格 " & _
+                           dictAddresses(fieldKey) & " （欄位：" & fieldKey & "）", vbExclamation
+                    WriteLog "工作表 [" & wsKey & "] 找不到儲存格 " & _
+                             dictAddresses(fieldKey) & " （欄位：" & fieldKey & "）"
+                    Err.Clear
+                End If
+                On Error GoTo 0
+            Else
+                ' 沒呼叫 SetField 的欄位 (值還是 Null)
+                MsgBox "工作表 [" & wsKey & "] 欄位尚未設定值: " & fieldKey, vbExclamation
+                WriteLog "工作表 [" & wsKey & "] 欄位尚未設定值: " & fieldKey
+            End If
+        Next fieldKey
         Set ws = Nothing
     Next wsKey
 End Sub
