@@ -23,8 +23,8 @@ Public Function GetAccessDataAsArray(ByVal DBPath As String, _
     rs.CursorLocation = 3 ' adUseClient
     rs.Open cmd
     If rs Is Nothing Or rs.EOF Then
-        MsgBox "查詢結果為空，請檢查資料庫與查詢條件。", vbExclamation
-        WriteLog "查詢結果為空，請檢查資料庫與查詢條件。"
+        MsgBox QueryName & "查詢結果為空，請檢查資料庫與查詢條件。", vbExclamation
+        WriteLog QueryName & "查詢結果為空，請檢查資料庫與查詢條件。"
         GetAccessDataAsArray = Array()
         Exit Function
     End If
