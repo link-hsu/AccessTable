@@ -1992,7 +1992,7 @@ Public Sub Process_F1_F2()
 
     If Err.Number <> 0 Or LBound(dataArr_10) > UBound(dataArr_10) Then
         MsgBox "資料有誤: " & reportTitle & ": " & queryTable_10 & "資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_10 & "資料表無資料" 
+        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_10 & "資料表無資料"
     Else
         For j = 0 To UBound(dataArr_10, 2)
             For i = 0 To UBound(dataArr_10, 1)
