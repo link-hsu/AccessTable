@@ -261,3 +261,59 @@ DataDate DataMonth DataMonthString
 
 票券交易明細表 統一編號，補到8位數，票載利率要拿掉百分比
 
+
+
+- 20250428 Work
+    1. 建立台幣Access資料表
+        1.1 完成DB column mapping
+        1.2 清洗資料表資料，欄位%調整和餘額欄位整併，另外還有利率敏感性分析的表
+    2.1 建立AccountCode Pair ReportType
+        2.1.1 建立好配對表，取得原始配對方式之後，分別為不同報表需求建立Query(兩種方式，一種是建立一個帶入參數的共用Query，參數會由前端代碼輸入，另一種是為不同的表建立不同的Query，就後續維護角度是共用參數較為理想)
+    2.2 check 前端資料取得函數Paramater
+    2.3 修改外幣SQL，可能要增加傳入參數
+    3.1 台幣製作報表邏輯
+    3.2 台幣有些欄位資料需要人工輸入，可能放在Setting頁面，VBA操控Control頁面清除必要填入欄位資料，程式碼在剛運行時，檢核相關欄位是否填入，如果沒有填入則強制中止Sub運行
+    3.3
+
+
+    處理外幣債表ValuationType欄位，寫一個for迴圈，然後看是不是要寫一個dictionary去替換名稱
+    減損的表也需要處理，寫for迴圈去逐一處理
+    至於要使用的主要名稱以餘額C名稱為主
+
+
+    外幣需要處理的報表
+    AI602
+    FB1
+    FM10
+    FM11
+    
+
+
+
+
+
+
+
+
+
+
+FVPL_GovBond_Foreign
+FVPL_GovBond_Foreign
+FVPL_CompanyBond_Foreign
+FVPL_CompanyBond_Foreign
+FVPL_FinancialBond_Foreign
+FVOCI_GovBond_Foreign
+FVOCI_CompanyBond_Foreign
+FVOCI_CompanyBond_Foreign
+FVOCI_FinancialBond_Foreign
+AC_GovBond_Foreign
+AC_CompanyBond_Foreign
+AC_CompanyBond_Foreign
+AC_FinancialBond_Foreign
+
+
+外幣債表
+AH
+
+減損
+L
