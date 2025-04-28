@@ -265,15 +265,16 @@ DataDate DataMonth DataMonthString
 
 - 20250428 Work
     1. 建立台幣Access資料表
-        1.1 完成DB column mapping
+        a. 完成DB column mapping
+        
         1.2 清洗資料表資料，欄位%調整和餘額欄位整併，另外還有利率敏感性分析的表
-    2.1 建立AccountCode Pair ReportType
+    2. 建立AccountCode Pair ReportType
         2.1.1 建立好配對表，取得原始配對方式之後，分別為不同報表需求建立Query(兩種方式，一種是建立一個帶入參數的共用Query，參數會由前端代碼輸入，另一種是為不同的表建立不同的Query，就後續維護角度是共用參數較為理想)
-    2.2 check 前端資料取得函數Paramater
-    2.3 修改外幣SQL，可能要增加傳入參數
-    3.1 台幣製作報表邏輯
-    3.2 台幣有些欄位資料需要人工輸入，可能放在Setting頁面，VBA操控Control頁面清除必要填入欄位資料，程式碼在剛運行時，檢核相關欄位是否填入，如果沒有填入則強制中止Sub運行
-    3.3
+    3. check 前端資料取得函數Paramater
+    4. 修改外幣SQL，可能要增加傳入參數
+    5. 台幣製作報表邏輯
+    6. 台幣有些欄位資料需要人工輸入，可能放在Setting頁面，VBA操控Control頁面清除必要填入欄位資料，程式碼在剛運行時，檢核相關欄位是否填入，如果沒有填入則強制中止Sub運行
+    7. 
 
 
     處理外幣債表ValuationType欄位，寫一個for迴圈，然後看是不是要寫一個dictionary去替換名稱
