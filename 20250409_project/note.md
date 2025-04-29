@@ -21,7 +21,7 @@
 
 - 其他項目，例如後端
     - (已修正) 整理資料庫匯入程式碼
-    - (已嘗試改善) 解決開啟多個Excel檔案時會出錯的問題
+    - (已修正) 解決開啟多個Excel檔案時會出錯的問題，是因為 ImporterStandard 那邊又定義一次xlApp導致，從外面的Sub傳進去之後就沒問題了。
     - (已修正) 後端增加 CloseRate
     - (已修正) 加入處理 F2 後端
     - (已修正) 加入處理 F2 前端
@@ -34,8 +34,9 @@
     - (已修正) 建立完整Log管理機制
     - (已完成) 加入錯誤處理
     - (已修正) 清理欄位時，有些資料表會新增空白資料
-    - 減損後端匯入的時候，會漏掉 AC債務工具投資-公債-中央政府(? 這張表沒有匯入，需將已經匯入的資料庫重新跑一次
+    - (已修正) 減損後端匯入的時候，會漏掉 AC債務工具投資-公債-中央政府(? 這張表沒有匯入，需將已經匯入的資料庫重新跑一次
     - 將每天的CloseRate匯入
+    - 有可能程序問題是ImporterStandard那邊的xlapp導致的，可以試看看
 
 
 
@@ -264,8 +265,9 @@ DataDate DataMonth DataMonthString
 
 
 - 20250428 Work
+    - Check ai602 fm10 來源報表及計算
     1. 建立台幣Access資料表
-        a. 完成DB column mapping
+        a. 完成DB column mapping 
         
         1.2 清洗資料表資料，欄位%調整和餘額欄位整併，另外還有利率敏感性分析的表
     2. 建立AccountCode Pair ReportType
@@ -276,11 +278,14 @@ DataDate DataMonth DataMonthString
     6. 台幣有些欄位資料需要人工輸入，可能放在Setting頁面，VBA操控Control頁面清除必要填入欄位資料，程式碼在剛運行時，檢核相關欄位是否填入，如果沒有填入則強制中止Sub運行
     7. 
 
-
-    處理外幣債表ValuationType欄位，寫一個for迴圈，然後看是不是要寫一個dictionary去替換名稱
-    減損的表也需要處理，寫for迴圈去逐一處理
-    至於要使用的主要名稱以餘額C名稱為主
-
+    - 修改Valuation MapTable:步驟
+        1. 減損及外幣債表加入新增欄位
+        2. 修改 DBsColTable 欄位
+        3. 修改FilePaths
+        4. 修改程式碼
+        5. 更新rawFile資料
+        6. Create Configuration Data
+        7. 點擊更新按鈕
 
     外幣需要處理的報表
     AI602
@@ -295,26 +300,27 @@ DataDate DataMonth DataMonthString
 
 
 
+- 說明整個運作流程
+    1. 原始批次、資通、外幣債等檔案在哪邊，資料呈現如何。
+    2. 原始檔案放在Relation\RawData\項下，更改檔名為正確格式。
+    3. 開啟Access的Configuration Form表單，填入ReportDataDate(輸入原始報表資料日期，日期格式為 YYYY/MM/DD，例如: 2025/2/27)，按Tab後ReportMonth會自動填入為月底日期，RawFilePath和CopyFilePath為原始檔案路徑和複製檔案路徑(複製檔案路徑中的檔案後續會清理為正規格式)
+    4. 填妥後滑鼠點擊更新Configuration，會在Configuration資料表中加入一筆設定資料(後續打開Access之後預設值會抓取這筆資料內容)，並將RawFilePath中的檔案複製一份到CopyFilePath
+    5. 點擊【上傳至Access DB】後即開始批次清洗Excel檔案為正規格式並匯入Access資料庫中。
+
+    1. 匯入CloseRate，進入CloseRate Form，填入關帳匯率日期及完整檔案路徑，點擊【Update Close Rate】
+
+    1. 資料表欄位統整資料Excel檔，以及批次建立資料表腳本，相關欄位名稱及資料類型等可以參考，如果有需要再調整也可以參考。
+
+    1. Log檔放哪邊
+
+    1. Table BankDirectory 外幣拆款報表，要填報和那些銀行程作多少金額會用到
+        DBsColTable 為彙整所有資料表欄位，這個欄位也需要更新，因為會影響到最後匯入資料庫的資料表名稱。
+        FilePath就是要設定想要清理和匯入資料庫的報表名稱
+        FXDebtReferCountry 為FM13建立的資料表，因為相關table沒辦法篩出外幣債是哪個國家發行，這邊只能手動填入
+
+        MonthlyDeclarationReport 為產製申報報表填報的欄位和值的資料
+
+    2. 前端產生報表，
 
 
 
-FVPL_GovBond_Foreign
-FVPL_GovBond_Foreign
-FVPL_CompanyBond_Foreign
-FVPL_CompanyBond_Foreign
-FVPL_FinancialBond_Foreign
-FVOCI_GovBond_Foreign
-FVOCI_CompanyBond_Foreign
-FVOCI_CompanyBond_Foreign
-FVOCI_FinancialBond_Foreign
-AC_GovBond_Foreign
-AC_CompanyBond_Foreign
-AC_CompanyBond_Foreign
-AC_FinancialBond_Foreign
-
-
-外幣債表
-AH
-
-減損
-L
