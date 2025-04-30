@@ -123,3 +123,28 @@ Public Sub ICleaner_additionalClean(ByVal fullFilePath As String, _
                                     ByVal xlApp As Excel.Application)
     'implement operations here
 End Sub
+
+
+
+債券交易明細表
+統一編號 F
+
+債券風險部位餘額
+NO
+
+CBAS BUY
+NO
+
+CBAS SELL
+NO
+
+票券交易明細表
+統一編號 F O P
+萬元單價/票載利率 T 需刪除%
+
+債券評價表
+NO
+
+票券評價表
+NO
+
