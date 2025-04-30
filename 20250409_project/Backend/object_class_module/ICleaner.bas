@@ -1,5 +1,13 @@
 Option Compare Database
 
+Public Function HasFile() As Boolean
+    hasFile = clsHasFile
+End Function
+
+Public Function HasData() As Boolean
+    hasData = clsHasData
+End Function
+
 Public Sub Initialize(Optional ByVal sheetName As Variant = 1, _
                       Optional ByVal loopColumn As Integer = 1, _
                       Optional ByVal leftToDelete As Integer = 2, _
@@ -10,7 +18,8 @@ Public Sub Initialize(Optional ByVal sheetName As Variant = 1, _
 End Sub
 
 Public Sub CleanReport(ByVal fullFilePath As String, _
-                       ByVal cleaningType As String)
+                       ByVal cleaningType As String, _
+                       ByVal xlApp As Excel.Application)
     'implement operations here
 End Sub
 
@@ -18,6 +27,7 @@ Public Sub additionalClean(ByVal fullFilePath As String, _
                            ByVal cleaningType As String, _
                            ByVal dataDate As Date, _
                            ByVal dataMonth As Date, _
-                           ByVal dataMonthString As String)
+                           ByVal dataMonthString As String, _
+                           ByVal xlApp As Excel.Application)
     'implement operations here
 End Sub
