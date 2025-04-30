@@ -10,6 +10,17 @@ Private clsRightToDelete As Integer
 Private clsRowsToDelete As Variant
 Private clsColsToDelete As Variant
 
+Private clsHasFile As Boolean
+Private clsHasData As Boolean
+
+Public Function ICleaner_HasFile() As Boolean
+    ICleaner_HasFile = clsHasFile
+End Function
+
+Public Function ICleaner_HasData() As Boolean
+    ICleaner_HasData = clsHasData
+End Function
+
 Public Sub ICleaner_Initialize(Optional ByVal sheetName As Variant = 1, _
                                Optional ByVal loopColumn As Integer = 1, _
                                Optional ByVal leftToDelete As Integer = 2, _
@@ -25,8 +36,8 @@ Public Sub ICleaner_Initialize(Optional ByVal sheetName As Variant = 1, _
 End Sub
 
 Public Sub ICleaner_CleanReport(ByVal fullFilePath As String, _
-                                ByVal cleaningType As String)
-    Dim xlApp As Excel.Application
+                                ByVal cleaningType As String, _
+                                ByVal xlApp As Excel.Application)
     Dim xlbk As Excel.Workbook
     Dim xlsht As Excel.Worksheet
     Dim i As Long, lastRow As Long
@@ -41,12 +52,15 @@ Public Sub ICleaner_CleanReport(ByVal fullFilePath As String, _
 
     ' 檢查檔案是否存在
     If Dir(fullFilePath) = "" Then
+        clsHasFile = False
         MsgBox "File does not exist in path: " & fullFilePath
+        WriteLog "File does not exist in path: " & fullFilePath
         Exit Sub
+    Else
+        clsHasFile = True
     End If
 
     ' 啟動 Excel 並開啟工作簿
-    Set xlApp = Excel.Application
     Set xlbk = xlApp.Workbooks.Open(fullFilePath)
     Set xlsht = xlbk.Sheets(clsSheetName)
 
@@ -56,6 +70,12 @@ Public Sub ICleaner_CleanReport(ByVal fullFilePath As String, _
     lastRow = xlsht.Cells(xlsht.Rows.Count, 1).End(xlUp).Row
     '**原來
     ' lastRow = xlsht.Cells(xlsht.Rows.Count, clsLoopColumn).End(xlUp).Row
+
+    If (lastRow > 1) Then
+        clsHasData = True
+    Else
+        clsHasData = False
+    End If
 
     ' 反向遍歷以刪除符合條件的列
     For i = lastRow To 2 Step -1
@@ -97,18 +117,20 @@ Public Sub ICleaner_CleanReport(ByVal fullFilePath As String, _
     xlbk.Close False
     Set xlsht = Nothing
     Set xlbk = Nothing
-    xlApp.Quit
-    Set xlApp = Nothing
 
-    MsgBox "完成清理 " & cleaningType & " ，路徑為: " & fullFilePath
-    Debug.Print "完成清理 " & cleaningType & " ，路徑為: " & fullFilePath
+    If clsHasFile And clsHasData Then
+        MsgBox "完成清理 " & cleaningType & " ，路徑為: " & fullFilePath
+        WriteLog "完成清理 " & cleaningType & " ，路徑為: " & fullFilePath
+        ' Debug.Print "完成清理 " & cleaningType & " ，路徑為: " & fullFilePath
+    End If
 End Sub
 
 Public Sub ICleaner_additionalClean(ByVal fullFilePath As String, _
                                     ByVal cleaningType As String, _
                                     ByVal dataDate As Date, _
                                     ByVal dataMonth As Date, _
-                                    ByVal dataMonthString As String)
+                                    ByVal dataMonthString As String, _
+                                    ByVal xlApp As Excel.Application)
     'implement operations here
 End Sub
 
