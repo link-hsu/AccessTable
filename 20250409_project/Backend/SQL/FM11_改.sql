@@ -146,6 +146,7 @@ INNER JOIN
     (
         SELECT
             OBU_AC5411B.DataID,
+            OBU_AC5411B.AccountCode,
             OBU_AC5411B.DataMonthString,
             OBU_AC5411B.MonthAmount
         FROM
@@ -196,6 +197,7 @@ INNER JOIN
     (
         SELECT
             OBU_AC5411B.DataID,
+            OBU_AC5411B.AccountCode,
             OBU_AC5411B.DataMonthString,
             OBU_AC5411B.MonthAmount
         FROM
@@ -237,8 +239,7 @@ FROM
 INNER JOIN
     (
         SELECT
-            OBU_AC5411B.DataID,
-            OBU_AC5411B.DataMonthString,
+            OBU_AC5411B.AccountCode,
             OBU_AC5411B.MonthAmount
         FROM
             OBU_AC5411B
