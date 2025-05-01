@@ -68,6 +68,22 @@ GROUP BY
     AccountCodeMap.AssetMeasurementType;
 
 
+SELECT
+    AccountCodeMap.AssetMeasurementType,
+    SUM(OBU_AC4620B.NetBalance) As SubtotalBalance
+FROM AccountCodeMap
+INNER JOIN
+    OBU_AC4620B
+ON
+    AccountCodeMap.AccountCode = OBU_AC4620B.AccountCode
+WHERE
+    AccountCodeMap.Category IN ("Cost" , "ValuationAdjust")
+    AND OBU_AC4620B.DataMonthString = "2024/11"
+    AND OBU_AC4620B.CurrencyType = "CNY"
+GROUP BY
+    AccountCodeMap.AssetMeasurementType;
+
+
 
 PARAMETERS DataMonthParam TEXT;
 SELECT
@@ -85,6 +101,23 @@ ON
     AccountCodeMap.AccountCode = oa.AccountCode
 WHERE
     AccountCodeMap.Category IN ('Cost' , 'ValuationAdjust')
+GROUP BY
+    AccountCodeMap.AssetMeasurementType;
+
+
+PARAMETERS DataMonthParam TEXT;
+SELECT
+    AccountCodeMap.AssetMeasurementType,
+    SUM(OBU_AC4620B.NetBalance) As SubtotalBalance
+FROM AccountCodeMap
+INNER JOIN
+    OBU_AC4620B
+ON
+    AccountCodeMap.AccountCode = OBU_AC4620B.AccountCode
+WHERE
+    AccountCodeMap.Category IN ('Cost' , 'ValuationAdjust')
+    AND OBU_AC4620B.DataMonthString = [DataMonthParam]
+    AND OBU_AC4620B.CurrencyType = "CNY"
 GROUP BY
     AccountCodeMap.AssetMeasurementType;
 
