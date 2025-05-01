@@ -324,3 +324,7 @@ DataDate DataMonth DataMonthString
 
 
 
+
+
+- AccountCodeMap 修改原來 AssetMeasurementSubType 為 AssetMeasurementType 和 增加 GroupFlag 欄位
+
