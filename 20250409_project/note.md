@@ -327,4 +327,7 @@ DataDate DataMonth DataMonthString
 
 
 - AccountCodeMap 修改原來 AssetMeasurementSubType 為 AssetMeasurementType 和 增加 GroupFlag 欄位
+- 已經改好外幣修改SQL
+- x還沒改好相對應修正前端代碼，可能要稍微核對一下名稱和欄位有沒有變動
+- 有關台幣清理部分已經完成
 
