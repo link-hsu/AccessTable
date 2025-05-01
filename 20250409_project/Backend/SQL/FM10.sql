@@ -1,4 +1,5 @@
 
+Old
 Query FM10_OBU_AC4603_LIST
 
 SELECT
@@ -56,10 +57,109 @@ WHERE
 
 
 
+New
+Query FM10_OBU_AC4603_LIST
+
+SELECT
+    OBU_AC4603.DataID,
+    OBU_AC4603.DataMonthString,
+    AccountCodeMap.AccountCode, 
+    AccountCodeMap.AccountTitle, 
+    OBU_AC4603.CurrencyType,
+    OBU_AC4603.NetBalance
+FROM 
+    AccountCodeMap
+INNER JOIN 
+    OBU_AC4603
+ON
+    AccountCodeMap.AccountCode = OBU_AC4603.AccountCode
+WHERE
+    AccountCodeMap.GroupFlag IN (1, 2)
+    AND AccountCodeMap.Category IN ("Cost" , "ValuationAdjust", "ImpairmentLoss", "otherFinancialAssets")
+    AND OBU_AC4603.CurrencyType = "USD" 
+    AND OBU_AC4603.DataMonthString = "2024/11";
+
+
+SELECT
+    oa.DataID,
+    oa.DataMonthString,
+    AccountCodeMap.AccountCode, 
+    AccountCodeMap.AccountTitle, 
+    oa.CurrencyType,
+    oa.NetBalance
+FROM 
+    AccountCodeMap
+INNER JOIN 
+    (
+        SELECT
+            OBU_AC4603.DataID,
+            OBU_AC4603.DataMonthString,
+            OBU_AC4603.CurrencyType,
+            OBU_AC4603.NetBalance
+        FROM 
+            OBU_AC4603
+        WHERE
+            OBU_AC4603.CurrencyType = "USD" 
+            AND OBU_AC4603.DataMonthString = "2024/11"
+    ) AS oa
+ON
+    AccountCodeMap.AccountCode = oa.AccountCode
+WHERE
+    AccountCodeMap.GroupFlag IN (1, 2)
+    AND AccountCodeMap.Category IN ("Cost" , "ValuationAdjust", "ImpairmentLoss", "otherFinancialAssets");
+
+
+PARAMETERS DataMonthParam TEXT;
+SELECT
+    OBU_AC4603.DataID,
+    OBU_AC4603.DataMonthString,
+    AccountCodeMap.AccountCode, 
+    AccountCodeMap.AccountTitle, 
+    OBU_AC4603.CurrencyType,
+    OBU_AC4603.NetBalance
+FROM 
+    AccountCodeMap
+INNER JOIN 
+    OBU_AC4603
+ON
+    AccountCodeMap.AccountCode = OBU_AC4603.AccountCode
+WHERE
+    AccountCodeMap.GroupFlag IN (1, 2)
+    AND AccountCodeMap.Category IN ("Cost" , "ValuationAdjust", "ImpairmentLoss", "otherFinancialAssets")
+    AND OBU_AC4603.CurrencyType = "USD" 
+    AND OBU_AC4603.DataMonthString = [DataMonthParam];
 
 
 
-new version add FVPL
+SELECT
+    oa.DataID,
+    oa.DataMonthString,
+    AccountCodeMap.AccountCode, 
+    AccountCodeMap.AccountTitle, 
+    oa.CurrencyType,
+    oa.NetBalance
+FROM 
+    AccountCodeMap
+INNER JOIN 
+    (
+        SELECT
+            OBU_AC4603.DataID,
+            OBU_AC4603.DataMonthString,
+            OBU_AC4603.CurrencyType,
+            OBU_AC4603.NetBalance
+        FROM 
+            OBU_AC4603
+        WHERE
+            OBU_AC4603.CurrencyType = "USD" 
+            AND OBU_AC4603.DataMonthString = [DataMonthParam]
+    ) AS oa
+ON
+    AccountCodeMap.AccountCode = oa.AccountCode
+WHERE
+    AccountCodeMap.GroupFlag IN (1, 2)
+    AND AccountCodeMap.Category IN ("Cost" , "ValuationAdjust", "ImpairmentLoss", "otherFinancialAssets");
+
+Old version add FVPL
 Query FM10_OBU_AC4603_Subtotal
 
 SELECT 
@@ -142,4 +242,91 @@ GROUP BY
       )
     )
   );
+
+
+
+
+New version add FVPL
+Query FM10_OBU_AC4603_Subtotal
+
+SELECT 
+  AccountCodeMap.AssetMeasurementType & "_" & AccountCodeMap.Category AS MeasurementCategory,
+  Sum(OBU_AC4603.NetBalance) AS SubtotalBalance
+FROM
+    AccountCodeMap
+INNER JOIN
+    OBU_AC4603
+ON
+    AccountCodeMap.AccountCode = OBU_AC4603.AccountCode
+WHERE
+    AccountCodeMap.Category IN ("Cost" , "ValuationAdjust", "ImpairmentLoss")
+    AND OBU_AC4603.CurrencyType = "USD"
+    AND OBU_AC4603.DataMonthString = "2024/11"
+GROUP BY
+    AccountCodeMap.AssetMeasurementType, AccountCodeMap.Category;
+
+PARAMETERS DataMonthParam TEXT;
+SELECT 
+  AccountCodeMap.AssetMeasurementType & "_" & AccountCodeMap.Category AS MeasurementCategory,
+  Sum(OBU_AC4603.NetBalance) AS SubtotalBalance
+FROM
+    AccountCodeMap
+INNER JOIN
+    OBU_AC4603
+ON
+    AccountCodeMap.AccountCode = OBU_AC4603.AccountCode
+WHERE
+    AccountCodeMap.Category IN ("Cost" , "ValuationAdjust", "ImpairmentLoss")
+    AND OBU_AC4603.CurrencyType = "USD"
+    AND OBU_AC4603.DataMonthString = [DataMonthParam]
+GROUP BY
+    AccountCodeMap.AssetMeasurementType, AccountCodeMap.Category;
+
+=================================================
+
+SELECT 
+  AccountCodeMap.AssetMeasurementType & "_" & AccountCodeMap.Category AS MeasurementCategory,
+  Sum(oa.NetBalance) AS SubtotalBalance
+FROM
+    AccountCodeMap
+INNER JOIN
+    (
+        SELECT
+            OBU_AC4603.AccountCode,
+            OBU_AC4603.NetBalance
+        FROM OBU_AC4603
+        WHERE
+            OBU_AC4603.CurrencyType = "USD"
+            AND OBU_AC4603.DataMonthString = "2024/11"
+    ) AS oa
+ON
+    AccountCodeMap.AccountCode = oa.AccountCode
+WHERE
+    AccountCodeMap.Category IN ("Cost" , "ValuationAdjust", "ImpairmentLoss")
+GROUP BY
+    AccountCodeMap.AssetMeasurementType, AccountCodeMap.Category;
+
+PARAMETERS DataMonthParam TEXT;
+SELECT 
+  AccountCodeMap.AssetMeasurementType & "_" & AccountCodeMap.Category AS MeasurementCategory,
+  Sum(oa.NetBalance) AS SubtotalBalance
+FROM
+    AccountCodeMap
+INNER JOIN
+    (
+        SELECT
+            OBU_AC4603.AccountCode,
+            OBU_AC4603.NetBalance
+        FROM OBU_AC4603
+        WHERE
+            OBU_AC4603.CurrencyType = "USD"
+            AND OBU_AC4603.DataMonthString = [DataMonthParam]
+    ) AS oa
+ON
+    AccountCodeMap.AccountCode = oa.AccountCode
+WHERE
+    AccountCodeMap.Category IN ("Cost" , "ValuationAdjust", "ImpairmentLoss")
+GROUP BY
+    AccountCodeMap.AssetMeasurementType, AccountCodeMap.Category;
+
 
