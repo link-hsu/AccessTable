@@ -430,3 +430,7 @@ End Sub
 
 
 https://chatgpt.com/share/68138b9d-51e4-8010-be2c-2001dbe48f81
+
+
+
+https://chatgpt.com/share/681598d8-7184-8010-b50a-0d6d55ca7dc7
