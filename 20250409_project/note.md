@@ -325,9 +325,63 @@ DataDate DataMonth DataMonthString
 
 
 
-
+這是說在家裡面做的
 - AccountCodeMap 修改原來 AssetMeasurementSubType 為 AssetMeasurementType 和 增加 GroupFlag 欄位
 - 已經改好外幣修改SQL
 - x還沒改好相對應修正前端代碼，可能要稍微核對一下名稱和欄位有沒有變動
 - 有關台幣清理部分已經完成
 
+
+
+
+
+
+
+
+
+每月匯入資料庫(Access)使用流程(Access檔案路徑為:):
+1.下載製作報表所需原始資料:批次檔案、資通檔案、外幣債評估表、減損表(檔案置放於共用資料夾路徑:Relation\RawData\)。
+2.修改檔案名稱為符合固定格式:報表名稱_yyyymmdd.副檔名(其中yyyymmdd為月底最後一工作日)(資通下載報表及以民國命名報表須修改)。
+3.開啟共用資料夾Access檔案(預設檔案開啟頁面為Configuration表單，可於Access左側找到該表單)，預設可輸入ReportDataDate或ReportMonth切換方式:
+    a.ReportDataDate: 輸入原始資料日期yyyy/mm/dd，即月底工作日(例如:2025/02/27)(需與流程2檔名年月日一致)，點擊Tab鍵ReportMonth會自動填入月底日期。
+    b.ReportMonth: 輸入年月份yyyy/mm(例如:2025/02)，點擊Tab鍵ReportDataDate會自動填入月底工作日。
+補充:(1)後續篩選資料時間區別係以DataMonthString欄位判斷。
+4.填妥後點擊【更新Configuration】按鈕，此時會在Configuration資料表建立一筆設定資料(開啟Configuration表單預設填入資料會抓取最新那筆設定資料)，並將RawFilePath中的檔案複製一份到CopyFilePath(RawFilePath檔案不會異動，CopyFilePath檔案會清理為正規格式)。
+5.先行確認FilePath資料表包含所有要匯入之報表，後點擊【上傳至Access DB】即開始批次清洗Excel檔案為正規格式並匯入Access資料庫中，出現執行完畢視窗後，確認資料庫表單資料是否匯入。
+
+關帳匯率CloseRate匯入資料庫使用流程:
+1.點擊Access左側【CloseRate表單】，輸入要匯入之關帳匯率西元年月日及完整檔案路徑後，點擊【Update Close Rate】，視窗顯示XXXX即更新完成。
+
+前端製作報表(Excel)使用流程(Excel檔案路徑為:):
+1.複製共用資料夾路徑中的XX檔案一份於本地端，開啟Excel檔案，切換分頁為Controll分頁，點擊執行按鈕，於視窗輸入申報西元年月份(月份需補0，例如:2025/01)。
+2.EmptyReport資料夾為空白申報檔，OutputReport資料夾為執行後產生之申報檔；Control頁面為相關配置設定，包含Access資料庫檔名、空白申報檔路徑等等；一個分頁代表申報的一個檔案，執行後會抓取Access已建立查找報表(Query)顯示於Excel，紀錄相關需填報分頁及欄位名稱與填報數值，後將相關填報報表名稱、欄位及其值新增至【MonthlyDeclarationReport】資料表中。
+
+UI部分只是方便先這樣配置沒有多想，有更好的想法可以再修改
+
+資料檢核部分還沒做
+
+還需要更多測試
+
+比較重要的表
+BankDirectory: 外幣部分有關拆款報表，需填寫銀行Code，由原始報表中的SWIFT CODE關聯拉取資料。
+DBsColTable: 彙整所有資料表及欄位資訊的表，在匯入資料庫前需拉取這邊資料資料表欄位名稱(順序會影響資料表是否正確匯入，IMPORT程序會檢核Excel Row1名稱是否和資料表欄位名稱一致)。
+FilePath: 設定需匯入資料庫之報表名稱、檔名及副檔名。
+FXDebtReferCountry: 為FM13所建立資料表，因為原始資料table沒辦法篩出外幣債是哪個國家發行，這邊只能手動填入。
+
+
+Log檔案路徑、
+快速帶一下前端的原始碼，帶一下如果後續要改要怎麼改，例如有新增欄位Excel欄位設定、class欄位設定、修改Process報表名稱內容、有必要時修改Access Query；例如新增報表: Excel增加分頁、Class新增Case設定欄位、Array增加報表、新增Process報表名稱Sub(報表製作處理邏輯)、新增Access Query。等等...資料庫匯入那邊要在繼續寫
+
+彙整的對照表(比較Account Code寫死在SQL中和使用另一張表集中管理差異比較，才不會改死人，又容易漏掉；優點有一個人集中管理可以同時修改所有相關表單資料，可能比較熟的經辦直接修改那邊的資料，那個對照關係可能關連到不同人的表單，有好有壞，有些人習慣都自己控，這樣可能會對自己手上表單有沒辦法掌控的異動。我現在就是先整理一個版本，可能也會有錯，還需要更多討論)
+
+
+
+待辦事項:
+1.修改台幣債資料庫匯入事項
+2.統一使用統整表SQL問題
+3.共用Function拉取彙整報表資料、關帳匯率
+4.確認修改後的SQL沒問題
+5.確認再那台主機上可以使用
+6.確認整個流程沒問題，Access放在共用資料夾，Excel放在本地端
+7.有關彙整表，是否可以建立一個介面，現有選單是下拉式選單，選取之後可以建立SQL可否達成，或是方便觀看也可以(可能中間還有一堆判斷篩選邏輯)；新增項目的功能。可能有些人習慣自己用自己的，或是統一由比較有經驗的人去控管
+8.針對控管部分一個是沒遇過的就直接擋掉；另一種是設定增幅控，同樣是否可以製作一個表單去控制
