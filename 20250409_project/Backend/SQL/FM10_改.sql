@@ -1,4 +1,3 @@
-
 Old
 Query FM10_OBU_AC4603_LIST
 
@@ -74,11 +73,10 @@ INNER JOIN
 ON
     AccountCodeMap.AccountCode = OBU_AC4603.AccountCode
 WHERE
-    AccountCodeMap.GroupFlag IN (1, 2)
-    AND AccountCodeMap.Category IN ("Cost" , "ValuationAdjust", "ImpairmentLoss", "otherFinancialAssets")
-    AND OBU_AC4603.CurrencyType = "USD" 
-    AND OBU_AC4603.DataMonthString = "2024/11";
-
+    AccountCodeMap.GroupFlag = '外幣債'
+    AND AccountCodeMap.Category IN ('Cost' , 'ValuationAdjust', 'ImpairmentLoss', 'otherFinancialAssets')
+    AND OBU_AC4603.CurrencyType = 'USD' 
+    AND OBU_AC4603.DataMonthString = '2024/11';
 
 SELECT
     oa.DataID,
@@ -95,18 +93,20 @@ INNER JOIN
             OBU_AC4603.DataID,
             OBU_AC4603.DataMonthString,
             OBU_AC4603.CurrencyType,
-            OBU_AC4603.NetBalance
+            OBU_AC4603.NetBalance,
+            OBU_AC4603.AccountCode
         FROM 
             OBU_AC4603
         WHERE
-            OBU_AC4603.CurrencyType = "USD" 
-            AND OBU_AC4603.DataMonthString = "2024/11"
+            OBU_AC4603.CurrencyType = 'USD' 
+            AND OBU_AC4603.DataMonthString = '2024/11'
     ) AS oa
 ON
     AccountCodeMap.AccountCode = oa.AccountCode
 WHERE
-    AccountCodeMap.GroupFlag IN (1, 2)
-    AND AccountCodeMap.Category IN ("Cost" , "ValuationAdjust", "ImpairmentLoss", "otherFinancialAssets");
+    AccountCodeMap.GroupFlag = '外幣債'
+    AND AccountCodeMap.Category IN ('Cost' , 'ValuationAdjust', 'ImpairmentLoss', 'otherFinancialAssets');
+
 
 
 PARAMETERS DataMonthParam TEXT;
@@ -124,13 +124,13 @@ INNER JOIN
 ON
     AccountCodeMap.AccountCode = OBU_AC4603.AccountCode
 WHERE
-    AccountCodeMap.GroupFlag IN (1, 2)
-    AND AccountCodeMap.Category IN ("Cost" , "ValuationAdjust", "ImpairmentLoss", "otherFinancialAssets")
-    AND OBU_AC4603.CurrencyType = "USD" 
+    AccountCodeMap.GroupFlag = '外幣債'
+    AND AccountCodeMap.Category IN ('Cost' , 'ValuationAdjust', 'ImpairmentLoss', 'otherFinancialAssets')
+    AND OBU_AC4603.CurrencyType = 'USD' 
     AND OBU_AC4603.DataMonthString = [DataMonthParam];
 
 
-
+PARAMETERS DataMonthParam TEXT;
 SELECT
     oa.DataID,
     oa.DataMonthString,
@@ -146,19 +146,22 @@ INNER JOIN
             OBU_AC4603.DataID,
             OBU_AC4603.DataMonthString,
             OBU_AC4603.CurrencyType,
-            OBU_AC4603.NetBalance
+            OBU_AC4603.NetBalance,
+            OBU_AC4603.AccountCode
         FROM 
             OBU_AC4603
         WHERE
-            OBU_AC4603.CurrencyType = "USD" 
+            OBU_AC4603.CurrencyType = 'USD' 
             AND OBU_AC4603.DataMonthString = [DataMonthParam]
     ) AS oa
 ON
     AccountCodeMap.AccountCode = oa.AccountCode
 WHERE
-    AccountCodeMap.GroupFlag IN (1, 2)
-    AND AccountCodeMap.Category IN ("Cost" , "ValuationAdjust", "ImpairmentLoss", "otherFinancialAssets");
+    AccountCodeMap.GroupFlag = '外幣債'
+    AND AccountCodeMap.Category IN ('Cost' , 'ValuationAdjust', 'ImpairmentLoss', 'otherFinancialAssets');
 
+-- ============================================================
+-- ============================================================
 Old version add FVPL
 Query FM10_OBU_AC4603_Subtotal
 
@@ -259,7 +262,7 @@ INNER JOIN
 ON
     AccountCodeMap.AccountCode = OBU_AC4603.AccountCode
 WHERE
-    AccountCodeMap.Category IN ("Cost" , "ValuationAdjust", "ImpairmentLoss")
+    AccountCodeMap.Category IN ("Cost" , "ValuationAdjust", "ImpairmentLoss", 'OSU')
     AND OBU_AC4603.CurrencyType = "USD"
     AND OBU_AC4603.DataMonthString = "2024/11"
 GROUP BY
@@ -276,7 +279,7 @@ INNER JOIN
 ON
     AccountCodeMap.AccountCode = OBU_AC4603.AccountCode
 WHERE
-    AccountCodeMap.Category IN ("Cost" , "ValuationAdjust", "ImpairmentLoss")
+    AccountCodeMap.Category IN ("Cost" , "ValuationAdjust", "ImpairmentLoss", 'OSU')
     AND OBU_AC4603.CurrencyType = "USD"
     AND OBU_AC4603.DataMonthString = [DataMonthParam]
 GROUP BY
@@ -302,7 +305,7 @@ INNER JOIN
 ON
     AccountCodeMap.AccountCode = oa.AccountCode
 WHERE
-    AccountCodeMap.Category IN ("Cost" , "ValuationAdjust", "ImpairmentLoss")
+    AccountCodeMap.Category IN ("Cost" , "ValuationAdjust", "ImpairmentLoss", 'OSU')
 GROUP BY
     AccountCodeMap.AssetMeasurementType, AccountCodeMap.Category;
 
@@ -319,14 +322,12 @@ INNER JOIN
             OBU_AC4603.NetBalance
         FROM OBU_AC4603
         WHERE
-            OBU_AC4603.CurrencyType = "USD"
+            OBU_AC4603.CurrencyType = 'USD'
             AND OBU_AC4603.DataMonthString = [DataMonthParam]
     ) AS oa
 ON
     AccountCodeMap.AccountCode = oa.AccountCode
 WHERE
-    AccountCodeMap.Category IN ("Cost" , "ValuationAdjust", "ImpairmentLoss")
+    AccountCodeMap.Category IN ('Cost' , 'ValuationAdjust', 'ImpairmentLoss', 'OSU')
 GROUP BY
     AccountCodeMap.AssetMeasurementType, AccountCodeMap.Category;
-
-
