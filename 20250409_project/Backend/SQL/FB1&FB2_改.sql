@@ -15,8 +15,8 @@ INNER JOIN
 ON 
     OBU_AC4620B.AccountCode = ACCAccount.AccountCode
 WHERE 
-    OBU_AC4620B.AccountCode IN ("115037101", "115037105", "115037115", "130152771", "130152773", "130152777") 
-    AND OBU_AC4620B.CurrencyType = "CNY" 
+    OBU_AC4620B.AccountCode IN ('115037101', '115037105', '115037115', '130152771', '130152773', '130152777') 
+    AND OBU_AC4620B.CurrencyType = 'CNY' 
     AND OBU_AC4620B.DataMonthString = [DataMonthParam];
     
 
@@ -35,9 +35,9 @@ INNER JOIN
 ON 
     d.AccountCode = a.AccountCode
 WHERE     
-    d.AccountCode IN ("115037101", "115037105", "115037115", "130152771", "130152773", "130152777") 
-    AND d.CurrencyType = "CNY" 
-    AND d.DataMonthString = "2024/11";
+    d.AccountCode IN ('115037101', '115037105', '115037115', '130152771', '130152773', '130152777') 
+    AND d.CurrencyType = 'CNY' 
+    AND d.DataMonthString = '2024/11';
 
 
 
@@ -47,29 +47,32 @@ WHERE
 
 New
 Query FB1_OBU_AC4620B_Subtotal
-
+-----------------------------------------------------
 
 SELECT
-    AccountCodeMap.AssetMeasurementType,
+    AccountCodeMap.AssetMeasurementType & "_" & AccountCodeMap.Category AS MeasurementCategory,
     SUM(oa.NetBalance) As SubtotalBalance
 FROM AccountCodeMap
 INNER JOIN
     (
         SELECT OBU_AC4620B.AccountCode, OBU_AC4620B.NetBalance
         FROM OBU_AC4620B
-        WHERE OBU_AC4620B.DataMonthString = "2024/11"
-        AND OBU_AC4620B.CurrencyType = "CNY"
+        WHERE OBU_AC4620B.DataMonthString = '2024/11'
+        AND OBU_AC4620B.CurrencyType = 'CNY'
     ) AS oa
 ON
     AccountCodeMap.AccountCode = oa.AccountCode
 WHERE
-    AccountCodeMap.Category IN ("Cost" , "ValuationAdjust")
+    AccountCodeMap.Category IN ('Cost' , 'ValuationAdjust')
+    AND AccountCodeMap.GroupFlag = '外幣債'
 GROUP BY
-    AccountCodeMap.AssetMeasurementType;
+    AccountCodeMap.AssetMeasurementType, AccountCodeMap.Category;
 
+
+-------------------------------------------------------
 
 SELECT
-    AccountCodeMap.AssetMeasurementType,
+    AccountCodeMap.AssetMeasurementType & "_" & AccountCodeMap.Category AS MeasurementCategory,
     SUM(OBU_AC4620B.NetBalance) As SubtotalBalance
 FROM AccountCodeMap
 INNER JOIN
@@ -78,16 +81,17 @@ ON
     AccountCodeMap.AccountCode = OBU_AC4620B.AccountCode
 WHERE
     AccountCodeMap.Category IN ("Cost" , "ValuationAdjust")
+    AND AccountCodeMap.GroupFlag = '外幣債'
     AND OBU_AC4620B.DataMonthString = "2024/11"
     AND OBU_AC4620B.CurrencyType = "CNY"
 GROUP BY
-    AccountCodeMap.AssetMeasurementType;
+    AccountCodeMap.AssetMeasurementType, AccountCodeMap.Category;
 
-
+-------------------------------------------------------
 
 PARAMETERS DataMonthParam TEXT;
 SELECT
-    AccountCodeMap.AssetMeasurementType,
+    AccountCodeMap.AssetMeasurementType & "_" & AccountCodeMap.Category AS MeasurementCategory,
     SUM(oa.NetBalance) As SubtotalBalance
 FROM AccountCodeMap
 INNER JOIN
@@ -101,13 +105,16 @@ ON
     AccountCodeMap.AccountCode = oa.AccountCode
 WHERE
     AccountCodeMap.Category IN ('Cost' , 'ValuationAdjust')
+    AND AccountCodeMap.GroupFlag = '外幣債'
 GROUP BY
-    AccountCodeMap.AssetMeasurementType;
+    AccountCodeMap.AssetMeasurementType, AccountCodeMap.Category;
 
+
+-------------------------------------------------------
 
 PARAMETERS DataMonthParam TEXT;
 SELECT
-    AccountCodeMap.AssetMeasurementType,
+    AccountCodeMap.AssetMeasurementType & "_" & AccountCodeMap.Category AS MeasurementCategory,
     SUM(OBU_AC4620B.NetBalance) As SubtotalBalance
 FROM AccountCodeMap
 INNER JOIN
@@ -116,12 +123,13 @@ ON
     AccountCodeMap.AccountCode = OBU_AC4620B.AccountCode
 WHERE
     AccountCodeMap.Category IN ('Cost' , 'ValuationAdjust')
+    AND AccountCodeMap.GroupFlag = '外幣債'
     AND OBU_AC4620B.DataMonthString = [DataMonthParam]
     AND OBU_AC4620B.CurrencyType = "CNY"
 GROUP BY
-    AccountCodeMap.AssetMeasurementType;
+    AccountCodeMap.AssetMeasurementType, AccountCodeMap.Category;
 
-
+-------------------------------------------------------
 
 Old
 Query FB1_OBU_AC4620B_Subtotal
