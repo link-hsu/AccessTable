@@ -34,6 +34,7 @@ Public Sub Main()
     gDataMonthStringROC_F1F2 = ConvertToROCFormat(gDataMonthString, "F1F2")
     ' 設定其他 config 參數（請根據實際環境調整）
     gDBPath = ThisWorkbook.Path & "\" & ThisWorkbook.Sheets("ControlPanel").Range("DBsPathFileName").Value
+    ' gDBPath = "\\10.10.122.40\後台作業\99_個人資料夾\8.修豪\" & ThisWorkbook.Sheets("ControlPanel").Range("DBsPathFileName").Value
     ' 空白報表路徑
     gReportFolder = ThisWorkbook.Path & "\" & ThisWorkbook.Sheets("ControlPanel").Range("EmptyReportPath").Value
     ' 產生之申報報表路徑
@@ -300,8 +301,8 @@ Public Sub Process_FB2()
 
     '=== Paste Queyr Table into Excel ===
     If Err.Number <> 0 Or LBound(dataArr) > UBound(dataArr) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable & " 資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable & " 資料表無資料"
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable & " 資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable & " 資料表無資料"
     Else
         For j = 0 To UBound(dataArr, 2)
             For i = 0 To UBound(dataArr, 1)
@@ -330,9 +331,13 @@ Public Sub Process_FB2()
     For Each rng In rngs
         If CStr(rng.Value) = "115037101" Then
             loanAmount = loanAmount + rng.Offset(0, 2).Value
+        ElseIf CStr(rng.Value) = "115037105" Then
+            loanAmount = loanAmount + rng.Offset(0, 2).Value
         ElseIf CStr(rng.Value) = "115037115" Then
             loanAmount = loanAmount + rng.Offset(0, 2).Value
         ElseIf CStr(rng.Value) = "130152771" Then
+            loanInterest = loanInterest + rng.Offset(0, 2).Value
+        ElseIf CStr(rng.Value) = "130152773" Then
             loanInterest = loanInterest + rng.Offset(0, 2).Value
         ElseIf CStr(rng.Value) = "130152777" Then
             loanInterest = loanInterest + rng.Offset(0, 2).Value
@@ -698,7 +703,8 @@ End Sub
 Public Sub Process_FM11()
     '=== Equal Setting ===
     'Fetch Query Access DB table
-    Dim dataArr As Variant
+    Dim dataArr_1 As Variant
+    Dim dataArr_2 As Variant
 
     'Declare worksheet and handle data
     Dim xlsht As Worksheet
@@ -707,32 +713,47 @@ Public Sub Process_FM11()
     Dim lastRow As Integer
 
     Dim reportTitle As String
-    Dim queryTable As String
+    Dim queryTable_1 As String
+    Dim queryTable_2 As String
 
     'Setting class clsReport
     Dim rpt As clsReport
     Set rpt = gReports("FM11")
     
     reportTitle = "FM11"
-    queryTable = "FM11_OBU_AC5411B"
+    queryTable_1 = "FM11_OBU_AC5411B"
+    queryTable_2 = "FM11_OBU_AC5411B_Subtotal"
 
     ' dataArr = GetAccessDataAsArray(gDBPath, queryTable, gDataMonthString)
-    dataArr = GetAccessDataAsArray(gDBPath, queryTable, gDataMonthString)
+    dataArr_1 = GetAccessDataAsArray(gDBPath, queryTable_1, gDataMonthString)
+    dataArr_2 = GetAccessDataAsArray(gDBPath, queryTable_2, gDataMonthString)
 
     Set xlsht = ThisWorkbook.Sheets(reportTitle)
     
     'Clear Excel Data
-    xlsht.Range("A:E").ClearContents
+    xlsht.Range("A:G").ClearContents
     xlsht.Range("T2:T100").ClearContents
 
     '=== Paste Queyr Table into Excel ===
-    If Err.Number <> 0 Or LBound(dataArr) > UBound(dataArr) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable & " 資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable & " 資料表無資料"
+    If Err.Number <> 0 Or LBound(dataArr_1) > UBound(dataArr_1) Then
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_1 & " 資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_1 & " 資料表無資料"
     Else
-        For j = 0 To UBound(dataArr, 2)
-            For i = 0 To UBound(dataArr, 1)
-                xlsht.Cells(i + 1, j + 1).Value = dataArr(i, j)
+        For j = 0 To UBound(dataArr_1, 2)
+            For i = 0 To UBound(dataArr_1, 1)
+                xlsht.Cells(i + 1, j + 1).Value = dataArr_1(i, j)
+            Next i
+        Next j
+    End If
+
+
+    If Err.Number <> 0 Or LBound(dataArr_2) > UBound(dataArr_2) Then
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_2 & " 資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_2 & " 資料表無資料"
+    Else
+        For j = 0 To UBound(dataArr_2, 2)
+            For i = 0 To UBound(dataArr_2, 1)
+                xlsht.Cells(i + 1, j + 6).Value = dataArr_2(i, j)
             Next i
         Next j
     End If
@@ -744,78 +765,60 @@ Public Sub Process_FM11()
     Dim rng As Range
 
     Dim foreignInterestRevenue As Double
+    Dim gainOnSecuritiesDisposal As Double
+    Dim lossOnSecuritiesDisposal As Double
     Dim reversalImpairmentPL As Double
     Dim valuationImpairmentLoss As Double
     Dim domesticInterestRevenue As Double
 
     foreignInterestRevenue = 0
+    gainOnSecuritiesDisposal = 0
+    lossOnSecuritiesDisposal = 0
     reversalImpairmentPL = 0
     valuationImpairmentLoss = 0
     domesticInterestRevenue = 0
     
-    lastRow = xlsht.Cells(xlsht.Rows.Count, 1).End(xlUp).Row
-    Set rngs = xlsht.Range("C2:C" & lastRow)
+    lastRow = xlsht.Cells(xlsht.Rows.Count, "F").End(xlUp).Row
+    Set rngs = xlsht.Range("F2:F" & lastRow)
 
     For Each rng In rngs
-        If CStr(rng.Value) = "410331203" Then
-            foreignInterestRevenue = foreignInterestRevenue + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "410331211" Then
-            foreignInterestRevenue = foreignInterestRevenue + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "410331212" Then
-            foreignInterestRevenue = foreignInterestRevenue + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "410331229" Then
-            foreignInterestRevenue = foreignInterestRevenue + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "410332203" Then
-            foreignInterestRevenue = foreignInterestRevenue + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "410332211" Then
-            foreignInterestRevenue = foreignInterestRevenue + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "410332212" Then
-            foreignInterestRevenue = foreignInterestRevenue + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "410332229" Then
-            foreignInterestRevenue = foreignInterestRevenue + rng.Offset(0, 2).Value
+        If CStr(rng.Value) = "InterestRevenue" Then
+            foreignInterestRevenue = foreignInterestRevenue + rng.Offset(0, 1).Value
+        
+        ElseIf CStr(rng.Value) = "GainOnDisposal" Then
+            gainOnSecuritiesDisposal = gainOnSecuritiesDisposal + rng.Offset(0, 1).Value
 
+        ElseIf CStr(rng.Value) = "LossOnDisposal" Then
+            lossOnSecuritiesDisposal = lossOnSecuritiesDisposal + rng.Offset(0, 1).Value
 
+        ElseIf CStr(rng.Value) = "ValuationProfit" Then
+            reversalImpairmentPL = reversalImpairmentPL + rng.Offset(0, 1).Value
 
-        ElseIf CStr(rng.Value) = "450110105" Then
-            reversalImpairmentPL = reversalImpairmentPL + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "450110125" Then
-            reversalImpairmentPL = reversalImpairmentPL + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "450110127" Then
-            reversalImpairmentPL = reversalImpairmentPL + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "450110143" Then
-            reversalImpairmentPL = reversalImpairmentPL + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "450130105" Then
-            reversalImpairmentPL = reversalImpairmentPL + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "450130125" Then
-            reversalImpairmentPL = reversalImpairmentPL + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "450130147" Then
-            reversalImpairmentPL = reversalImpairmentPL + rng.Offset(0, 2).Value
+        ' FVPL 金融資產評價損失
+        ElseIf CStr(rng.Value) = "ValuationLoss" Then
+            valuationImpairmentLoss = valuationImpairmentLoss + rng.Offset(0, 1).Value
 
-        ElseIf CStr(rng.Value) = "550110105" Then
-            valuationImpairmentLoss = valuationImpairmentLoss + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "550110125" Then
-            valuationImpairmentLoss = valuationImpairmentLoss + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "550110127" Then
-            valuationImpairmentLoss = valuationImpairmentLoss + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "550110143" Then
-            valuationImpairmentLoss = valuationImpairmentLoss + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "550130105" Then
-            valuationImpairmentLoss = valuationImpairmentLoss + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "550130127" Then
-            valuationImpairmentLoss = valuationImpairmentLoss + rng.Offset(0, 2).Value
-
-        ElseIf CStr(rng.Value) = "410997201" Then
-            domesticInterestRevenue = domesticInterestRevenue + rng.Offset(0, 2).Value
+        ' 拆放證券公司息 OSU
+        ElseIf CStr(rng.Value) = "OSU息" Then
+            domesticInterestRevenue = domesticInterestRevenue + rng.Offset(0, 1).Value
         End If
     Next rng
 
     foreignInterestRevenue = Round(foreignInterestRevenue / 1000, 0)
+    gainOnSecuritiesDisposal = Round(gainOnSecuritiesDisposal / 1000, 0)
+    lossOnSecuritiesDisposal = Round(lossOnSecuritiesDisposal / 1000, 0)
     reversalImpairmentPL = Round(reversalImpairmentPL / 1000, 0)
     valuationImpairmentLoss = Round(valuationImpairmentLoss / 1000, 0)
     domesticInterestRevenue = Round(domesticInterestRevenue / 1000, 0)
     
     xlsht.Range("FM11_一利息股息收入_利息_其他").Value = foreignInterestRevenue
     rpt.SetField "FOA", "FM11_一利息股息收入_利息_其他", CStr(foreignInterestRevenue)
+
+    xlsht.Range("FM11_三證券投資處分利益_一年期以上之債權證券").Value = gainOnSecuritiesDisposal
+    rpt.SetField "FOA", "FM11_三證券投資處分利益_一年期以上之債權證券", CStr(gainOnSecuritiesDisposal)
+
+    xlsht.Range("FM11_三證券投資處分損失_一年期以上之債權證券").Value = lossOnSecuritiesDisposal
+    rpt.SetField "FOA", "FM11_三證券投資處分損失_一年期以上之債權證券", CStr(lossOnSecuritiesDisposal)
 
     xlsht.Range("FM11_五證券投資評價及減損迴轉利益_一年期以上之債權證券").Value = reversalImpairmentPL
     rpt.SetField "FOA", "FM11_五證券投資評價及減損迴轉利益_一年期以上之債權證券", CStr(reversalImpairmentPL)
@@ -1311,8 +1314,8 @@ Public Sub Process_FB5()
 
     '=== Paste Queyr Table into Excel ===
     If Err.Number <> 0 Or LBound(dataArr) > UBound(dataArr) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable & " 資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable & " 資料表無資料"
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable & " 資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable & " 資料表無資料"
     Else
         For j = 0 To UBound(dataArr, 2)
             For i = 0 To UBound(dataArr, 1)
@@ -1485,8 +1488,8 @@ Public Sub Process_FM2()
 
     '=== Paste Queyr Table into Excel ===
     If Err.Number <> 0 Or LBound(dataArr_1) > UBound(dataArr_1) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable_1 & " 資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_1 & " 資料表無資料"
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_1 & " 資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_1 & " 資料表無資料"
     Else
         For j = 0 To UBound(dataArr_1, 2)
             For i = 0 To UBound(dataArr_1, 1)
@@ -1497,8 +1500,8 @@ Public Sub Process_FM2()
 
 
     If Err.Number <> 0 Or LBound(dataArr_2) > UBound(dataArr_2) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable_2 & " 資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_2 & " 資料表無資料"
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_2 & " 資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_2 & " 資料表無資料"
     Else
         For j = 0 To UBound(dataArr_2, 2)
             For i = 0 To UBound(dataArr_2, 1)
@@ -1509,8 +1512,8 @@ Public Sub Process_FM2()
 
 
     If Err.Number <> 0 Or LBound(dataArr_3) > UBound(dataArr_3) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable_3 & " 資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_3 & " 資料表無資料"
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_3 & " 資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_3 & " 資料表無資料"
     Else
         For j = 0 To UBound(dataArr_3, 2)
             For i = 0 To UBound(dataArr_3, 1)
@@ -1657,8 +1660,8 @@ Public Sub Process_FM10()
 
     '=== Paste Queyr Table into Excel ===
     If Err.Number <> 0 Or LBound(dataArr_1) > UBound(dataArr_1) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable_1 & " 資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_1 & " 資料表無資料"
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_1 & " 資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_1 & " 資料表無資料"
     Else
         For j = 0 To UBound(dataArr_1, 2)
             For i = 0 To UBound(dataArr_1, 1)
@@ -1669,8 +1672,8 @@ Public Sub Process_FM10()
 
 
     If Err.Number <> 0 Or LBound(dataArr_2) > UBound(dataArr_2) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable_2 & " 資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_2 & " 資料表無資料"
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_2 & " 資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_2 & " 資料表無資料"
     Else
         For j = 0 To UBound(dataArr_2, 2)
             For i = 0 To UBound(dataArr_2, 1)
@@ -1718,26 +1721,20 @@ Public Sub Process_FM10()
     Set rngs = xlsht.Range("G2:G" & lastRow)
 
     For Each rng In rngs
-        If CStr(rng.Value) = "FVPL_VALUE" Then
+        If CStr(rng.Value) = "FVPL_Cost" Then
             FVPL_VALUE = FVPL_VALUE + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "FVPL_ADJUSTMENT" Then
+        ElseIf CStr(rng.Value) = "FVPL_ValuationAdjust" Then
             FVPL_ADJUSTMENT = FVPL_ADJUSTMENT + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "FVOCI_VALUE" Then
+        ElseIf CStr(rng.Value) = "FVOCI_Cost" Then
             FVOCI_VALUE = FVOCI_VALUE + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "FVOCI_ADJUSTMENT" Then
+        ElseIf CStr(rng.Value) = "FVOCI_ValuationAdjust" Then
             FVOCI_ADJUSTMENT = FVOCI_ADJUSTMENT + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "AC_VALUE" Then
+        ElseIf CStr(rng.Value) = "AC_Cost" Then
             AC_VALUE = AC_VALUE + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "AC_ADJUSTMENT" Then
+        ElseIf CStr(rng.Value) = "AC_ImpairmentLoss" Then
             AC_ADJUSTMENT = AC_ADJUSTMENT + rng.Offset(0, 1).Value
-        End If
-    Next rng
-
-    lastRow = xlsht.Cells(xlsht.Rows.Count, 1).End(xlUp).Row
-    Set rngs = xlsht.Range("C2:C" & lastRow)
-    For Each rng In rngs
-        If CStr(rng.Value) = "155517201" Then
-            otherFinancialAssets = otherFinancialAssets + rng.Offset(0, 3).Value
+        ElseIf CStr(rng.Value) = "拆放證券公司_OSU" Then
+            otherFinancialAssets = otherFinancialAssets + rng.Offset(0, 1).Value
         End If
     Next rng
 
@@ -1891,8 +1888,8 @@ Public Sub Process_F1_F2()
     '=== Paste Queyr Table into Excel ===
     ' F1
     If Err.Number <> 0 Or LBound(dataArr_1) > UBound(dataArr_1) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable_1 & "資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_1 & "資料表無資料"
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_1 & "資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_1 & "資料表無資料"
     Else
         For j = 0 To UBound(dataArr_1, 2)
             For i = 0 To UBound(dataArr_1, 1)
@@ -1902,8 +1899,8 @@ Public Sub Process_F1_F2()
     End If
 
     If Err.Number <> 0 Or LBound(dataArr_2) > UBound(dataArr_2) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable_2 & "資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_2 & "資料表無資料"
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_2 & "資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_2 & "資料表無資料"
     Else
         For j = 0 To UBound(dataArr_2, 2)
             For i = 0 To UBound(dataArr_2, 1)
@@ -1913,8 +1910,8 @@ Public Sub Process_F1_F2()
     End If
 
     If Err.Number <> 0 Or LBound(dataArr_3) > UBound(dataArr_3) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable_3 & "資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_3 & "資料表無資料"
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_3 & "資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_3 & "資料表無資料"
     Else
         For j = 0 To UBound(dataArr_3, 2)
             For i = 0 To UBound(dataArr_3, 1)
@@ -1935,8 +1932,8 @@ Public Sub Process_F1_F2()
     End If
 
     If Err.Number <> 0 Or LBound(dataArr_5) > UBound(dataArr_5) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable_5 & "資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_5 & "資料表無資料"
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_5 & "資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_5 & "資料表無資料"
     Else
         For j = 0 To UBound(dataArr_5, 2)
             For i = 0 To UBound(dataArr_5, 1)
@@ -1946,8 +1943,8 @@ Public Sub Process_F1_F2()
     End If
 
     If Err.Number <> 0 Or LBound(dataArr_6) > UBound(dataArr_6) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable_6 & "資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_6 & "資料表無資料"
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_6 & "資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_6 & "資料表無資料"
     Else
         For j = 0 To UBound(dataArr_6, 2)
             For i = 0 To UBound(dataArr_6, 1)
@@ -1958,8 +1955,8 @@ Public Sub Process_F1_F2()
 
     ' F2
     If Err.Number <> 0 Or LBound(dataArr_7) > UBound(dataArr_7) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable_7 & "資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_7 & "資料表無資料"
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_7 & "資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_7 & "資料表無資料"
     Else
         For j = 0 To UBound(dataArr_7, 2)
             For i = 0 To UBound(dataArr_7, 1)
@@ -1969,8 +1966,8 @@ Public Sub Process_F1_F2()
     End If
 
     If Err.Number <> 0 Or LBound(dataArr_8) > UBound(dataArr_8) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable_8 & "資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_8 & "資料表無資料"
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_8 & "資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_8 & "資料表無資料"
     Else
         For j = 0 To UBound(dataArr_8, 2)
             For i = 0 To UBound(dataArr_8, 1)
@@ -1980,8 +1977,8 @@ Public Sub Process_F1_F2()
     End If
 
     If Err.Number <> 0 Or LBound(dataArr_9) > UBound(dataArr_9) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable_9 & "資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_9 & "資料表無資料"
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_9 & "資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_9 & "資料表無資料"
     Else
         For j = 0 To UBound(dataArr_9, 2)
             For i = 0 To UBound(dataArr_9, 1)
@@ -1991,7 +1988,7 @@ Public Sub Process_F1_F2()
     End If
 
     If Err.Number <> 0 Or LBound(dataArr_10) > UBound(dataArr_10) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable_10 & "資料表無資料"
+        MsgBox reportTitle & ": " & queryTable_10 & "資料表無資料"
         WriteLog reportTitle & ": " & queryTable_10 & "資料表無資料"
     Else
         For j = 0 To UBound(dataArr_10, 2)
@@ -2183,8 +2180,8 @@ Public Sub Process_Table41()
 
     '=== Paste Queyr Table into Excel ===
     If Err.Number <> 0 Or LBound(dataArr_1) > UBound(dataArr_1) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable_1 & " 資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_1 & " 資料表無資料"
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_1 & " 資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_1 & " 資料表無資料"
     Else
         For j = 0 To UBound(dataArr_1, 2)
             For i = 0 To UBound(dataArr_1, 1)
@@ -2194,8 +2191,8 @@ Public Sub Process_Table41()
     End If
 
     If Err.Number <> 0 Or LBound(dataArr_2) > UBound(dataArr_2) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable_2 & " 資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_2 & " 資料表無資料"
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_2 & " 資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_2 & " 資料表無資料"
     Else
         For j = 0 To UBound(dataArr_2, 2)
             For i = 0 To UBound(dataArr_2, 1)
@@ -2214,9 +2211,9 @@ Public Sub Process_Table41()
     derivativeLoss = 0
     lastRow = xlsht.Cells(xlsht.Rows.Count, 1).End(xlUp).Row
 
-    If xlsht.Cells(1, "I").Value = "SumProfit" Then
-        If NOT IsEmpty(xlsht.Cells(2, "I").Value) Then
-            derivativeGain = xlsht.Cells(2, "I").Value
+    If xlsht.Cells(1, "L").Value = "SumProfit_USD" Then
+        If NOT IsEmpty(xlsht.Cells(2, "L").Value) Then
+            derivativeGain = xlsht.Cells(2, "L").Value
         Else
             MsgBox "Error: No Data for Derivative Profit"
             WriteLog "Error: No Data for Derivative Profit"
@@ -2226,9 +2223,9 @@ Public Sub Process_Table41()
         WriteLog "Error: No Data for Derivative Profit/Loss"
     End If
 
-    If xlsht.Cells(1, "J").Value = "SumLoss" Then
-        If NOT IsEmpty(xlsht.Cells(2, "J").Value) Then
-            derivativeLoss = xlsht.Cells(2, "J").Value
+    If xlsht.Cells(1, "M").Value = "SumLoss_USD" Then
+        If NOT IsEmpty(xlsht.Cells(2, "M").Value) Then
+            derivativeLoss = xlsht.Cells(2, "M").Value
         Else
             MsgBox "Error: No Data for Derivative Loss"
             WriteLog "Error: No Data for Derivative Loss"
@@ -2272,7 +2269,6 @@ Public Sub Process_AI602()
     'Fetch Query Access DB table
     Dim dataArr_1 As Variant
     Dim dataArr_2 As Variant
-    Dim dataArr_3 As Variant
 
     'Declare worksheet and handle data
     Dim xlsht As Worksheet
@@ -2283,34 +2279,31 @@ Public Sub Process_AI602()
     Dim reportTitle As String
     Dim queryTable_1 As String
     Dim queryTable_2 As String
-    Dim queryTable_3 As String
 
     'Setting class clsReport
     Dim rpt As clsReport
     Set rpt = gReports("AI602")
     
     reportTitle = "AI602"
-    queryTable_1 = "AI602_Impairment_USD"
-    queryTable_2 = "AI602_GroupedAC5601"
-    queryTable_3 = "AI602_Subtotal"
+    queryTable_1 = "AI602_SumIpUSD"
+    queryTable_2 = "AI602_Subtotal"
 
     ' dataArr_1 = GetAccessDataAsArray(gDBPath, queryTable_1, gDataMonthString)
     ' dataArr_2 = GetAccessDataAsArray(gDBPath, queryTable_2, gDataMonthString)
     ' dataArr_3 = GetAccessDataAsArray(gDBPath, queryTable_3, gDataMonthString)
     dataArr_1 = GetAccessDataAsArray(gDBPath, queryTable_1, gDataMonthString)
     dataArr_2 = GetAccessDataAsArray(gDBPath, queryTable_2, gDataMonthString)
-    dataArr_3 = GetAccessDataAsArray(gDBPath, queryTable_3, gDataMonthString)
 
     Set xlsht = ThisWorkbook.Sheets(reportTitle)
     
     'Clear Excel Data
-    xlsht.Range("A:K").ClearContents
+    xlsht.Range("A:D").ClearContents
     xlsht.Range("T2:T100").ClearContents
 
     '=== Paste Queyr Table into Excel ===
     If Err.Number <> 0 Or LBound(dataArr_1) > UBound(dataArr_1) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable_1 & " 資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_1 & " 資料表無資料"
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_1 & " 資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_1 & " 資料表無資料"
     Else
         For j = 0 To UBound(dataArr_1, 2)
             For i = 0 To UBound(dataArr_1, 1)
@@ -2320,23 +2313,12 @@ Public Sub Process_AI602()
     End If
 
     If Err.Number <> 0 Or LBound(dataArr_2) > UBound(dataArr_2) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable_2 & " 資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_2 & " 資料表無資料"
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_2 & " 資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_2 & " 資料表無資料"
     Else
         For j = 0 To UBound(dataArr_2, 2)
             For i = 0 To UBound(dataArr_2, 1)
                 xlsht.Cells(i + 1, j + 3).Value = dataArr_2(i, j)
-            Next i
-        Next j
-    End If
-
-    If Err.Number <> 0 Or LBound(dataArr_3) > UBound(dataArr_3) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable_3 & " 資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_3 & " 資料表無資料"
-    Else
-        For j = 0 To UBound(dataArr_3, 2)
-            For i = 0 To UBound(dataArr_3, 1)
-                xlsht.Cells(i + 1, j + 10).Value = dataArr_3(i, j)
             Next i
         Next j
     End If
@@ -2346,6 +2328,21 @@ Public Sub Process_AI602()
     '--------------
     Dim rngs As Range
     Dim rng As Range
+
+    Dim FVPL_GovDebt_Cost As Double
+    Dim FVPL_GovDebt_Adjustment As Double
+    Dim FVPL_GovDebt_Impairment As Double
+    Dim FVPL_GovDebt_BookValue As Double
+
+    Dim FVPL_CompanyDebt_Cost As Double
+    Dim FVPL_CompanyDebt_Adjustment As Double
+    Dim FVPL_CompanyDebt_Impairment As Double
+    Dim FVPL_CompanyDebt_BookValue As Double
+
+    Dim FVPL_FinanceDebt_Cost As Double
+    Dim FVPL_FinanceDebt_Adjustment As Double
+    Dim FVPL_FinanceDebt_Impairment As Double
+    Dim FVPL_FinanceDebt_BookValue As Double
 
     Dim FVOCI_GovDebt_Cost As Double
     Dim FVOCI_GovDebt_Adjustment As Double
@@ -2374,6 +2371,21 @@ Public Sub Process_AI602()
     Dim AC_FinanceDebt_Impairment As Double
     Dim AC_FinanceDebt_BookValue As Double
 
+    FVPL_GovDebt_Cost = 0
+    FVPL_GovDebt_Adjustment = 0
+    FVPL_GovDebt_Impairment = 0
+    FVPL_GovDebt_BookValue = 0
+
+    FVPL_CompanyDebt_Cost = 0
+    FVPL_CompanyDebt_Adjustment = 0
+    FVPL_CompanyDebt_Impairment = 0
+    FVPL_CompanyDebt_BookValue = 0
+
+    FVPL_FinanceDebt_Cost = 0
+    FVPL_FinanceDebt_Adjustment = 0
+    FVPL_FinanceDebt_Impairment = 0
+    FVPL_FinanceDebt_BookValue = 0
+
     FVOCI_GovDebt_Cost = 0
     FVOCI_GovDebt_Adjustment = 0
     FVOCI_GovDebt_Impairment = 0
@@ -2401,42 +2413,74 @@ Public Sub Process_AI602()
     AC_FinanceDebt_Impairment = 0
     AC_FinanceDebt_BookValue = 0
 
-    lastRow = xlsht.Cells(xlsht.Rows.Count, "J").End(xlUp).Row
-    Set rngs = xlsht.Range("J2:J" & lastRow)
+    lastRow = xlsht.Cells(xlsht.Rows.Count, "C").End(xlUp).Row
+    Set rngs = xlsht.Range("C2:C" & lastRow)
 
     For Each rng In rngs
-        If CStr(rng.Value) = "FVOCI_政府公債_外國_投資成本" Then
+        ' FVPL 政府公債
+        If CStr(rng.Value) = "FVPL_GovBond_Foreign_Cost" Then
+            FVPL_GovDebt_Cost = FVPL_GovDebt_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_GovBond_Foreign_ValuationAdjust" Then
+            FVPL_GovDebt_Adjustment = FVPL_GovDebt_Adjustment + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_GovBond_Foreign_減損" Then
+            FVPL_GovDebt_Impairment = FVPL_GovDebt_Impairment + rng.Offset(0, 1).Value
+        ' FVOCI 政府公債
+        ElseIf CStr(rng.Value) = "FVOCI_GovBond_Foreign_Cost" Then
             FVOCI_GovDebt_Cost = FVOCI_GovDebt_Cost + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "FVOCI_政府公債_外國_評價調整" Then
+        ElseIf CStr(rng.Value) = "FVOCI_GovBond_Foreign_ValuationAdjust" Then
             FVOCI_GovDebt_Adjustment = FVOCI_GovDebt_Adjustment + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "FVOCI_政府公債_外國_減損" Then
+        ElseIf CStr(rng.Value) = "FVOCI_GovBond_Foreign_減損" Then
             FVOCI_GovDebt_Impairment = FVOCI_GovDebt_Impairment + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "AC_政府公債_外國_投資成本" Then
+        ' AC 政府公債
+        ElseIf CStr(rng.Value) = "AC_GovBond_Foreign_Cost" Then
             AC_GovDebt_Cost = AC_GovDebt_Cost + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "AC_政府公債_外國_減損" Then
+        ElseIf CStr(rng.Value) = "AC_GovBond_Foreign_減損" Then
             AC_GovDebt_Impairment = AC_GovDebt_Impairment + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "FVOCI_公司債_外國_投資成本" Then
+        ' FVPL 公司債
+        ElseIf CStr(rng.Value) = "FVPL_CompanyBond_Foreign_Cost" Then
+            FVPL_CompanyDebt_Cost = FVPL_CompanyDebt_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_CompanyBond_Foreign_ValuationAdjust" Then
+            FVPL_CompanyDebt_Adjustment = FVPL_CompanyDebt_Adjustment + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_CompanyBond_Foreign_減損" Then
+            FVPL_CompanyDebt_Impairment = FVPL_CompanyDebt_Impairment + rng.Offset(0, 1).Value
+        ' FVOCI 公司債
+        ElseIf CStr(rng.Value) = "FVOCI_CompanyBond_Foreign_Cost" Then
             FVOCI_CompanyDebt_Cost = FVOCI_CompanyDebt_Cost + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "FVOCI_公司債_外國_評價調整" Then
+        ElseIf CStr(rng.Value) = "FVOCI_CompanyBond_Foreign_ValuationAdjust" Then
             FVOCI_CompanyDebt_Adjustment = FVOCI_CompanyDebt_Adjustment + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "FVOCI_公司債_外國_減損" Then
+        ElseIf CStr(rng.Value) = "FVOCI_CompanyBond_Foreign_減損" Then
             FVOCI_CompanyDebt_Impairment = FVOCI_CompanyDebt_Impairment + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "AC_公司債_外國_投資成本" Then
+        ' AC 公司債
+        ElseIf CStr(rng.Value) = "AC_CompanyBond_Foreign_Cost" Then
             AC_CompanyDebt_Cost = AC_CompanyDebt_Cost + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "AC_公司債_外國_減損" Then
+        ElseIf CStr(rng.Value) = "AC_CompanyBond_Foreign_減損" Then
             AC_CompanyDebt_Impairment = AC_CompanyDebt_Impairment + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "FVOCI_金融債_外國_投資成本" Then
+        ' FVPL 金融債
+        ElseIf CStr(rng.Value) = "FVPL_FinancialBond_Foreign_Cost" Then
+            FVPL_FinanceDebt_Cost = FVPL_FinanceDebt_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_FinancialBond_Foreign_ValuationAdjust" Then
+            FVPL_FinanceDebt_Adjustment = FVPL_FinanceDebt_Adjustment + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_FinancialBond_Foreign_減損" Then
+            FVPL_FinanceDebt_Impairment = FVPL_FinanceDebt_Impairment + rng.Offset(0, 1).Value
+        ' FVOCI 金融債
+        ElseIf CStr(rng.Value) = "FVOCI_FinancialBond_Foreign_Cost" Then
             FVOCI_FinanceDebt_Cost = FVOCI_FinanceDebt_Cost + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "FVOCI_金融債_外國_評價調整" Then
+        ElseIf CStr(rng.Value) = "FVOCI_FinancialBond_Foreign_ValuationAdjust" Then
             FVOCI_FinanceDebt_Adjustment = FVOCI_FinanceDebt_Adjustment + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "FVOCI_金融債_外國_減損" Then
+        ElseIf CStr(rng.Value) = "FVOCI_FinancialBond_Foreign_減損" Then
             FVOCI_FinanceDebt_Impairment = FVOCI_FinanceDebt_Impairment + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "AC_金融債_外國_投資成本" Then
+        ' AC 金融債
+        ElseIf CStr(rng.Value) = "AC_FinancialBond_Foreign_Cost" Then
             AC_FinanceDebt_Cost = AC_FinanceDebt_Cost + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "AC_金融債_外國_減損" Then
+        ElseIf CStr(rng.Value) = "AC_FinancialBond_Foreign_減損" Then
             AC_FinanceDebt_Impairment = AC_FinanceDebt_Impairment + rng.Offset(0, 1).Value
         End If
     Next rng
+
+    'FVOCI減損數為正數，需要扣除
+    FVPL_GovDebt_BookValue = FVPL_GovDebt_Cost + FVPL_GovDebt_Adjustment - FVPL_GovDebt_Impairment 
+    FVPL_CompanyDebt_BookValue = FVPL_CompanyDebt_Cost + FVPL_CompanyDebt_Adjustment - FVPL_CompanyDebt_Impairment
+    FVPL_FinanceDebt_BookValue = FVPL_FinanceDebt_Cost + FVPL_FinanceDebt_Adjustment - FVPL_FinanceDebt_Impairment
 
     'FVOCI減損數為正數，需要扣除
     FVOCI_GovDebt_BookValue = FVOCI_GovDebt_Cost + FVOCI_GovDebt_Adjustment - FVOCI_GovDebt_Impairment 
@@ -2444,9 +2488,9 @@ Public Sub Process_AI602()
     FVOCI_FinanceDebt_BookValue = FVOCI_FinanceDebt_Cost + FVOCI_FinanceDebt_Adjustment - FVOCI_FinanceDebt_Impairment
     
     'AC減損數為負數，相加即可
-    AC_GovDebt_BookValue = AC_GovDebt_Cost + AC_GovDebt_Impairment
-    AC_CompanyDebt_BookValue = AC_CompanyDebt_Cost + AC_CompanyDebt_Impairment
-    AC_FinanceDebt_BookValue = AC_FinanceDebt_Cost + AC_FinanceDebt_Impairment
+    AC_GovDebt_BookValue = AC_GovDebt_Cost - AC_GovDebt_Impairment
+    AC_CompanyDebt_BookValue = AC_CompanyDebt_Cost - AC_CompanyDebt_Impairment
+    AC_FinanceDebt_BookValue = AC_FinanceDebt_Cost - AC_FinanceDebt_Impairment
 
     Dim sum_GovDebt_Cost As Double
     Dim sum_GovDebt_BookValue As Double
@@ -2463,27 +2507,39 @@ Public Sub Process_AI602()
     sum_FinanceDebt_Cost = 0
     sum_FinanceDebt_BookValue = 0
 
+    FVPL_GovDebt_Cost = Round(FVPL_GovDebt_Cost / 1000, 0)
+    FVPL_GovDebt_BookValue = Round(FVPL_GovDebt_BookValue / 1000, 0)
     FVOCI_GovDebt_Cost = Round(FVOCI_GovDebt_Cost / 1000, 0)
     FVOCI_GovDebt_BookValue = Round(FVOCI_GovDebt_BookValue / 1000, 0)
     AC_GovDebt_Cost = Round(AC_GovDebt_Cost / 1000, 0)
     AC_GovDebt_BookValue = Round(AC_GovDebt_BookValue / 1000, 0)
-    sum_GovDebt_Cost = FVOCI_GovDebt_Cost + AC_GovDebt_Cost
-    sum_GovDebt_BookValue = FVOCI_GovDebt_BookValue + AC_GovDebt_BookValue
+    sum_GovDebt_Cost = FVPL_GovDebt_Cost + FVOCI_GovDebt_Cost + AC_GovDebt_Cost
+    sum_GovDebt_BookValue = FVPL_GovDebt_BookValue + FVOCI_GovDebt_BookValue + AC_GovDebt_BookValue
 
+    FVPL_CompanyDebt_Cost = Round(FVPL_CompanyDebt_Cost / 1000, 0)
+    FVPL_CompanyDebt_BookValue = Round(FVPL_CompanyDebt_BookValue / 1000, 0)
     FVOCI_CompanyDebt_Cost = Round(FVOCI_CompanyDebt_Cost / 1000, 0)
     FVOCI_CompanyDebt_BookValue = Round(FVOCI_CompanyDebt_BookValue / 1000, 0)
     AC_CompanyDebt_Cost = Round(AC_CompanyDebt_Cost / 1000, 0)
     AC_CompanyDebt_BookValue = Round(AC_CompanyDebt_BookValue / 1000, 0)
-    sum_CompanyDebt_Cost = FVOCI_CompanyDebt_Cost + AC_CompanyDebt_Cost
-    sum_CompanyDebt_BookValue = FVOCI_CompanyDebt_BookValue + AC_CompanyDebt_BookValue
+    sum_CompanyDebt_Cost = FVPL_CompanyDebt_Cost + FVOCI_CompanyDebt_Cost + AC_CompanyDebt_Cost
+    sum_CompanyDebt_BookValue = FVPL_CompanyDebt_BookValue + FVOCI_CompanyDebt_BookValue + AC_CompanyDebt_BookValue
 
+    FVPL_FinanceDebt_Cost = Round(FVPL_FinanceDebt_Cost / 1000, 0)
+    FVPL_FinanceDebt_BookValue = Round(FVPL_FinanceDebt_BookValue / 1000, 0)    
     FVOCI_FinanceDebt_Cost = Round(FVOCI_FinanceDebt_Cost / 1000, 0)
     FVOCI_FinanceDebt_BookValue = Round(FVOCI_FinanceDebt_BookValue / 1000, 0)
     AC_FinanceDebt_Cost = Round(AC_FinanceDebt_Cost / 1000, 0)
     AC_FinanceDebt_BookValue = Round(AC_FinanceDebt_BookValue / 1000, 0)
-    sum_FinanceDebt_Cost = FVOCI_FinanceDebt_Cost + AC_FinanceDebt_Cost
-    sum_FinanceDebt_BookValue = FVOCI_FinanceDebt_BookValue + AC_FinanceDebt_BookValue
-    
+    sum_FinanceDebt_Cost = FVPL_FinanceDebt_Cost + FVOCI_FinanceDebt_Cost + AC_FinanceDebt_Cost
+    sum_FinanceDebt_BookValue = FVPL_FinanceDebt_BookValue + FVOCI_FinanceDebt_BookValue + AC_FinanceDebt_BookValue
+
+    xlsht.Range("AI602_政府公債_投資成本_FVPL_F1").Value = FVPL_GovDebt_Cost
+    rpt.SetField "Table1", "AI602_政府公債_投資成本_FVPL_F1", CStr(FVPL_GovDebt_Cost)
+
+    xlsht.Range("AI602_政府公債_帳面價值_FVPL_F1").Value = FVPL_GovDebt_BookValue
+    rpt.SetField "Table1", "AI602_政府公債_帳面價值_FVPL_F1", CStr(FVPL_GovDebt_BookValue)
+
     xlsht.Range("AI602_政府公債_投資成本_FVOCI_F2").Value = FVOCI_GovDebt_Cost
     rpt.SetField "Table1", "AI602_政府公債_投資成本_FVOCI_F2", CStr(FVOCI_GovDebt_Cost)
 
@@ -2502,7 +2558,12 @@ Public Sub Process_AI602()
     xlsht.Range("AI602_政府公債_帳面價值_合計_F5").Value = sum_GovDebt_BookValue
     rpt.SetField "Table1", "AI602_政府公債_帳面價值_合計_F5", CStr(sum_GovDebt_BookValue)
 
+    xlsht.Range("AI602_公司債_投資成本_FVPL_F6").Value = FVPL_CompanyDebt_Cost
+    rpt.SetField "Table1", "AI602_公司債_投資成本_FVPL_F6", CStr(FVPL_CompanyDebt_Cost)
 
+    xlsht.Range("AI602_公司債_帳面價值_FVPL_F6").Value = FVPL_CompanyDebt_BookValue
+    rpt.SetField "Table1", "AI602_公司債_帳面價值_FVPL_F6", CStr(FVPL_CompanyDebt_BookValue)
+    
     xlsht.Range("AI602_公司債_投資成本_FVOCI_F7").Value = FVOCI_CompanyDebt_Cost
     rpt.SetField "Table1", "AI602_公司債_投資成本_FVOCI_F7", CStr(FVOCI_CompanyDebt_Cost)
 
@@ -2521,6 +2582,11 @@ Public Sub Process_AI602()
     xlsht.Range("AI602_公司債_帳面價值_合計_F10").Value = sum_CompanyDebt_BookValue
     rpt.SetField "Table1", "AI602_公司債_帳面價值_合計_F10", CStr(sum_CompanyDebt_BookValue)
 
+    xlsht.Range("AI602_金融債_投資成本_FVPL_F1").Value = FVPL_FinanceDebt_Cost
+    rpt.SetField "Table2", "AI602_金融債_投資成本_FVPL_F1", CStr(FVPL_FinanceDebt_Cost)
+
+    xlsht.Range("AI602_金融債_帳面價值_FVPL_F1").Value = FVPL_FinanceDebt_BookValue
+    rpt.SetField "Table2", "AI602_金融債_帳面價值_FVPL_F1", CStr(FVPL_FinanceDebt_BookValue)
 
     xlsht.Range("AI602_金融債_投資成本_FVOCI_F2").Value = FVOCI_FinanceDebt_Cost
     rpt.SetField "Table2", "AI602_金融債_投資成本_FVOCI_F2", CStr(FVOCI_FinanceDebt_Cost)
@@ -2597,8 +2663,8 @@ Public Sub Process_AI240()
 
     '=== Paste Queyr Table into Excel ===
     If Err.Number <> 0 Or LBound(dataArr_1) > UBound(dataArr_1) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable_1 & " 資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_1 & " 資料表無資料"
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_1 & " 資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_1 & " 資料表無資料"
     Else
         For j = 0 To UBound(dataArr_1, 2)
             For i = 0 To UBound(dataArr_1, 1)
@@ -2608,8 +2674,8 @@ Public Sub Process_AI240()
     End If
 
     If Err.Number <> 0 Or LBound(dataArr_2) > UBound(dataArr_2) Then
-        MsgBox "資料有誤: " & reportTitle & ": " & queryTable_2 & " 資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & ": " & queryTable_2 & " 資料表無資料"
+        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_2 & " 資料表無資料"
+        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_2 & " 資料表無資料"
     Else
         For j = 0 To UBound(dataArr_2, 2)
             For i = 0 To UBound(dataArr_2, 1)
