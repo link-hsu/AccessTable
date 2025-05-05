@@ -95,13 +95,16 @@ FROM AI602_GroupedAC5601
 GROUP BY AI602_GroupedAC5601.GroupedAccount;
 
 
--- ============================
+------------------------------
 
 New Query AI602_SumIpUSD
 
+AccountCodeMap.AssetMeasurementType & "_" & AccountCodeMap.Category AS MeasurementCategory,
+
+
 PARAMETERS DataMonthParam Text;
 SELECT 
-    IP.GroupMeasurement AS GroupMeasurement,
+    IP.GroupMeasurement & "_減損" AS GroupMeasurement,
     SUM(IP.CurrImpairmentCost) AS Subtotal_CurrImpairmentCost
 FROM 
     AssetsImpairment AS IP
@@ -123,7 +126,7 @@ GROUP BY IP.GroupMeasurement;
 
 PARAMETERS DataMonthParam Text;
 SELECT 
-    IP.GroupMeasurement AS GroupMeasurement,
+    IP.GroupMeasurement & "_減損" AS GroupMeasurement,
     SUM(IP.CurrImpairmentCost) AS Subtotal_CurrImpairmentCost
 FROM 
     AssetsImpairment AS IP
@@ -147,7 +150,7 @@ GROUP BY
 New 
 PARAMETERS DataMonthParam TEXT;
 SELECT
-    AccountCodeMap.AssetMeasurementSubType AS MeasureType,
+    AccountCodeMap.AssetMeasurementSubType & "_" & AccountCodeMap.Category AS MeasureType,
     SUM(OBU_AC5601.NetBalance) AS SubNetBalance
 FROM
     AccountCodeMap
@@ -157,15 +160,16 @@ ON
     AccountCodeMap.AccountCode = OBU_AC5411B.AccountCode
 WHERE
     AccountCodeMap.Category IN ('Cost', 'ValuationAdjust')
+    AND AccountCodeMap.GroupFlag = '外幣債'
     AND OBU_AC5601.CurrencyType = 'USD'
     AND OBU_AC5601.DataMonthString = [DataMonthParam];
 GROUP BY
-    AccountCodeMap.AssetMeasurementSubType
+    AccountCodeMap.AssetMeasurementSubType, AccountCodeMap.Category;
 
 
 PARAMETERS DataMonthParam TEXT;
 SELECT
-    AccountCodeMap.AssetMeasurementSubType AS MeasureType,
+    AccountCodeMap.AssetMeasurementSubType & "_" & AccountCodeMap.Category AS MeasureType,
     SUM(oa.NetBalance) AS SubNetBalance
 FROM
     AccountCodeMap
@@ -184,8 +188,9 @@ ON
     AccountCodeMap.AccountCode = OBU_AC5411B.AccountCode
 WHERE
     AccountCodeMap.Category IN ('Cost', 'ValuationAdjust')
+    AND AccountCodeMap.GroupFlag = '外幣債'
 GROUP BY
-    AccountCodeMap.AssetMeasurementSubType
+    AccountCodeMap.AssetMeasurementSubType, AccountCodeMap.Category;
 
 
 
@@ -193,14 +198,15 @@ GROUP BY
 
 Final
 New Query AI602_Subtotal
+
 PARAMETERS DataMonthParam TEXT;
 SELECT
-    AI602_SumIpUSD.GroupMeasurement AS MeasureType
+    AI602_SumIpUSD.GroupMeasurement AS MeasureType,
     AI602_SumIpUSD.Subtotal_CurrImpairmentCost AS SubNetBalance
 FROM AI602_SumIpUSD
 UNION ALL
 SELECT
-    AccountCodeMap.AssetMeasurementSubType AS MeasureType,
+    AccountCodeMap.AssetMeasurementSubType & "_" & AccountCodeMap.Category AS MeasureType,
     SUM(oa.NetBalance) AS SubNetBalance
 FROM
     AccountCodeMap
@@ -216,8 +222,9 @@ INNER JOIN
             AND OBU_AC5601.DataMonthString = [DataMonthParam]
     ) AS oa
 ON
-    AccountCodeMap.AccountCode = OBU_AC5411B.AccountCode
+    AccountCodeMap.AccountCode = oa.AccountCode
 WHERE
     AccountCodeMap.Category IN ('Cost', 'ValuationAdjust')
+    AND AccountCodeMap.GroupFlag = '外幣債'
 GROUP BY
-    AccountCodeMap.AssetMeasurementSubType
+    AccountCodeMap.AssetMeasurementSubType, AccountCodeMap.Category;
