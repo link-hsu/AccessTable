@@ -109,12 +109,11 @@ WHERE
     AND d.DataMonthString = "2024/11";
 ***remark: 其中 550130147 AC債務工具投資減損損失-金融債券
 
-
-
-
-
 New
 
+Query FM11_OBU_AC5411B
+
+---------------------------------------
 PARAMETERS DataMonthParam TEXT;
 SELECT
     OBU_AC5411B.DataID,
@@ -129,10 +128,11 @@ INNER JOIN
 ON
     AccountCodeMap.AccountCode = OBU_AC5411B.AccountCode
 WHERE
-    AccountCodeMap.Category IN ("InterestRevenue" , "GainOnDisposal", "LossOnDisposal", "Interest", "ValuationProfit", "ValuationLoss")
+    AccountCodeMap.Category IN ("InterestRevenue" , "GainOnDisposal", "LossOnDisposal", "OSU息", "ValuationProfit", "ValuationLoss")
     AND OBU_AC5411B.DataMonthString = [DataMonthParam];
 
 
+---------------------------------------
 PARAMETERS DataMonthParam TEXT;
 SELECT
     oa.DataID,
@@ -157,13 +157,12 @@ INNER JOIN
 ON
     AccountCodeMap.AccountCode = oa.AccountCode
 WHERE
-    AccountCodeMap.Category IN ("InterestRevenue" , "GainOnDisposal", "LossOnDisposal", "Interest", "ValuationProfit", "ValuationLoss");
-
+    AccountCodeMap.Category IN ("InterestRevenue" , "GainOnDisposal", "LossOnDisposal", "OSU息", "ValuationProfit", "ValuationLoss");
+---------------------------------------
 
 New
 
 
-Query FM11_OBU_AC5411B
 
 PARAMETERS DataMonthParam TEXT;
 SELECT
@@ -179,11 +178,12 @@ INNER JOIN
 ON
     AccountCodeMap.AccountCode = OBU_AC5411B.AccountCode
 WHERE
-    AccountCodeMap.Category IN ("InterestRevenue" , "GainOnDisposal", "LossOnDisposal", "Interest", "ValuationProfit", "ValuationLoss")
+    AccountCodeMap.Category IN ("InterestRevenue" , "GainOnDisposal", "LossOnDisposal", "OSU息", "ValuationProfit", "ValuationLoss")
     AND OBU_AC5411B.DataMonthString = '2024/11';
 
 
 
+---------------------------------------
 PARAMETERS DataMonthParam TEXT;
 SELECT
     oa.DataID,
@@ -208,10 +208,13 @@ INNER JOIN
 ON
     AccountCodeMap.AccountCode = oa.AccountCode
 WHERE
-    AccountCodeMap.Category IN ("InterestRevenue" , "GainOnDisposal", "LossOnDisposal", "Interest", "ValuationProfit", "ValuationLoss");
+    AccountCodeMap.Category IN ("InterestRevenue" , "GainOnDisposal", "LossOnDisposal", "OSU息", "ValuationProfit", "ValuationLoss");
 
 
 
+Query FM11_OBU_AC5411B_Subtotal
+
+---------------------------------------
 PARAMETERS DataMonthParam TEXT;
 SELECT
     AccountCodeMap.Category, 
@@ -223,13 +226,16 @@ INNER JOIN
 ON
     AccountCodeMap.AccountCode = OBU_AC5411B.AccountCode
 WHERE
-    AccountCodeMap.Category IN ("InterestRevenue" , "GainOnDisposal", "LossOnDisposal", "Interest", "ValuationProfit", "ValuationLoss")
+    AccountCodeMap.Category IN ("InterestRevenue" , "GainOnDisposal", "LossOnDisposal", "OSU息", "ValuationProfit", "ValuationLoss")
     AND OBU_AC5411B.DataMonthString = [DataMonthParam]
 GROUP BY
     AccountCodeMap.Category
 
 
 
+
+
+---------------------------------------
 PARAMETERS DataMonthParam TEXT;
 SELECT
     AccountCodeMap.Category, 
@@ -249,8 +255,6 @@ INNER JOIN
 ON
     AccountCodeMap.AccountCode = oa.AccountCode
 WHERE
-    AccountCodeMap.Category IN ("InterestRevenue" , "GainOnDisposal", "LossOnDisposal", "Interest", "ValuationProfit", "ValuationLoss");
+    AccountCodeMap.Category IN ("InterestRevenue" , "GainOnDisposal", "LossOnDisposal", "OSU息", "ValuationProfit", "ValuationLoss")
 GROUP BY
-    AccountCodeMap.Category
-
-
+    AccountCodeMap.Category;
