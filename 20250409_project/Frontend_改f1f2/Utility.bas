@@ -190,6 +190,7 @@ Function GetLogFileName() As String
     Dim fileName As String
     
     folderPath = ThisWorkbook.Path & "\LogFile_Frontend\"  ' 你也可以指定其他資料夾
+    ' folderPath = "\\10.10.122.40\後台作業\99_個人資料夾\8.修豪\LogFile_Frontend\"
     uuid = CreateUUID()
     fileName = "LogFile_" & Format(Now, "yyyymmdd_hhnnss") & "_" & uuid & ".txt"
     
@@ -221,3 +222,90 @@ Sub WriteLog(logMessage As String, _
     Print #fileNum, Format(Now, "yyyy-mm-dd hh:nn:ss") & " - " & logMessage
     Close #fileNum
 End Sub
+
+
+' Fetch ExchangeRate from AccessDB
+Function GetExchangeRates(BaseCurrency As String, _
+                          DataDate As Date, _
+                          Direction As String, _
+                          ParamArray QuoteCurrencies() As Variant) As Variant
+
+    ' ===Example===
+    ' Excel 365 以上:
+    ' 任一儲存格輸入（以橫向為例）：
+    ' =GetExchangeRates("USD", DATE(2025,3,31), "v", "TWD","JPY","GBP") 按 Enter 後，會自動「溢出」為多欄
+    ' ===Example===
+    ' Excel 2019 以前:
+    ' 1.選取要填的區塊（例如 1×3或3×1儲存格範圍）
+    ' 2.輸入公式 =GetExchangeRates("USD", DATE(2025,3,31), "v", "TWD","JPY","GBP")
+    ' 3.同時按下 Ctrl+Shift+Enter，公式即填滿選取區域
+
+    Dim conn As Object
+    Dim rs As Object
+    Dim DBPath As String
+    Dim sql As String
+    Dim i As Long
+    Dim results() As Variant
+
+    On Error GoTo ErrHandler
+
+    Dim bCurr As String
+    bCurr = UCase(BaseCurrency)
+
+    Dim qCurr() As Variant
+    ReDim qCurr(LBound(QuoteCurrencies) To UBound(QuoteCurrencies))
+    For i = LBound(QuoteCurrencies) To UBound(QuoteCurrencies)
+        qCurr(i) = UCase(QuoteCurrencies(i))
+    Next i
+
+    ' Access 資料庫路徑
+    DBPath = ThisWorkbook.Path & "\" & ThisWorkbook.Sheets("ControlPanel").Range("DBsPathFileName").Value
+    ' DBPath = "\\10.10.122.40\後台作業\99_個人資料夾\8.修豪\" & ThisWorkbook.Sheets("ControlPanel").Range("DBsPathFileName").Value
+
+    ' Build connection
+    Set conn = CreateObject("ADODB.Connection")
+    conn.Open "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & DBPath
+
+    ' Output direction
+    If UCase(Direction) = "V" Then
+        ReDim results(1 To UBound(qCurr) + 1, 1 To 1)
+    Else
+        ReDim results(1 To 1, 1 To UBound(qCurr) + 1)
+    End If
+
+    ' Connect to AccessDB
+    For i = LBound(qCurr) To UBound(qCurr)
+        sql = "SELECT Rate FROM CloseRate " & _
+              "WHERE BaseCurrency = '" & bCurr  & "' " & _
+              "  AND QuoteCurrency = '" & qCurr(i) & "' " & _
+              "  AND DataDate = #" & Format(DataDate, "yyyy\/mm\/dd") & "#"
+
+        Set rs = conn.Execute(sql)
+
+        Dim rateValue As Variant
+        If Not rs.EOF Then
+            ' rateValue = rs.Fields("Rate").Value
+            rateValue = rs!Rate
+        Else
+            rateValue = "找不到匯率: " & bCurr & " 兌換 " & qCurr(i)
+        End If
+
+        If UCase(Direction) = "V" Then
+            results(i + 1, 1) = rateValue
+        Else
+            results(1, i + 1) = rateValue
+        End If
+
+        rs.Close
+    Next i
+
+    conn.Close
+    Set rs = Nothing
+    Set conn = Nothing
+
+    GetExchangeRates = results
+    Exit Function
+
+ErrHandler:
+    GetExchangeRates = "資料庫錯誤或參數錯誤"
+End Function
