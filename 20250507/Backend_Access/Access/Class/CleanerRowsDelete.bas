@@ -109,5 +109,3 @@ Public Sub ICleaner_additionalClean(ByVal fullFilePath As String, _
                                     ByVal xlApp As Excel.Application)
     'implement operations here
 End Sub
-
-
