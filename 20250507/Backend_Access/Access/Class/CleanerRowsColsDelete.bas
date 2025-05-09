@@ -134,19 +134,3 @@ Public Sub ICleaner_additionalClean(ByVal fullFilePath As String, _
                                     ByVal xlApp As Excel.Application)
     'implement operations here
 End Sub
-
-' 範例：
-' 假設 xlsht 是一個 Excel 工作表，以下範例將刪除 第 3 列：
-
-' Dim xlsht As Worksheet
-' Set xlsht = ThisWorkbook.Sheets("Sheet1")
-
-' xlsht.Columns(3).Delete ' 刪除第 3 列
-' 或刪除 B 列：
-
-' xlsht.Columns("B").Delete ' 刪除 B 列
-' 刪除多列：
-' 一次刪除多列，例如刪除 B 到 D 列：
-
-' xlsht.Columns("B:D").Delete
-' 這樣就可以刪除指定的列了！ 🚀
