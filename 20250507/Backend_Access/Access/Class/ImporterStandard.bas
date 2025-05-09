@@ -9,30 +9,32 @@ Public Sub IImporter_ImportData(ByVal fullFilePath As String, _
     Dim cn As Object
     Dim xlbk As Object
     Dim sqlString As String
-    Dim sheetName As String
-    Dim i As Integer, j As Integer
+    Dim i As Integer
 
     Dim tableColumns As Variant
 
     Dim fieldList As String
     Dim selectList As String
 
+    Dim fso As Object
+    Dim ext As String
+
+    ' 建立 FSO 並取得副檔名
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    ext = LCase(fso.GetExtensionName(fullFilePath))
+
     ' 使用 ADODB 連接 Access 資料庫
     Set cn = CreateObject("ADODB.Connection")
     cn.Open "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & accessDBPath & ";"
-
-    ' 使用 Excel 來開啟檔案，取得所有分頁名稱
-    ' xlApp.Visible = False ' Excel 不顯示
-    Set xlbk = xlApp.Workbooks.Open(fullFilePath)
 
     ' 取得 Access 資料表的欄位名稱
     tableColumns = GetTableColumns(tableName) ' 假設這個函式回傳欄位名稱陣列
 
     ' 確保 tableColumns 至少有 2 個欄位（避免 Primary Key 之外沒有欄位）
     If UBound(tableColumns) < 1 Then
-    MsgBox "資料表 " & tableName & " 至少需要 2 個欄位（Primary Key + 其他欄位）。", vbCritical
-    WriteLog "資料表 " & tableName & " 至少需要 2 個欄位（Primary Key + 其他欄位）。"
-    Exit Sub
+        MsgBox "資料表 " & tableName & " 至少需要 2 個欄位（Primary Key + 其他欄位）。", vbCritical
+        WriteLog "資料表 " & tableName & " 至少需要 2 個欄位（Primary Key + 其他欄位）。"
+        Exit Sub
     End If
 
     ' 動態構建 `INSERT INTO` 及 `SELECT` 語法（忽略 Primary Key）
@@ -48,18 +50,21 @@ Public Sub IImporter_ImportData(ByVal fullFilePath As String, _
     fieldList = Left(fieldList, Len(fieldList) - 1)
     selectList = Left(selectList, Len(selectList) - 1)
 
-    For i = 1 To xlbk.Sheets.count
-        sheetName = xlbk.Sheets(i).Name
-        ' Dynamic structure SQL Query language，skip Primary Key
+    If ext = "csv" Then
         sqlString = "INSERT INTO " & tableName & " (" & fieldList & ") " & _
-        "SELECT " & selectList & " FROM [Excel 12.0 Xml;HDR=YES;Database=" & fullFilePath & "].[" & sheetName & "$]"
-        ' 執行 SQL
+                    "SELECT " & selectList & " FROM " & _
+                    "[Text;FMT=Delimited;HDR=YES;Database=" & Left(fullFilePath, InStrRev(fullFilePath, "\") - 1) & "].[" & Mid(fullFilePath, InStrRev(fullFilePath, "\") + 1) & "]"
         cn.Execute sqlString
-    Next i
-
-    ' 關閉 Excel 檔案和釋放物件
-    xlbk.Close False
-    Set xlbk = Nothing
+    Else
+        Set xlbk = xlApp.Workbooks.Open(fullFilePath)
+        For i = 1 To xlbk.Sheets.Count
+            sqlString = "INSERT INTO " & tableName & " (" & fieldList & ") " & _
+            "SELECT " & selectList & " FROM [Excel 12.0 Xml;HDR=YES;Database=" & fullFilePath & "].[" & xlbk.Sheets(i).Name & "$]"
+            cn.Execute sqlString
+        Next i
+        xlbk.Close False
+        Set xlbk = Nothing
+    End If
 
     ' 關閉 ADODB 連接
     cn.Close
