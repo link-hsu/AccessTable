@@ -34,9 +34,58 @@ Public Sub ICleaner_additionalClean(ByVal fullFilePath As String, _
                                     ByVal dataMonth As Date, _
                                     ByVal dataMonthString As String, _
                                     ByVal xlApp As Excel.Application)
+    Dim fso As Object
+    Dim ext As String
+
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    ext = LCase(fso.GetExtensionName(fullFilePath))
+
+    If ext = "csv" Then
+        ' CSV 處理
+        Dim fileIn As Object
+        Dim lines As Variant
+        Dim outLines() As String
+        Dim parts As Variant
+        Dim i As Long
+        Dim headerCols As Variant
+
+        Set fileIn = fso.OpenTextFile(fullFilePath, 1, False)
+        lines = Split(fileIn.ReadAll, vbLf)
+        fileIn.Close
+
+        headerCols = GetTableColumns(cleaningType)
+        
+        ReDim outLines(UBound(lines))
+        For i = 0 To UBound(lines)
+            If Trim(lines(i)) = "" Then GoTo SkipLine2
+            parts = Split(lines(i), ",")
+            If i = 0 Then
+                ' outLines(i) = Join(headerCols, ",")
+                outLines(i) = Join(Filter(headerCols, headerCols(0), False, vbTextCompare), ",")
+            Else
+                outLines(i) = Format(dataDate, "yyyy-mm-dd") & "," & _
+                              Format(dataMonth, "yyyy-mm-dd") & "," & _
+                              dataMonthString & "," & lines(i)
+            End If
+SkipLine2:
+        Next i
+
+        Set fileIn = fso.OpenTextFile(fullFilePath, 2, True)
+        For i = 0 To UBound(outLines)
+            ' fileIn.WriteLine outLines(i)
+            fileIn.Write outLines(i) & vbLf
+        Next i
+        fileIn.Close
+
+        MsgBox "完成Addition Clean，路徑為: " &  fullFilePath
+        WriteLog "完成Addition Clean，路徑為: " &  fullFilePath
+
+        Exit Sub
+    End If
+
     Dim xlbk As Excel.Workbook
     Dim xlsht As Excel.Worksheet
-    Dim i As Long, lastRow As Long
+    Dim lastRow As Long
     Dim tableColumns As Variant
 
     ' 檢查檔案是否存在
