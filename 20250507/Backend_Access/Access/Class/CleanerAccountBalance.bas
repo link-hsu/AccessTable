@@ -35,7 +35,6 @@ Public Sub ICleaner_CleanReport(ByVal fullFilePath As String, _
     Dim colsToDelete As Variant
     Dim col As Variant
     
-    ' balanceSheets = Array("餘額A", "餘額C", "餘額D", "餘額E (2)")
     balanceSheets = Array("餘額A", "餘額C", "餘額D", "餘額E (2)")
 
     ' 檢查檔案是否存在
@@ -50,6 +49,18 @@ Public Sub ICleaner_CleanReport(ByVal fullFilePath As String, _
 
     ' 啟動 Excel 並開啟工作簿
     Set xlbk = xlApp.Workbooks.Open(fullFilePath)
+
+    ' 優先處理「餘額E (2)」貼上值
+    On Error Resume Next
+    Set xlsht = xlbk.Sheets("餘額E (2)")
+    On Error GoTo 0
+
+    If Not xlsht Is Nothing Then
+        lastRow = xlsht.Cells(xlsht.Rows.Count, 1).End(xlUp).Row
+        If lastRow > 1 Then
+            xlsht.Range("A2:C" & lastRow).Value = xlsht.Range("A2:C" & lastRow).Value
+        End If
+    End If
 
     For Each xlsht In xlbk.sheets
         sheetToDelete = True
@@ -73,7 +84,6 @@ Public Sub ICleaner_CleanReport(ByVal fullFilePath As String, _
                 colsToDelete = Array("E", "D", "B")
             ElseIf xlsht.Name = "餘額E (2)" Then
                 colsToDelete = Array("K", "I", "H", "E", "D", "B")
-                xlsht.Range("A2:C" & lastRow).Value = xlsht.Range("A2:C" & lastRow).Value
             End if
 
             For Each col in colsToDelete
