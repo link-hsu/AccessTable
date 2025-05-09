@@ -377,3 +377,53 @@ End Sub
 Public Sub ClearCutCopyMode(ByRef xlApp As Excel.Application)
     xlApp.CutCopyMode = False
 End Sub
+
+Public Function GetLogFileName() As String
+    Dim folderPath As String
+    Dim uuid As String
+    Dim fileName As String
+    
+    folderPath = CurrentProject.Path & "\LogFile_Backend\"  ' Access 資料庫的所在資料夾
+    uuid = CreateUUID()
+    fileName = "LogFile_" & Format(Now, "yyyymmdd_hhnnss") & "_" & uuid & ".txt"
+    
+    GetLogFileName = folderPath & fileName
+End Function
+
+Public Function CreateUUID() As String
+    Randomize
+    CreateUUID = Format(Now, "hhmmss") & _
+                 Hex(Int(Rnd() * 65536)) & _
+                 Hex(Int(Rnd() * 65536))
+End Function
+
+
+Public Sub WriteLog(logMessage As String, _
+             Optional logFilePath As String = "")
+    Static logFile As String
+    
+    If logFilePath <> "" Then
+        logFile = logFilePath
+    ElseIf logFile = "" Then
+        logFile = GetLogFileName()
+    End If
+
+    Dim fileNum As Integer
+    fileNum = FreeFile
+    
+    Open logFile For Append As #fileNum
+    Print #fileNum, Format(Now, "yyyy-mm-dd hh:nn:ss") & " - " & logMessage
+    Close #fileNum
+End Sub
+
+' 於CleanerOMReport使用
+' 移除尾端 .0，並轉成 yyyy-mm-dd
+Private Function FormatDateTimeFix(ByVal inputStr As String) As String
+    On Error GoTo ErrHandler
+    Dim temp As String
+    temp = Replace(inputStr, ".0", "")
+    FormatDateTimeFix = Format(CDate(temp), "yyyy-mm-dd")
+    Exit Function
+ErrHandler:
+    FormatDateTimeFix = inputStr
+End Function
