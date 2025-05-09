@@ -1,11 +1,6 @@
 Option Compare Database
 
-
-'欠缺多個檔案for迴圈遍歷處理 and 簡化程式碼
-
 Public Function GetImporter(ByVal cleaningType As String) As IImporter
-    ' 目前以標準匯入方式處理所有報表
-    ' 若未來有特殊匯入需求，可根據 cleaningType 擴充其他 Importer 類別
     Set GetImporter = New ImporterStandard
 End Function
 
@@ -57,45 +52,46 @@ Public Function GetCleaner(ByVal cleaningType As String) As ICleaner
             
         ' Case "DBU_FC7810B"
         '     Set GetCleaner = New CleanerAC5601
-        
 
         ' ============
         ' NT Position
         ' ============
+
         Case "AccountBalance"
             Set GetCleaner = New CleanerAccountBalance
 
-        Case "BondTransactionDetails"
+        Case "BillTransactionDetails"
             ' 統一編號要補零（F 欄）
             Set GetCleaner = New CleanerOMReport
-            GetCleaner.Initialize , , , , , , Array("FormatCols", "F")
+            GetCleaner.Initialize , , , , , , Array("RemoveSpaceCols", 4, "RemovePercentCols", 19)
 
-        Case "BillTransactionDetails"
-            ' 統一編號要補零（F O P 欄）
-            ' 票載利率要移除百分比( T 欄)
-            ' 移除空白銀行名稱
+        Case "BillRiskPositionBalance"
             Set GetCleaner = New CleanerOMReport
-            GetCleaner.Initialize , , , , , , Array("FormatCols", "F", "FormatCols", "O", "FormatCols", "P", "RemovePercentCols", "T", "RemoveSpaceCols", "E")
+            GetCleaner.Initialize , , , , , , Array("FormatDateCols", 2, "FormatDateCols", 11, "FormatDateCols", 12, "FormatDateCols", 13)
 
         Case "BillHoldingDetails"
+            Set GetCleaner = New CleanerOMReport
+            GetCleaner.Initialize , , , , , , Array("RemoveSpaceCols", 7)
+
+        Case "BillValuation"
             ' 移除空白銀行名稱
             Set GetCleaner = New CleanerOMReport
-            GetCleaner.Initialize , , , , , , Array("RemoveSpaceCols", "H")
+            GetCleaner.Initialize , , , , , , Array("FormatDateCols", 1, "FormatDateCols", 8, "FormatDateCols", 9, "FormatDateCols", 10)
 
-        Case "BillRiskPositionBalance", "BillValuation", "BondRiskPositionBalance", "BondValuation"
+        Case "BondValuation"
             Set GetCleaner = New CleanerOMReport
-            GetCleaner.Initialize , , , , , , colsDict
+            GetCleaner.Initialize , , , , , , Array("FormatDateCols", 2, "FormatDateCols", 3, "FormatDateCols", 8, "FormatDateCols", 9)
+            
+        Case "BondTransactionDetails", "BondRiskPositionBalance"
+            Set GetCleaner = New CleanerOMReport
+            GetCleaner.Initialize , , , , , , Array()
         
-
-
         Case Else
             MsgBox "未知的清理類型: " & cleaningType
             WriteLog "未知的清理類型: " & cleaningType
             Set GetCleaner = Nothing
     End Select
 End Function
-
-
 
 Public Sub ProcessFile(ByVal filePath As String, _
                        ByVal cleaningType As String, _
@@ -163,8 +159,70 @@ Public Sub ProcessFile(ByVal filePath As String, _
     ' Call ClearCutCopyMode(xlApp)
 End Sub
 
+'---------------------------
+'Call Return Object with Dictionary
+'---------------------------
+Public Sub ProcessAllReports()
+    Dim ReportDataDate As Date
+    Dim ReportMonth As Date
+    Dim ReportMonthString As String
 
+    'Handle clean data and import data
+    Dim configDict As Object
+    Dim filePathDict As Object
+    Dim reportType As Variant
+    Dim filePath As String
 
+    'Custom Paths
+    Dim customPathArray As Variant
+    Dim customDate As Date
+
+    'Share Excel Application
+    Dim xlApp As Excel.Application
+    'Set CustomPath
+    customPathArray = Array()
+
+    '取得設定
+    Set configDict = GetConfigsReturnDict(customPathArray, customDate)
+
+    '檢查是否成功取得設定
+    If configDict.count = 0 Then
+        MsgBox "Error: 無法取得設定資料", vbCritical
+        WriteLog "Error: 無法取得設定資料"
+        Exit Sub
+    End If
+
+    ' 設定報表時間資訊
+    ReportDataDate = configDict("ReportDataDate")
+    ReportMonth = configDict("ReportMonth")
+    ReportMonthString = configDict("ReportMonthString")
+
+    ' 設定 FilePaths
+    Set filePathDict = configDict("FilePaths")
+
+    ' Set Unit Excel Application
+    Set xlApp = New Excel.Application
+    Call ConfigureExcelApp(xlApp)
+
+    ' 遍歷 FilePaths
+    For Each reportType In filePathDict.Keys
+        
+        filePath = filePathDict(reportType)
+        ProcessFile filePath, reportType, ReportDataDate, ReportMonth, ReportMonthString, xlApp
+    Next reportType
+
+    ' 所有檔案處理完畢後，還原 Excel 屬性
+    Call RestoreExcelAppSettings(xlApp)
+    ' 最後再呼叫 ClearCutCopyMode，作為保險備援
+    ' Call ClearCutCopyMode(xlApp)
+
+    ' Close Excel Application
+    xlApp.Quit
+    Set xlApp = Nothing
+    MsgBox "***完成所有原始報表匯入作業***"
+    WriteLog "***完成所有原始報表匯入作業***"
+    ' Debug.Print "***完成所有原始報表匯入作業***"
+End Sub
 
 '---------------------------
 'Call Object with Collection
@@ -205,79 +263,3 @@ End Sub
 '         ProcessFile filePath, ReportType, reportDataDate
 '     Next ReportType
 ' End Sub
-
-
-'---------------------------
-'Call Return Object with Dictionary
-'---------------------------
-
-Public Sub ProcessAllReports()
-    Dim ReportDataDate As Date
-    Dim ReportMonth As Date
-    Dim ReportMonthString As String
-
-    'Handle clean data and import data
-    Dim configDict As Object
-    Dim filePathDict As Object
-    Dim reportType As Variant
-    Dim filePath As String
-
-    'Custom Paths
-    Dim customPathArray As Variant
-    Dim customDate As Date
-
-    'Share Excel Application
-    Dim xlApp As Excel.Application
-    'Set CustomPath
-    customPathArray = Array()
-
-    '取得設定
-    Set configDict = GetConfigsReturnDict(customPathArray, customDate)
-
-    '檢查是否成功取得設定
-    If configDict.count = 0 Then
-        MsgBox "Error: 無法取得設定資料", vbCritical
-        WriteLog "Error: 無法取得設定資料"
-        Exit Sub
-    End If
-
-    ' 設定報表時間資訊
-    ReportDataDate = configDict("ReportDataDate")
-    ReportMonth = configDict("ReportMonth")
-    ReportMonthString = configDict("ReportMonthString")
-
-    Debug.Print()
-
-    ' 設定 FilePaths
-    Set filePathDict = configDict("FilePaths")
-
-    ' Set Unit Excel Application
-    Set xlApp = New Excel.Application
-    Call ConfigureExcelApp(xlApp)
-
-    ' 遍歷 FilePaths
-    For Each reportType In filePathDict.Keys
-        
-        filePath = filePathDict(reportType)
-        ProcessFile filePath, reportType, ReportDataDate, ReportMonth, ReportMonthString, xlApp
-    Next reportType
-
-    ' 所有檔案處理完畢後，還原 Excel 屬性
-    Call RestoreExcelAppSettings(xlApp)
-    ' 最後再呼叫 ClearCutCopyMode，作為保險備援
-    ' Call ClearCutCopyMode(xlApp)
-
-    ' Close Excel Application
-    xlApp.Quit
-    Set xlApp = Nothing
-    MsgBox "***完成所有原始報表匯入作業***"
-    WriteLog "***完成所有原始報表匯入作業***"
-    ' Debug.Print "***完成所有原始報表匯入作業***"
-End Sub
-
-
-
-
-' 待修改事項
-' 1.   '*********要修改GetCleaner中將cleaningType輸入，取得相應的資料欄位，直接貼入，可以在GetCleaner這邊加入參數丟進去
-' 2.import 多個分頁，前提是資料表要處理乾淨
