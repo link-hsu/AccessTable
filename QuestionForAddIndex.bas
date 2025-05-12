@@ -1083,3 +1083,215 @@ Public Sub Process_FM2()
     xlsht.Range("U2:U100").NumberFormat = "#,##,##"
     xlsht.Range("V2:V100").NumberFormat = "#,##,##"
 End Sub
+
+
+
+
+
+
+'================================================
+Answer here
+
+以下是整合後的完整範例，示範如何在全域只跟 Access 要一次最大 Index，並且後續每次插入都自動遞增：
+
+```vb
+'=== 模組最上方：全域宣告 ===
+Option Explicit
+
+' 使用者輸入與路徑設定
+Public gDataMonthString         As String         ' 使用者輸入的資料月份 (yyyy/mm)
+Public gDataMonthStringROC      As String         ' ROC 格式
+Public gDataMonthStringROC_NUM  As String         ' ROC_NUM 格式
+Public gDataMonthStringROC_F1F2 As String         ' ROC_F1F2 格式
+Public gDBPath                  As String         ' Access 資料庫路徑
+Public gReportFolder            As String         ' 原始空白報表資料夾
+Public gOutputFolder            As String         ' 產出報表資料夾
+Public gReportNames             As Variant        ' 報表名稱陣列
+Public gReports                 As Collection     ' clsReport 物件集合
+
+' 全域 Index 計數器
+Public gRecIndex                As Long
+
+'=== 取得當月最大 Index（只執行一次） ===
+Public Function GetMaxIndex(ByVal DBPath As String, _
+                            ByVal tableName As String, _
+                            ByVal dataMonthString As String) As Long
+    Dim conn As Object, rs As Object
+    Dim sql  As String
+    
+    Set conn = CreateObject("ADODB.Connection")
+    conn.Open "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & DBPath
+    
+    sql = "SELECT MAX([Index]) AS MaxIdx FROM " & tableName & _
+          " WHERE DataMonthString='" & dataMonthString & "';"
+    Set rs = conn.Execute(sql)
+    
+    If Not rs.EOF And Not IsNull(rs.Fields("MaxIdx").Value) Then
+        GetMaxIndex = rs.Fields("MaxIdx").Value
+    Else
+        GetMaxIndex = 0
+    End If
+    
+    rs.Close:  conn.Close
+    Set rs   = Nothing
+    Set conn = Nothing
+End Function
+
+'=== 修改後的 InsertIntoTable：改用全域 gRecIndex，並自動 +1 ===
+Public Sub InsertIntoTable(ByVal DBPath As String, _
+                           ByVal tableName As String, _
+                           ByVal dataMonthString As String, _
+                           ByVal reportName As String, _
+                           ByVal worksheetName_fieldKey As String, _
+                           ByVal fieldValue As String, _
+                           ByVal fieldAddress As String)
+    Dim conn      As Object
+    Dim cmd       As Object
+    Dim sql       As String
+    Dim thisIndex As Long
+    
+    ' 使用全域計數器
+    thisIndex = gRecIndex
+    
+    Set conn = CreateObject("ADODB.Connection")
+    conn.Open "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & DBPath
+    
+    sql = "INSERT INTO " & tableName & _
+          " (DataMonthString, ReportName, WorksheetName_FieldKey, FieldValue, FieldAddress, [Index], CaseCreatedAt) " & _
+          "VALUES (" & _
+            "'" & dataMonthString & "', " & _
+            "'" & reportName & "', " & _
+            "'" & worksheetName_fieldKey & "', " & _
+            "'" & fieldValue & "', " & _
+            "'" & fieldAddress & "', " & _
+            thisIndex & ", Now());"
+    
+    Set cmd = CreateObject("ADODB.Command")
+    cmd.ActiveConnection = conn
+    cmd.CommandText     = sql
+    cmd.Execute
+    
+    conn.Close
+    Set cmd  = Nothing
+    Set conn = Nothing
+    
+    ' 每插一筆就遞增
+    gRecIndex = gRecIndex + 1
+End Sub
+
+'=== 主流程入口 Main ===
+Public Sub Main()
+    Dim isInputValid As Boolean
+    
+    ' 1. 讓使用者輸入並驗證 gDataMonthString
+    isInputValid = False
+    Do
+        gDataMonthString = InputBox("請輸入資料月份 (格式: yyyy/mm):", "輸入資料月份")
+        If IsValidDataMonth(gDataMonthString) Then
+            isInputValid = True
+        ElseIf Trim(gDataMonthString) = "" Then
+            MsgBox "請輸入報表資料所屬的年度/月份 (例如: 2024/01)", vbExclamation, "輸入錯誤"
+            WriteLog "請輸入報表資料所屬的年度/月份 (例如: 2024/01)"
+        Else
+            MsgBox "格式錯誤，請輸入正確格式 (yyyy/mm)", vbExclamation, "格式錯誤"
+            WriteLog "格式錯誤，請輸入正確格式 (yyyy/mm)"
+        End If
+    Loop Until isInputValid
+    
+    ' 2. 轉換 ROC 格式
+    gDataMonthStringROC      = ConvertToROCFormat(gDataMonthString, "ROC")
+    gDataMonthStringROC_NUM  = ConvertToROCFormat(gDataMonthString, "NUM")
+    gDataMonthStringROC_F1F2 = ConvertToROCFormat(gDataMonthString, "F1F2")
+    
+    ' 3. 設定路徑與報表清單
+    gDBPath       = ThisWorkbook.Path & "\" & ThisWorkbook.Sheets("ControlPanel").Range("DBsPathFileName").Value
+    gReportFolder = ThisWorkbook.Path & "\" & ThisWorkbook.Sheets("ControlPanel").Range("EmptyReportPath").Value
+    gOutputFolder = ThisWorkbook.Path & "\" & ThisWorkbook.Sheets("ControlPanel").Range("OutputReportPath").Value
+    gReportNames  = Array("CNY1", "FB1", "FB2", "FB3", "FB3A", "FM5", "FM11", "FM13", _
+                          "AI821", "Table2", "FB5", "FB5A", "FM2", "FM10", "F1_F2", _
+                          "Table41", "AI602", "AI240")
+    
+    ' 4. 只呼叫一次，取得目前最大 Index，並設定下一筆要用的 gRecIndex
+    gRecIndex = GetMaxIndex(gDBPath, "MonthlyDeclarationReport", gDataMonthString) + 1
+    
+    ' 5. Process A: 初始化所有報表到 Access（初始 Null Data）
+    Call InitializeReports
+    MsgBox "完成 Process A"
+    WriteLog "完成 Process A"
+    
+    ' 6. Process B: 各報表製表並更新 DB
+    Call Process_CNY1
+    Call Process_FB1
+    Call Process_FB2
+    Call Process_FB3
+    Call Process_FB3A
+    Call Process_FM5
+    Call Process_FM11
+    Call Process_FM13
+    Call Process_AI821
+    Call Process_Table2
+    Call Process_FB5
+    Call Process_FB5A
+    Call Process_FM2
+    Call Process_FM10
+    Call Process_F1_F2
+    Call Process_Table41
+    Call Process_AI602
+    Call Process_AI240
+    MsgBox "完成 Process B"
+    WriteLog "完成 Process B"
+    
+    ' 7. Process C: 填入 Excel 報表並另存
+    Call UpdateExcelReports
+    MsgBox "完成 Process C (全部處理程序完成)"
+    WriteLog "完成 Process C (全部處理程序完成)"
+End Sub
+
+'=== A. 初始化所有報表並插入 Null Data ===
+Public Sub InitializeReports()
+    Dim rpt       As clsReport
+    Dim rptName   As Variant, key As Variant
+    Dim combined  As Object
+    
+    Set gReports = New Collection
+    
+    For Each rptName In gReportNames
+        Set rpt = New clsReport
+        rpt.Init rptName, gDataMonthStringROC, gDataMonthStringROC_NUM, gDataMonthStringROC_F1F2
+        gReports.Add rpt, rptName
+        
+        Set combined = rpt.GetAllFieldPositions
+        For Each key In combined.Keys
+            ' 全部呼 InsertIntoTable，內部自動用 gRecIndex
+            InsertIntoTable gDBPath, "MonthlyDeclarationReport", _
+                            gDataMonthString, rptName, key, "", combined(key)
+        Next key
+    Next rptName
+    
+    MsgBox "完成'報表初始欄位資訊儲存'及'初始資料庫資料建立'"
+    WriteLog "完成'報表初始欄位資訊儲存'及'初始資料庫資料建立'"
+End Sub
+
+'=== 範例：Process_FB3A 只要呼 InsertIntoTable 就好（省略繁複細節） ===
+Public Sub Process_FB3A()
+    ' … 取 dataArr, 填 Excel, rpt 物件處理 …  
+    ' 每次需要寫入 DB，就：
+    InsertIntoTable gDBPath, "MonthlyDeclarationReport", _
+                    gDataMonthString, "FB3A", _
+                    "FOA|FB3A_BankCode_" & bankCodeKey, bankCodeValue, bankCodeAddress
+    InsertIntoTable gDBPath, "MonthlyDeclarationReport", _
+                    gDataMonthString, "FB3A", _
+                    "FOA|FB3A_Amount_" & bankCodeKey, amountValue, amountAddress
+    ' … 其餘流程 …
+End Sub
+```
+
+**重點說明**
+
+1. **全域只執行一次** `GetMaxIndex`，結果存到 `gRecIndex`。
+2. **`InsertIntoTable`** 內部都用 `gRecIndex`，並在每次執行後自動 `gRecIndex = gRecIndex + 1`。
+3. 之後呼 `InsertIntoTable` 時，完全不用再帶 Index，也不用再跟 Access 查最大值。
+
+這樣即可大幅降低與 Access 互動次數，並確保每筆資料的 `[Index]` 欄位連續、遞增。
+
+https://chatgpt.com/share/68221a61-b738-8010-964f-97ca96618c7a
