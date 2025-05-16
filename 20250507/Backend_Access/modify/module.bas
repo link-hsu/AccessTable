@@ -47,6 +47,9 @@ Public Sub Main()
     Dim allReportNames As Variant
     allReportNames = Array("CNY1", "FB1", "FB2", "FB3", "FB3A", "FM5", "FM11", "FM13", "AI821", "Table2", "FB5", "FB5A", "FM2", "FM10", "F1_F2", "Table41", "AI602", "AI240", "AI822")
 
+    ' =====testArray=====
+    ' allReportNames = Array("AI822")
+
     ' ========== 選擇產生全部或部分報表 ==========
     Dim respRunAll As VbMsgBoxResult
     Dim userInput As String
@@ -57,6 +60,9 @@ Public Sub Main()
                   vbQuestion + vbYesNo, "選擇產生全部或部分報表")    
     If respRunAll = vbYes Then
         gReportNames = allReportNames
+        For i = LBound(gReportNames) To UBound(gReportNames)
+            gReportNames(i) = UCase(gReportNames(i))
+        Next i
     Else
         userInput = InputBox("請輸入要執行的報表名稱，用逗號分隔(例如：CNY1,FB2,FM11)：", "指定要產生的報表")
         userInput = Replace(userInput, " ", "")
@@ -82,23 +88,38 @@ Public Sub Main()
             If Not found Then
                 invalidReports = invalidReports & gReportNames(i) & ", "
             End If
-        Next i
 
+        Next i
         If Len(invalidReports) > 0 Then
             invalidReports = Left(invalidReports, Len(invalidReports) - 2)
             MsgBox "報表名稱錯誤，請重新確認：" & vbCrLf & invalidReports, vbCritical, "報表名稱錯誤"
+            WriteLog "報表名稱錯誤，請重新確認：" & vbCrLf & invalidReports
             Exit Sub
         End If
     End If
     
+
+
     ' ========== 處理其他部門提供數據欄位 ==========
     ' 定義每張報表必需由使用者填入／確認的儲存格名稱
     Dim req As Object
     Set req = CreateObject("Scripting.Dictionary")
-    req.Add "TABLE41", Array("CNY1_國外部", "CNY1_信託部")
-    ' ► 若有其他報表也要此流程，可依同模式再加入：
-    ' req.Add "FB2", Array("FB2_必要欄1", "FB2_必要欄2")
-    ' req.Add "FM11", Array("FM11_必要欄1", ...)
+    req.Add "TABLE41", Array("Table41_國外部_一利息收入", _
+                             "Table41_國外部_一利息收入_利息", _
+                             "Table41_國外部_一利息收入_利息_存放銀行同業", _
+                             "Table41_國外部_二金融服務收入", _
+                             "Table41_國外部_一利息支出", _
+                             "Table41_國外部_一利息支出_利息", _
+                             "Table41_國外部_一利息支出_利息_外國人外匯存款", _
+                             "Table41_國外部_二金融服務支出", _
+                             "Table41_企銷處_一利息支出", _
+                             "Table41_企銷處_一利息支出_利息", _
+                             "Table41_企銷處_一利息支出_利息_外國人新台幣存款")
+                            
+    req.Add "AI822", Array("AI822_會計科_上年度決算後淨值", _
+                           "AI822_國外部_直接往來之授信", _
+                           "AI822_國外部_間接往來之授信", _
+                           "AI822_授管處_直接往來之授信")
 
     ' 暫存要移除的報表
     Dim toRemove As Collection
@@ -140,13 +161,19 @@ Public Sub Main()
                 ElseIf IsNumeric(userVal) Then
                     ws.Range(fld).Value = CDbl(userVal)
                 Else
+                    If IsNumeric(defaultVal) Then
+                        ws.Range(fld).Value = CDbl(defaultVal)
+                    Else
+                        ws.Range(fld).Value = 0
+                    End If
                     MsgBox "您輸入的不是數字，將保留原值：" & defaultVal, vbExclamation
+                    WriteLog "您輸入的不是數字，將保留原值：" & defaultVal
                 End If
             Next fld
         End If
     Next rptName
 
-    '► 新增：把使用者取消的報表，從 gReportNames 中移除
+    ' 把使用者取消的報表，從 gReportNames 中移除
     If toRemove.Count > 0 Then
         Dim tmpArr As Variant
         Dim idx As Long
@@ -172,6 +199,7 @@ Public Sub Main()
         Next name
         If idx = 0 Then
             MsgBox "所有報表均取消，程序結束", vbInformation
+            WriteLog "所有報表均取消，程序結束", vbInformation
             Exit Sub
         End If
     End If
@@ -208,30 +236,9 @@ Public Sub Main()
             Case "AI822":   Call Process_AI822
             Case Else
                 MsgBox "未知的報表名稱: " & rptName, vbExclamation
+                WriteLog "未知的報表名稱: " & rptName
         End Select
     Next rptName    
-
-    ' ' Process B: 製表及更新Access DB Data
-    ' Call Process_CNY1
-    ' Call Process_FB1
-    ' Call Process_FB2
-    ' Call Process_FB3
-    ' Call Process_FB3A
-    ' Call Process_FM5
-    ' Call Process_FM11
-    ' Call Process_FM13
-    ' Call Process_AI821
-    ' Call Process_Table2
-    ' Call Process_FB5
-    ' Call Process_FB5A
-    ' Call Process_FM2
-    ' Call Process_FM10
-    ' Call Process_F1_F2
-    ' Call Process_Table41
-    ' Call Process_AI602
-    ' Call Process_AI240
-    ' Call Process_AI822
-
     ' MsgBox "完成 Process B"
     WriteLog "完成 Process B"
 
@@ -376,6 +383,8 @@ Public Sub Process_CNY1()
             UpdateRecord gDBPath, gDataMonthString, rpt.ReportName, key, allPositions(key), allValues(key)
         Next key
     End If
+    ' 更改分頁顏色為黃色(6)
+    xlsht.Tab.ColorIndex = 6
 End Sub
 
 Public Sub Process_FB1()
@@ -434,6 +443,8 @@ Public Sub Process_FB1()
             UpdateRecord gDBPath, gDataMonthString, rpt.ReportName, key, allPositions(key), allValues(key)
         Next key
     End If
+    ' 更改分頁顏色為黃色(6)
+    xlsht.Tab.ColorIndex = 6
 End Sub
 
 
@@ -549,6 +560,8 @@ Public Sub Process_FB2()
             UpdateRecord gDBPath, gDataMonthString, rpt.ReportName, key, allPositions(key), allValues(key)
         Next key
     End If
+    ' 更改分頁顏色為黃色(6)
+    xlsht.Tab.ColorIndex = 6
 End Sub
 
 
@@ -664,6 +677,8 @@ Public Sub Process_FB3()
             Next key
         End If
     End If
+    ' 更改分頁顏色為黃色(6)
+    xlsht.Tab.ColorIndex = 6
 End Sub
 
 Public Sub Process_FB3A()
@@ -808,6 +823,8 @@ Public Sub Process_FB3A()
         xlsht.Range("O2:O100").NumberFormat = "#,##,##"
         xlsht.Range("P2:P100").NumberFormat = "#,##,##"
     End If
+    ' 更改分頁顏色為黃色(6)
+    xlsht.Tab.ColorIndex = 6
 End Sub
 
 
@@ -866,6 +883,8 @@ Public Sub Process_FM5()
             UpdateRecord gDBPath, gDataMonthString, rpt.ReportName, key, allPositions(key), allValues(key)
         Next key
     End If
+    ' 更改分頁顏色為黃色(6)
+    xlsht.Tab.ColorIndex = 6
 End Sub
 
 Public Sub Process_FM11()
@@ -1015,6 +1034,8 @@ Public Sub Process_FM11()
             UpdateRecord gDBPath, gDataMonthString, rpt.ReportName, key, allPositions(key), allValues(key)
         Next key
     End If
+    ' 更改分頁顏色為黃色(6)
+    xlsht.Tab.ColorIndex = 6
 End Sub
 
 
@@ -1182,6 +1203,8 @@ Public Sub Process_FM13()
             UpdateRecord gDBPath, gDataMonthString, rpt.ReportName, key, allPositions(key), allValues(key)
         Next key
     End If
+    ' 更改分頁顏色為黃色(6)
+    xlsht.Tab.ColorIndex = 6
 End Sub
 
 
@@ -1320,6 +1343,8 @@ Public Sub Process_AI821()
             UpdateRecord gDBPath, gDataMonthString, rpt.ReportName, key, allPositions(key), allValues(key)
         Next key
     End If
+    ' 更改分頁顏色為黃色(6)
+    xlsht.Tab.ColorIndex = 6
 End Sub
 
 Public Sub Process_Table2()
@@ -1448,6 +1473,8 @@ Public Sub Process_Table2()
             UpdateRecord gDBPath, gDataMonthString, rpt.ReportName, key, allPositions(key), allValues(key)
         Next key
     End If
+    ' 更改分頁顏色為黃色(6)
+    xlsht.Tab.ColorIndex = 6
 End Sub
 
 Public Sub Process_FB5()
@@ -1534,6 +1561,8 @@ Public Sub Process_FB5()
             UpdateRecord gDBPath, gDataMonthString, rpt.ReportName, key, allPositions(key), allValues(key)
         Next key
     End If
+    ' 更改分頁顏色為黃色(6)
+    xlsht.Tab.ColorIndex = 6
 End Sub
 
 
@@ -1612,6 +1641,8 @@ Public Sub Process_FB5A()
             UpdateRecord gDBPath, gDataMonthString, rpt.ReportName, key, allPositions(key), allValues(key)
         Next key
     End If
+    ' 更改分頁顏色為黃色(6)
+    xlsht.Tab.ColorIndex = 6
 End Sub
 
 Public Sub Process_FM2()
@@ -1789,6 +1820,8 @@ Public Sub Process_FM2()
     xlsht.Range("T2:T100").NumberFormat = "#,##,##"
     xlsht.Range("U2:U100").NumberFormat = "#,##,##"
     xlsht.Range("V2:V100").NumberFormat = "#,##,##"
+    ' 更改分頁顏色為黃色(6)
+    xlsht.Tab.ColorIndex = 6
 End Sub
 
 Public Sub Process_FM10()
@@ -1961,6 +1994,8 @@ Public Sub Process_FM10()
             UpdateRecord gDBPath, gDataMonthString, rpt.ReportName, key, allPositions(key), allValues(key)
         Next key
     End If
+    ' 更改分頁顏色為黃色(6)
+    xlsht.Tab.ColorIndex = 6
 End Sub
 
 Public Sub Process_F1_F2()
@@ -2309,6 +2344,8 @@ Public Sub Process_F1_F2()
             UpdateRecord gDBPath, gDataMonthString, rpt.ReportName, key, allPositions(key), allValues(key)
         Next key
     End If
+    ' 更改分頁顏色為黃色(6)
+    xlsht.Tab.ColorIndex = 6
 End Sub
 
 Public Sub Process_Table41()
@@ -2344,7 +2381,7 @@ Public Sub Process_Table41()
     
     'Clear Excel Data
     xlsht.Range("A:E").ClearContents
-    xlsht.Range("T2:T100").ClearContents
+    xlsht.Range("T2:T3").ClearContents
 
     '=== Paste Queyr Table into Excel ===
     If Err.Number <> 0 Or LBound(dataArr_1) > UBound(dataArr_1) Then
@@ -2411,6 +2448,16 @@ Public Sub Process_Table41()
 
     xlsht.Range("Table41_四衍生工具處分損失").Value = derivativeLoss
     rpt.SetField "FOA", "Table41_四衍生工具處分損失", CStr(derivativeLoss)
+
+    rpt.SetField "FOA", "Table41_一利息收入", CStr(xlsht.Range("Table41_一利息收入").Value)
+    rpt.SetField "FOA", "Table41_一利息收入_利息", CStr(xlsht.Range("Table41_一利息收入_利息").Value)
+    rpt.SetField "FOA", "Table41_一利息收入_利息_存放銀行同業", CStr(xlsht.Range("Table41_一利息收入_利息_存放銀行同業").Value)
+    rpt.SetField "FOA", "Table41_二金融服務收入", CStr(xlsht.Range("Table41_二金融服務收入").Value)
+    rpt.SetField "FOA", "Table41_一利息支出", CStr(xlsht.Range("Table41_一利息支出").Value)
+    rpt.SetField "FOA", "Table41_一利息支出_利息", CStr(xlsht.Range("Table41_一利息支出_利息").Value)
+    rpt.SetField "FOA", "Table41_一利息支出_利息_外國人新台幣存款", CStr(xlsht.Range("Table41_一利息支出_利息_外國人新台幣存款").Value)
+    rpt.SetField "FOA", "Table41_一利息支出_利息_外國人外匯存款", CStr(xlsht.Range("Table41_一利息支出_利息_外國人外匯存款").Value)
+    rpt.SetField "FOA", "Table41_二金融服務支出", CStr(xlsht.Range("Table41_二金融服務支出").Value)
     
     xlsht.Range("T2:T100").NumberFormat = "#,##,##"
     
@@ -2430,6 +2477,8 @@ Public Sub Process_Table41()
             UpdateRecord gDBPath, gDataMonthString, rpt.ReportName, key, allPositions(key), allValues(key)
         Next key
     End If
+    ' 更改分頁顏色為黃色(6)
+    xlsht.Tab.ColorIndex = 6
 End Sub
 
 Public Sub Process_AI602()
@@ -2792,6 +2841,8 @@ Public Sub Process_AI602()
             UpdateRecord gDBPath, gDataMonthString, rpt.ReportName, key, allPositions(key), allValues(key)
         Next key
     End If
+    ' 更改分頁顏色為黃色(6)
+    xlsht.Tab.ColorIndex = 6
 End Sub
 
 Public Sub Process_AI240()
@@ -2967,6 +3018,8 @@ Public Sub Process_AI240()
             UpdateRecord gDBPath, gDataMonthString, rpt.ReportName, key, allPositions(key), allValues(key)
         Next key
     End If
+    ' 更改分頁顏色為黃色(6)
+    xlsht.Tab.ColorIndex = 6
 End Sub
 
 Public Sub Process_AI822()
@@ -3011,11 +3064,11 @@ Public Sub Process_AI822()
     
     'Clear Excel Data
     xlsht.Range("A:O").ClearContents
-    xlsht.Range("T2:T100").ClearContents
+    xlsht.Range("T4,T8,T19,T20,T22,T23,T25,T26,T28,T29,T34,T35,T37,T38,T40,T41,T43,T44,T45").ClearContents
 
     '=== Paste Queyr Table into Excel ===
     If Err.Number <> 0 Or LBound(dataArr_1) > UBound(dataArr_1) Then
-        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_1 & " 資料表無資料"
+        ' MsgBox "資料有誤: " & reportTitle & "| " & queryTable_1 & " 資料表無資料"
         WriteLog "資料有誤: " & reportTitle & "| " & queryTable_1 & " 資料表無資料"
     Else
         For j = 0 To UBound(dataArr_1, 2)
@@ -3026,7 +3079,7 @@ Public Sub Process_AI822()
     End If
 
     If Err.Number <> 0 Or LBound(dataArr_2) > UBound(dataArr_2) Then
-        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_2 & " 資料表無資料"
+        ' MsgBox "資料有誤: " & reportTitle & "| " & queryTable_2 & " 資料表無資料"
         WriteLog "資料有誤: " & reportTitle & "| " & queryTable_2 & " 資料表無資料"
     Else
         For j = 0 To UBound(dataArr_2, 2)
@@ -3037,8 +3090,8 @@ Public Sub Process_AI822()
     End If
 
     If Err.Number <> 0 Or LBound(dataArr_3) > UBound(dataArr_3) Then
-        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_3 & " 資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_3 & " 資料表無資料"
+        ' MsgBox reportTitle & ": " & queryTable_3 & "資料表無資料"
+        WriteLog reportTitle & ": " & queryTable_3 & "資料表無資料"
     Else
         For j = 0 To UBound(dataArr_3, 2)
             For i = 0 To UBound(dataArr_3, 1)
@@ -3048,8 +3101,8 @@ Public Sub Process_AI822()
     End If
 
     If Err.Number <> 0 Or LBound(dataArr_4) > UBound(dataArr_4) Then
-        MsgBox "資料有誤: " & reportTitle & "| " & queryTable_4 & " 資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & "| " & queryTable_4 & " 資料表無資料"
+        ' MsgBox reportTitle & ": " & queryTable_4 & "資料表無資料"
+        WriteLog reportTitle & ": " & queryTable_4 & "資料表無資料"
     Else
         For j = 0 To UBound(dataArr_4, 2)
             For i = 0 To UBound(dataArr_4, 1)
@@ -3063,79 +3116,23 @@ Public Sub Process_AI822()
     '--------------
     Dim rngs As Range
     Dim rng As Range
-
+    Dim refRngs As Range
+    Dim refRng As Range
 
     ' Table1
-    ' 授信、投資及資金拆存總額度
-    Dim totalCredit_Invest_Deposit As Double
-    totalCredit_Invest_Deposit = 0
-    ' 上年度決算後淨值
-    ' 需手動輸入
-    Dim LastYearNetValue As Double
-    LastYearNetValue = 0
     ' 對大陸地區之授信、投資及資金拆存總額度占上年度決算後淨值之倍數
     Dim quotaMultipleNetvalue As Double
     quotaMultipleNetvalue = 0
 
     ' Table2
-    ' 授信
-    Dim totalCredit As Double
-    totalCredit = 0
-    ' 直接往來之授信 total and 國外 授管提供
-    Dim directCredit As Double
-    Dim directCredit_From_Foreign As Double
-    Dim directCredit_From_Credit As Double
-    directCredit = 0
-    directCredit_From_Foreign = 0
-    directCredit_From_Credit = 0
-    ' 間接往來之授信 total and 國外 授管提供
-    Dim indirectCredit As Double
-    Dim indirectCredit_From_Foreign As Double
-    Dim indirectCredit_From_Credit As Double
-    indirectCredit = 0
-    indirectCredit_From_Foreign = 0
-    indirectCredit_From_Credit = 0
-
-    ' 減：短期貿易融資 total and 國外 提供
-    Dim shortTermFinance As Double
-    Dim shortTermFinance_From_Foreign As Double
-    shortTermFinance = 0
-    shortTermFinance_From_Foreign = 0
+    '  減：短期貿易融資(授信)
+    Dim minusFinanceForCredit As Double
+    minusFinanceForCredit = 0
 
     ' Table4
-    ' 資金拆存 e9
-    Dim shortTermCreditTotal As Double
-    shortTermCreditTotal = 0    
-    ' 債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_帳列小計 c10
-    Dim shortTermCredit_Subtotal As Double
-    shortTermCredit_Subtotal = 0
     ' 債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_適用權數 d10
-    Dim shortTermCredit_Weight As Double
-    shortTermCredit_Weight = 0.2
-    ' 債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_小計 e10
-    Dim shortTermCredit_WeightSubtotal As Double
-    shortTermCredit_WeightSubtotal = 0
-
-    ' 債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_資金拆借帳列金額 f10
-    Dim shortTermCredit_LoanAmount As Double
-    shortTermCredit_LoanAmount = 0
-
-    ' 債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_存放銀行同業帳列金額 g10
-    Dim shortTermCredit_Deposits As Double
-    shortTermCredit_Deposits = 0
-
-    ' 債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_帳列小計 h10
-    shortTermCredit_Subtotal
-
-    ' 大陸地區銀行_資金拆借帳列金額 f11
-    Dim CNBank_LoanAmount As Double
-    CNBank_LoanAmount = 0
-    ' 大陸地區銀行_存放銀行同業帳列金額 g11
-    Dim CNBank_DepositAmount As Double
-    CNBank_DepositAmount = 0
-    ' 大陸地區銀行_帳列小計 h11
-    Dim CNBank_Subtotal As Double
-    CNBank_Subtotal = 0
+    ' Dim shortTermCredit_Weight As Double
+    ' shortTermCredit_Weight = 0.2
 
     ' 中國人民銀行_資金拆借帳列金額
     Dim CNCentralBank_LoanAmount As Double
@@ -3143,9 +3140,6 @@ Public Sub Process_AI822()
     ' 中國人民銀行_存放銀行同業帳列金額
     Dim CNCentralBank_DepositAmount As Double
     CNCentralBank_DepositAmount = 0
-    ' 中國人民銀行_帳列小計
-    Dim CNCentralBank_Subtotal As Double
-    CNCentralBank_Subtotal = 0
 
     ' 政策性及國有商業銀行_資金拆借帳列金額
     Dim CNPolicyBank_LoanAmount As Double
@@ -3153,9 +3147,6 @@ Public Sub Process_AI822()
     ' 政策性及國有商業銀行_存放銀行同業帳列金額
     Dim CNPolicyBank_DepositAmount As Double
     CNPolicyBank_DepositAmount = 0
-    ' 政策性及國有商業銀行_帳列小計
-    Dim CNPolicyBank_Subtotal As Double
-    CNPolicyBank_Subtotal = 0
 
     ' 股份制商業銀行_資金拆借帳列金額
     Dim CNStockBank_LoanAmount As Double
@@ -3163,9 +3154,6 @@ Public Sub Process_AI822()
     ' 股份制商業銀行_存放銀行同業帳列金額
     Dim CNStockBank_DepositAmount As Double
     CNStockBank_DepositAmount = 0
-    ' 股份制商業銀行_帳列小計
-    Dim CNStockBank_Subtotal As Double
-    CNStockBank_Subtotal = 0
 
     ' 其他_資金拆借帳列金額
     Dim CNOtherBank_LoanAmount As Double
@@ -3173,39 +3161,21 @@ Public Sub Process_AI822()
     ' 其他_存放銀行同業帳列金額
     Dim CNOtherBank_DepositAmount As Double
     CNOtherBank_DepositAmount = 0
-    ' 其他_帳列小計
-    Dim CNOtherBank_Subtotal As Double
-    CNOtherBank_Subtotal = 0
 
     ' Table5
-    ' 保證_減風險移轉
-    Dim guaranteeRisk As Double
-    guaranteeRisk = 0
-    ' 擔保品_減風險移轉
-    Dim collateralRisk As Double
-    collateralRisk = 0
-    ' 小計_減風險移轉
-    Dim riskSubtotal As Double
-    riskSubtotal = 0
     ' 保證_授信
     Dim guaranteeCredit As Double
     guaranteeCredit = 0
     ' 擔保品_授信
     Dim collateralCredit As Double
     collateralCredit = 0
-    ' 小計_授信
-    Dim creditSubtotal As Double
-    creditSubtotal = 0
+
     ' 保證_投資
     Dim guaranteeInves As Double
     guaranteeInves = 0
     ' 擔保品_投資
     Dim collateralInves As Double
     collateralInves = 0
-    ' 小計_投資
-    Dim invesSubtotal As Double
-    invesSubtotal = 0
-
 
     ' Table6
     ' 資金拆存予陸資銀行在台分行_資金拆借帳列金額
@@ -3214,9 +3184,7 @@ Public Sub Process_AI822()
     ' 資金拆存予陸資銀行在台分行_存放銀行同業帳列金額
     Dim TWBranch_Loan_DepositAmount As Double
     TWBranch_Loan_DepositAmount = 0
-    ' 資金拆存予陸資銀行在台分行_帳列小計
-    Dim TWBranch_Loan_Subtotal As Double
-    TWBranch_Loan_Subtotal = 0
+
 
     ' 授信予陸資銀行在台分行
     Dim TWBranch_Credit As Double
@@ -3228,105 +3196,183 @@ Public Sub Process_AI822()
     Dim CreditBadDebt As Double
     CreditBadDebt = 0
 
-    lastRow = xlsht.Cells(xlsht.Rows.Count, "C").End(xlUp).Row
-    Set rngs = xlsht.Range("C2:C" & lastRow)
+    ' =====已命名=====
+
+    ' Table1
+    ' ' 授信、投資及資金拆存總額度
+    ' Dim totalCredit_Invest_Deposit As Double
+    ' totalCredit_Invest_Deposit = 0
+
+    ' ' 上年度決算後淨值
+    ' ' 需手動輸入
+    ' Dim LastYearNetValue As Double
+    ' LastYearNetValue = 0
+
+    ' Table2
+    ' ' 授信
+    ' Dim totalCredit As Double
+    ' totalCredit = 0
+    ' ' 直接往來之授信 total and 國外 授管提供
+    ' Dim directCredit As Double
+    ' Dim directCredit_From_Foreign As Double
+    ' Dim directCredit_From_Credit As Double
+    ' directCredit = 0
+    ' directCredit_From_Foreign = 0
+    ' directCredit_From_Credit = 0
+    ' ' 間接往來之授信 total and 國外 授管提供
+    ' Dim indirectCredit As Double
+    ' Dim indirectCredit_From_Foreign As Double
+    ' Dim indirectCredit_From_Credit As Double
+    ' indirectCredit = 0
+    ' indirectCredit_From_Foreign = 0
+    ' indirectCredit_From_Credit = 0
+
+    ' Table4
+    ' ' 資金拆存 e9
+    ' Dim shortTermCreditTotal As Double
+    ' shortTermCreditTotal = 0
+
+    ' ' 債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_帳列小計 c10
+    ' Dim shortTermCredit_Subtotal As Double
+    ' shortTermCredit_Subtotal = 0
+
+    ' ' 債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_小計 e10
+    ' Dim shortTermCredit_WeightSubtotal As Double
+    ' shortTermCredit_WeightSubtotal = 0
+
+    ' ' 債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_資金拆借帳列金額 f10
+    ' Dim shortTermCredit_LoanAmount As Double
+    ' shortTermCredit_LoanAmount = 0
+
+    ' ' 債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_存放銀行同業帳列金額 g10
+    ' Dim shortTermCredit_Deposits As Double
+    ' shortTermCredit_Deposits = 0
+
+    ' 債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_帳列小計 h10
+    ' shortTermCredit_Subtotal
+
+    ' ' 大陸地區銀行_資金拆借帳列金額 f11
+    ' Dim CNBank_LoanAmount As Double
+    ' CNBank_LoanAmount = 0
+    ' ' 大陸地區銀行_存放銀行同業帳列金額 g11
+    ' Dim CNBank_DepositAmount As Double
+    ' CNBank_DepositAmount = 0
+    ' ' 大陸地區銀行_帳列小計 h11
+    ' Dim CNBank_Subtotal As Double
+    ' CNBank_Subtotal = 0
+
+    ' ' 中國人民銀行_帳列小計
+    ' Dim CNCentralBank_Subtotal As Double
+    ' CNCentralBank_Subtotal = 0
+
+    ' ' 政策性及國有商業銀行_帳列小計
+    ' Dim CNPolicyBank_Subtotal As Double
+    ' CNPolicyBank_Subtotal = 0
+
+    ' ' 股份制商業銀行_帳列小計
+    ' Dim CNStockBank_Subtotal As Double
+    ' CNStockBank_Subtotal = 0
+
+    ' ' 其他_帳列小計
+    ' Dim CNOtherBank_Subtotal As Double
+    ' CNOtherBank_Subtotal = 0
+
+    ' Table5
+    ' ' 保證_減風險移轉
+    ' Dim guaranteeRisk As Double
+    ' guaranteeRisk = 0
+    ' ' 擔保品_減風險移轉
+    ' Dim collateralRisk As Double
+    ' collateralRisk = 0
+    ' ' 小計_減風險移轉
+    ' Dim riskSubtotal As Double
+    ' riskSubtotal = 0
+
+    ' ' 小計_授信
+    ' Dim creditSubtotal As Double
+    ' creditSubtotal = 0
+
+    ' ' 小計_投資
+    ' Dim invesSubtotal As Double
+    ' invesSubtotal = 0
+
+    ' Table6
+    ' ' 資金拆存予陸資銀行在台分行_帳列小計
+    ' Dim TWBranch_Loan_Subtotal As Double
+    ' TWBranch_Loan_Subtotal = 0
+
+    ' ===============
+    lastRow = xlsht.Cells(xlsht.Rows.Count, "E").End(xlUp).Row
+    Set refRngs = xlsht.Range("E2:E" & lastRow)
+
+    lastRow = xlsht.Cells(xlsht.Rows.Count, "A").End(xlUp).Row
+    Set rngs = xlsht.Range("A2:A" & lastRow)
 
     '886', '890', '891'
-    For Each rng In rngs
-        If CStr(rng.Value) = "890" Or CStr(rng.Value) = 890 Then
+    If (lastRow > 1) Then
+        For Each rng In rngs
             ' 政策性及國有商業銀行_存放銀行同業帳列金額
-            CNPolicyBank_DepositAmount = CNPolicyBank_DepositAmount + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "886" Or CStr(rng.Value) = 886 Then
+            If CStr(rng.Value) = "890" Or CStr(rng.Value) = 890 Then
+                For Each refRng In refRngs
+                    If rng.Offset(0, 2).Value = refRng.Offset(0, 1).Value Then
+                        CNPolicyBank_DepositAmount = CNPolicyBank_DepositAmount + rng.Offset(0, 3).Value * refRng.Offset(0, 2).Value
+                        Exit For
+                    End If
+                Next refRng
             ' 資金拆存予陸資銀行在台分行_存放銀行同業帳列金額
-            TWBranch_Loan_DepositAmount = TWBranch_Loan_DepositAmount + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "891" Or CStr(rng.Value) = 891 Then
+            ElseIf CStr(rng.Value) = "886" Or CStr(rng.Value) = 886 Then
+                For Each refRng In refRngs
+                    If rng.Offset(0, 2).Value = refRng.Offset(0, 1).Value Then
+                        TWBranch_Loan_DepositAmount = TWBranch_Loan_DepositAmount + rng.Offset(0, 3).Value * refRng.Offset(0, 2).Value
+                        Exit For
+                    End If
+                Next refRng
             ' 資金拆存予陸資銀行在台分行_存放銀行同業帳列金額
-            TWBranch_Loan_DepositAmount = TWBranch_Loan_DepositAmount + rng.Offset(0, 1).Value
-        End If
-    Next rng
+            ElseIf CStr(rng.Value) = "891" Or CStr(rng.Value) = 891 Then
+                For Each refRng In refRngs
+                    If rng.Offset(0, 2).Value = refRng.Offset(0, 1).Value Then
+                        TWBranch_Loan_DepositAmount = TWBranch_Loan_DepositAmount + rng.Offset(0, 3).Value * refRng.Offset(0, 2).Value
+                        Exit For
+                    End If
+                Next refRng
+            End If
+        Next rng
+    End If
 
-    lastRow = xlsht.Cells(xlsht.Rows.Count, "C").End(xlUp).Row
-    Set rngs = xlsht.Range("C2:C" & lastRow)
+    lastRow = xlsht.Cells(xlsht.Rows.Count, "N").End(xlUp).Row
+    Set rngs = xlsht.Range("N2:N" & lastRow)
 
-    For Each rng In rngs
-        ' 資金拆存予陸資銀行在台分行_資金拆借帳列金額
-        CStr(rng.Value) = "DBU" Then
-            TWBranch_Loan_LoanAmount = TWBranch_Loan_LoanAmount + rng.Offset(0, 1).Value
-        ElseIf CStr(rng.Value) = "OBU"
-            TWBranch_Loan_LoanAmount = TWBranch_Loan_LoanAmount + rng.Offset(0, 1).Value
-        End If
-    Next rng
+    If (lastRow > 1) Then
+        For Each rng In rngs
+            ' 資金拆存予陸資銀行在台分行_資金拆借帳列金額
+            If CStr(rng.Value) = "DBU" Then
+                TWBranch_Loan_LoanAmount = TWBranch_Loan_LoanAmount + rng.Offset(0, 1).Value
+            ElseIf CStr(rng.Value) = "OBU" Then
+                TWBranch_Loan_LoanAmount = TWBranch_Loan_LoanAmount + rng.Offset(0, 1).Value
+            End If
+        Next rng
+    End If
 
-    CNBank_LoanAmount = CNCentralBank_LoanAmount + CNPolicyBank_LoanAmount + CNStockBank_LoanAmount + CNOtherBank_LoanAmount
-    CNBank_DepositAmount = CNCentralBank_DepositAmount + CNPolicyBank_DepositAmount + CNStockBank_DepositAmount + CNOtherBank_DepositAmount
-    CNBank_Subtotal = CNBank_LoanAmount + CNBank_DepositAmount
+    CNPolicyBank_DepositAmount = Round(CNPolicyBank_DepositAmount, 0)
+    TWBranch_Loan_DepositAmount = Round(TWBranch_Loan_DepositAmount, 0)
+    TWBranch_Loan_LoanAmount = Round(TWBranch_Loan_LoanAmount, 0)
 
-    shortTermCredit_LoanAmount = CNBank_LoanAmount
-    shortTermCredit_Deposits = CNBank_DepositAmount
-    shortTermCredit_Subtotal = CNBank_Subtotal
+    ' VBA中計算
+    xlsht.Range("AI822_政策性及國有商業銀行_存放銀行同業帳列金額").Value = CNPolicyBank_DepositAmount
+    rpt.SetField "Table4", "AI822_政策性及國有商業銀行_存放銀行同業帳列金額", CStr(CNPolicyBank_DepositAmount)
 
-    shortTermCredit_WeightSubtotal = shortTermCredit_Subtotal * shortTermCredit_Weight
-    shortTermCreditTotal = shortTermCredit_WeightSubtotal
+    xlsht.Range("AI822_資金拆存予陸資銀行在台分行_存放銀行同業帳列金額").Value = TWBranch_Loan_DepositAmount
+    rpt.SetField "Table6", "AI822_資金拆存予陸資銀行在台分行_存放銀行同業帳列金額", CStr(TWBranch_Loan_DepositAmount)
 
-    guaranteeRisk = guaranteeCredit + guaranteeInves
-    collateralRisk = collateralCredit + collateralInves
-    riskSubtotal = guaranteeRisk + collateralRisk
+    xlsht.Range("AI822_資金拆存予陸資銀行在台分行_資金拆借帳列金額").Value = TWBranch_Loan_LoanAmount
+    rpt.SetField "Table6", "AI822_資金拆存予陸資銀行在台分行_資金拆借帳列金額", CStr(TWBranch_Loan_LoanAmount)
 
-    creditSubtotal = guaranteeCredit + collateralCredit
-    invesSubtotal = guaranteeInves + collateralInves
-
-    TWBranch_Loan_Subtotal = TWBranch_Loan_LoanAmount + TWBranch_Loan_DepositAmount
-
-    xlsht.Range("AI822_授信、投資及資金拆存總額度").Value = totalCredit_Invest_Deposit
-    rpt.SetField "Table1", "AI822_授信、投資及資金拆存總額度", CStr(totalCredit_Invest_Deposit)
-
-    xlsht.Range("AI822_上年度決算後淨值").Value = LastYearNetValue
-    rpt.SetField "Table1", "AI822_上年度決算後淨值", CStr(LastYearNetValue)
-
+    ' 無資料設定初始值
     xlsht.Range("AI822_對大陸地區之授信、投資及資金拆存總額度占上年度決算後淨值之倍數").Value = quotaMultipleNetvalue
     rpt.SetField "Table1", "AI822_對大陸地區之授信、投資及資金拆存總額度占上年度決算後淨值之倍數", CStr(quotaMultipleNetvalue)
 
-    xlsht.Range("AI822_授信").Value = totalCredit
-    rpt.SetField "Table2", "AI822_授信", CStr(totalCredit)
-
-    xlsht.Range("AI822_直接往來之授信").Value = directCredit
-    rpt.SetField "Table2", "AI822_直接往來之授信", CStr(directCredit)
-
-    xlsht.Range("AI822_間接往來之授信").Value = indirectCredit
-    rpt.SetField "Table2", "AI822_間接往來之授信", CStr(indirectCredit)
-
-    xlsht.Range("AI822_減短期貿易融資").Value = shortTermFinance
-    rpt.SetField "Table2", "AI822_減短期貿易融資", CStr(shortTermFinance)
-
-    xlsht.Range("AI822_資金拆存_小計").Value = shortTermCreditTotal
-    rpt.SetField "Table4", "AI822_資金拆存_小計", CStr(shortTermCreditTotal)
-
-    xlsht.Range("AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_帳列小計C3").Value = shortTermCredit_Subtotal
-    rpt.SetField "Table4", "AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_帳列小計C3", CStr(shortTermCredit_Subtotal)
-
-    xlsht.Range("AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_適用權數").Value = shortTermCredit_Weight
-    rpt.SetField "Table4", "AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_適用權數", CStr(shortTermCredit_Weight)
-    
-    xlsht.Range("AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_小計").Value = shortTermCredit_WeightSubtotal
-    rpt.SetField "Table4", "AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_小計", CStr(shortTermCredit_WeightSubtotal)
-
-    xlsht.Range("AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_資金拆借帳列金額").Value = shortTermCredit_LoanAmount
-    rpt.SetField "Table4", "AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_資金拆借帳列金額", CStr(shortTermCredit_LoanAmount)
-
-    xlsht.Range("AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_存放銀行同業帳列金額").Value = shortTermCredit_Deposits
-    rpt.SetField "Table4", "AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_存放銀行同業帳列金額", CStr(shortTermCredit_Deposits)
-
-    xlsht.Range("AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_帳列小計D5").Value = shortTermCredit_Subtotal
-    rpt.SetField "Table4", "AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_帳列小計D5", CStr(shortTermCredit_Subtotal)
-
-    xlsht.Range("AI822_大陸地區銀行_資金拆借帳列金額").Value = CNBank_LoanAmount
-    rpt.SetField "Table4", "AI822_大陸地區銀行_資金拆借帳列金額", CStr(CNBank_LoanAmount)
-
-    xlsht.Range("AI822_大陸地區銀行_存放銀行同業帳列金額").Value = CNBank_DepositAmount
-    rpt.SetField "Table4", "AI822_大陸地區銀行_存放銀行同業帳列金額", CStr(CNBank_DepositAmount)
-
-    xlsht.Range("AI822_大陸地區銀行_帳列小計").Value = CNBank_Subtotal
-    rpt.SetField "Table4", "AI822_大陸地區銀行_帳列小計", CStr(CNBank_Subtotal)
+    xlsht.Range("AI822_減短期貿易融資").Value = minusFinanceForCredit
+    rpt.SetField "Table2", "AI822_減短期貿易融資", CStr(minusFinanceForCredit)
 
     xlsht.Range("AI822_中國人民銀行_資金拆借帳列金額").Value = CNCentralBank_LoanAmount
     rpt.SetField "Table4", "AI822_中國人民銀行_資金拆借帳列金額", CStr(CNCentralBank_LoanAmount)
@@ -3334,17 +3380,8 @@ Public Sub Process_AI822()
     xlsht.Range("AI822_中國人民銀行_存放銀行同業帳列金額").Value = CNCentralBank_DepositAmount
     rpt.SetField "Table4", "AI822_中國人民銀行_存放銀行同業帳列金額", CStr(CNCentralBank_DepositAmount)
 
-    xlsht.Range("AI822_中國人民銀行_帳列小計").Value = CNCentralBank_Subtotal
-    rpt.SetField "Table4", "AI822_中國人民銀行_帳列小計", CStr(CNCentralBank_Subtotal)
-
     xlsht.Range("AI822_政策性及國有商業銀行_資金拆借帳列金額").Value = CNPolicyBank_LoanAmount
     rpt.SetField "Table4", "AI822_政策性及國有商業銀行_資金拆借帳列金額", CStr(CNPolicyBank_LoanAmount)
-
-    xlsht.Range("AI822_政策性及國有商業銀行_存放銀行同業帳列金額").Value = CNPolicyBank_DepositAmount
-    rpt.SetField "Table4", "AI822_政策性及國有商業銀行_存放銀行同業帳列金額", CStr(CNPolicyBank_DepositAmount)
-
-    xlsht.Range("AI822_政策性及國有商業銀行_帳列小計").Value = CNPolicyBank_Subtotal
-    rpt.SetField "Table4", "AI822_政策性及國有商業銀行_帳列小計", CStr(CNPolicyBank_Subtotal)
 
     xlsht.Range("AI822_股份制商業銀行_資金拆借帳列金額").Value = CNStockBank_LoanAmount
     rpt.SetField "Table4", "AI822_股份制商業銀行_資金拆借帳列金額", CStr(CNStockBank_LoanAmount)
@@ -3352,26 +3389,11 @@ Public Sub Process_AI822()
     xlsht.Range("AI822_股份制商業銀行_存放銀行同業帳列金額").Value = CNStockBank_DepositAmount
     rpt.SetField "Table4", "AI822_股份制商業銀行_存放銀行同業帳列金額", CStr(CNStockBank_DepositAmount)
 
-    xlsht.Range("AI822_股份制商業銀行_帳列小計").Value = CNStockBank_Subtotal
-    rpt.SetField "Table4", "AI822_股份制商業銀行_帳列小計", CStr(CNStockBank_Subtotal)
-
     xlsht.Range("AI822_其他_資金拆借帳列金額").Value = CNOtherBank_LoanAmount
     rpt.SetField "Table4", "AI822_其他_資金拆借帳列金額", CStr(CNOtherBank_LoanAmount)
 
     xlsht.Range("AI822_其他_存放銀行同業帳列金額").Value = CNOtherBank_DepositAmount
     rpt.SetField "Table4", "AI822_其他_存放銀行同業帳列金額", CStr(CNOtherBank_DepositAmount)
-
-    xlsht.Range("AI822_其他_帳列小計").Value = CNOtherBank_Subtotal
-    rpt.SetField "Table4", "AI822_其他_帳列小計", CStr(CNOtherBank_Subtotal)
-
-    xlsht.Range("AI822_保證_減風險移轉").Value = guaranteeRisk
-    rpt.SetField "Table5", "AI822_保證_減風險移轉", CStr(guaranteeRisk)
-
-    xlsht.Range("AI822_擔保品_減風險移轉").Value = collateralRisk
-    rpt.SetField "Table5", "AI822_擔保品_減風險移轉", CStr(collateralRisk)
-
-    xlsht.Range("AI822_小計_減風險移轉").Value = riskSubtotal
-    rpt.SetField "Table5", "AI822_小計_減風險移轉", CStr(riskSubtotal)
 
     xlsht.Range("AI822_保證_授信").Value = guaranteeCredit
     rpt.SetField "Table5", "AI822_保證_授信", CStr(guaranteeCredit)
@@ -3379,26 +3401,11 @@ Public Sub Process_AI822()
     xlsht.Range("AI822_擔保品_授信").Value = collateralCredit
     rpt.SetField "Table5", "AI822_擔保品_授信", CStr(collateralCredit)
 
-    xlsht.Range("AI822_小計_授信").Value = creditSubtotal
-    rpt.SetField "Table5", "AI822_小計_授信", CStr(creditSubtotal)
-
     xlsht.Range("AI822_保證_投資").Value = guaranteeInves
     rpt.SetField "Table5", "AI822_保證_投資", CStr(guaranteeInves)
 
     xlsht.Range("AI822_擔保品_投資").Value = collateralInves
     rpt.SetField "Table5", "AI822_擔保品_投資", CStr(collateralInves)
-
-    xlsht.Range("AI822_小計_投資").Value = invesSubtotal
-    rpt.SetField "Table5", "AI822_小計_投資", CStr(invesSubtotal)
-
-    xlsht.Range("AI822_資金拆存予陸資銀行在台分行_資金拆借帳列金額").Value = TWBranch_Loan_LoanAmount
-    rpt.SetField "Table6", "AI822_資金拆存予陸資銀行在台分行_資金拆借帳列金額", CStr(TWBranch_Loan_LoanAmount)
-
-    xlsht.Range("AI822_資金拆存予陸資銀行在台分行_存放銀行同業帳列金額").Value = TWBranch_Loan_DepositAmount
-    rpt.SetField "Table6", "AI822_資金拆存予陸資銀行在台分行_存放銀行同業帳列金額", CStr(TWBranch_Loan_DepositAmount)
-
-    xlsht.Range("AI822_資金拆存予陸資銀行在台分行_帳列小計").Value = TWBranch_Loan_Subtotal
-    rpt.SetField "Table6", "AI822_資金拆存予陸資銀行在台分行_帳列小計", CStr(TWBranch_Loan_Subtotal)
 
     xlsht.Range("AI822_授信予陸資銀行在台分行").Value = TWBranch_Credit
     rpt.SetField "Table6", "AI822_授信予陸資銀行在台分行", CStr(TWBranch_Credit)
@@ -3408,10 +3415,40 @@ Public Sub Process_AI822()
 
     xlsht.Range("AI822_當月授信轉銷呆帳金額").Value = CreditBadDebt
     rpt.SetField "Table6", "AI822_當月授信轉銷呆帳金額", CStr(CreditBadDebt)
-    
-    xlsht.Range("T2:T100").NumberFormat = "#,##,##"
-    
 
+    ' Excel中計算
+    rpt.SetField "Table1", "AI822_授信、投資及資金拆存總額度", CStr(xlsht.Range("AI822_授信、投資及資金拆存總額度").Value)
+    rpt.SetField "Table1", "AI822_上年度決算後淨值", CStr(xlsht.Range("AI822_上年度決算後淨值").Value)
+
+    rpt.SetField "Table2", "AI822_授信", CStr(xlsht.Range("AI822_授信").Value)
+    rpt.SetField "Table2", "AI822_直接往來之授信", CStr(xlsht.Range("AI822_直接往來之授信").Value)
+    rpt.SetField "Table2", "AI822_間接往來之授信", CStr(xlsht.Range("AI822_間接往來之授信").Value)
+
+    rpt.SetField "Table4", "AI822_資金拆存_小計", CStr(xlsht.Range("AI822_資金拆存_小計").Value)
+    rpt.SetField "Table4", "AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_帳列小計C3", CStr(xlsht.Range("AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_帳列小計C3").Value)
+    ' rpt.SetField "Table4", "AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_適用權數", CStr(xlsht.Range("AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_適用權數").Value)
+    rpt.SetField "Table4", "AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_小計", CStr(xlsht.Range("AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_小計").Value)
+    rpt.SetField "Table4", "AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_資金拆借帳列金額", CStr(xlsht.Range("AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_資金拆借帳列金額").Value)
+    rpt.SetField "Table4", "AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_存放銀行同業帳列金額", CStr(xlsht.Range("AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_存放銀行同業帳列金額").Value)
+    rpt.SetField "Table4", "AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_帳列小計D5", CStr(xlsht.Range("AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_帳列小計D5").Value)
+    rpt.SetField "Table4", "AI822_大陸地區銀行_資金拆借帳列金額", CStr(xlsht.Range("AI822_大陸地區銀行_資金拆借帳列金額").Value)
+    rpt.SetField "Table4", "AI822_大陸地區銀行_存放銀行同業帳列金額", CStr(xlsht.Range("AI822_大陸地區銀行_存放銀行同業帳列金額").Value)
+    rpt.SetField "Table4", "AI822_大陸地區銀行_帳列小計", CStr(xlsht.Range("AI822_大陸地區銀行_帳列小計").Value)
+    rpt.SetField "Table4", "AI822_中國人民銀行_帳列小計", CStr(xlsht.Range("AI822_中國人民銀行_帳列小計").Value)
+    rpt.SetField "Table4", "AI822_政策性及國有商業銀行_帳列小計", CStr(xlsht.Range("AI822_政策性及國有商業銀行_帳列小計").Value)
+    rpt.SetField "Table4", "AI822_股份制商業銀行_帳列小計", CStr(xlsht.Range("AI822_股份制商業銀行_帳列小計").Value)
+    rpt.SetField "Table4", "AI822_其他_帳列小計", CStr(xlsht.Range("AI822_其他_帳列小計").Value)
+
+    rpt.SetField "Table5", "AI822_保證_減風險移轉", CStr(xlsht.Range("AI822_保證_減風險移轉").Value)
+    rpt.SetField "Table5", "AI822_擔保品_減風險移轉", CStr(xlsht.Range("AI822_擔保品_減風險移轉").Value)
+    rpt.SetField "Table5", "AI822_小計_減風險移轉", CStr(xlsht.Range("AI822_小計_減風險移轉").Value)
+    rpt.SetField "Table5", "AI822_小計_授信", CStr(xlsht.Range("AI822_小計_授信").Value)
+    rpt.SetField "Table5", "AI822_小計_投資", CStr(xlsht.Range("AI822_小計_投資").Value)
+
+    rpt.SetField "Table6", "AI822_資金拆存予陸資銀行在台分行_帳列小計", CStr(xlsht.Range("AI822_資金拆存予陸資銀行在台分行_帳列小計").Value)
+
+    ' xlsht.Range("T2:T100").NumberFormat = "#,##,##"
+    
     ' 1.Validation filled all value (NO Null value exist)
     ' 2.Update Access DB
     If rpt.ValidateFields() Then
@@ -3427,6 +3464,8 @@ Public Sub Process_AI822()
             UpdateRecord gDBPath, gDataMonthString, rpt.ReportName, key, allPositions(key), allValues(key)
         Next key
     End If
+    ' 更改分頁顏色為黃色(6)
+    xlsht.Tab.ColorIndex = 6
 End Sub
 
 
