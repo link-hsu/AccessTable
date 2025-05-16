@@ -88,7 +88,7 @@ Public Sub Init(ByVal reportName As String, _
                 Array("AI821_外商銀行在臺分行", "D63", Null), _
                 Array("AI821_大陸地區銀行", "D64", Null), _
                 Array("AI821_其他", "D65", Null) )
-        Case "Table2"
+        Case "TABLE2"
             AddWorksheetFields "FOA", Array( _
                 Array("Table2_申報時間", "E3", dataMonthStringROC), _
                 Array("Table2_A_1011100_其他", "D17", Null), _
@@ -166,11 +166,20 @@ Public Sub Init(ByVal reportName As String, _
             AddWorksheetFields "f2", fieldList_F2
             AddDynamicField "f2", "F2_申報時間", "A3", dataMonthStringROC_F1F2
 
-        Case "Table41"
+        Case "TABLE41"
             AddWorksheetFields "FOA", Array( _
                 Array("Table41_申報時間", "A3", dataMonthStringROC), _
                 Array("Table41_四衍生工具處分利益", "D25", Null), _
-                Array("Table41_四衍生工具處分損失", "G25", Null) )
+                Array("Table41_四衍生工具處分損失", "G25", Null), _
+                Array("Table41_一利息收入", "D9", Null), _
+                Array("Table41_一利息收入_利息", "D10", Null), _
+                Array("Table41_一利息收入_利息_存放銀行同業", "D12", Null), _
+                Array("Table41_二金融服務收入", "D19", Null), _
+                Array("Table41_一利息支出", "G9", Null), _
+                Array("Table41_一利息支出_利息", "G10", Null), _
+                Array("Table41_一利息支出_利息_外國人新台幣存款", "G14", Null), _
+                Array("Table41_一利息支出_利息_外國人外匯存款", "G15", Null), _
+                Array("Table41_二金融服務支出", "G19", Null) )
         Case "AI602"
             AddWorksheetFields "Table1", Array( _
                 Array("AI602_申報時間", "B3", dataMonthStringROC_NUM), _
@@ -221,6 +230,7 @@ Public Sub Init(ByVal reportName As String, _
                 Array("AI822_授信、投資及資金拆存總額度", "C9", Null), _
                 Array("AI822_上年度決算後淨值", "C10", Null), _
                 Array("AI822_對大陸地區之授信、投資及資金拆存總額度占上年度決算後淨值之倍數", "C11", Null) )
+                
 
             AddWorksheetFields "Table2", Array( _
                 Array("AI822_授信", "C9", Null), _
@@ -231,7 +241,6 @@ Public Sub Init(ByVal reportName As String, _
             AddWorksheetFields "Table4", Array( _
                 Array("AI822_資金拆存_小計", "E9", Null), _
                 Array("AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_帳列小計C3", "C10", Null), _
-                Array("AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_適用權數", "D10", Null), _
                 Array("AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_小計", "E10", Null), _
                 Array("AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_資金拆借帳列金額", "F10", Null), _
                 Array("AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_存放銀行同業帳列金額", "G10", Null), _
@@ -251,6 +260,7 @@ Public Sub Init(ByVal reportName As String, _
                 Array("AI822_其他_資金拆借帳列金額", "F15", Null), _
                 Array("AI822_其他_存放銀行同業帳列金額", "G15", Null), _
                 Array("AI822_其他_帳列小計", "H15", Null) )
+                ' Array("AI822_債權債務剩餘期限不足3個月且交易對手之長期債信或短期債信符合投資等級以上者_適用權數", "D10", Null), _
 
             AddWorksheetFields "Table5", Array( _
                 Array("AI822_保證_減風險移轉", "C9", Null), _
