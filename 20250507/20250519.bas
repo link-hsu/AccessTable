@@ -361,3 +361,107 @@ End Sub
    * 完全不用 Dictionary，僅使用基本陣列與巢狀迴圈。
    * 可以自動貼上所有標題一致的欄位，不限於固定數量。
    * 如果新增或刪除欄位，只要標題一致，就能自動對應。
+
+
+
+
+
+
+
+
+
+' ===================================
+
+
+Question 2
+
+以下程式示範如何只用 **兩張工作表**（第一張是「摘要表」，第二張是「SQL 結果表」）完成你的需求：
+
+```vb
+Sub FillAssetSummary()
+    Dim wsSum     As Worksheet   ' 摘要表，用來放結果
+    Dim wsData    As Worksheet   ' SQL 匯出結果表
+    Dim lastSum   As Long        ' 摘要表最後一列
+    Dim lastData  As Long        ' 資料表最後一列
+    Dim iSum      As Long        ' 摘要表列迴圈
+    Dim iData     As Long        ' 資料表列迴圈
+    Dim jHead     As Long        ' 摘要表欄迴圈（找標題）
+    Dim codeVal   As String      ' 申報代號（摘要表欄A）
+    Dim measType  As String      ' 衡量方式（資料表欄A）
+    Dim subtotal  As Double      ' 小計（資料表欄C）
+    Dim sumAll    As Double      ' 合計（每個 code 的累計）
+    Dim totalCol  As Long        ' 合計欄位
+
+    ' 1. 指定工作表
+    Set wsSum  = ThisWorkbook.Worksheets("摘要表")
+    Set wsData = ThisWorkbook.Worksheets("SQL結果表")
+
+    ' 2. 找最後一列
+    lastSum  = wsSum.Cells(wsSum.Rows.Count, "A").End(xlUp).Row
+    lastData = wsData.Cells(wsData.Rows.Count, "A").End(xlUp).Row
+
+    ' 3. 先找出「合計」欄位，如果不存在就自動新增在最右側下一欄
+    totalCol = wsSum.Cells(1, wsSum.Columns.Count).End(xlToLeft).Column + 1
+    wsSum.Cells(1, totalCol).Value = "合計"
+
+    ' 4. 走訪摘要表每一筆申報代號
+    For iSum = 2 To lastSum
+        codeVal = wsSum.Cells(iSum, "A").Value
+        sumAll  = 0
+
+        ' 5. 比對 SQL 結果表每一列
+        For iData = 2 To lastData
+            ' 如果 Category（假設在欄B）等於這筆 code
+            If wsData.Cells(iData, "B").Value = codeVal Then
+                measType = wsData.Cells(iData, "A").Value       ' 衡量方式
+                subtotal = wsData.Cells(iData, "C").Value       ' 小計
+                sumAll = sumAll + subtotal
+
+                ' 6. 找出對應「衡量方式」在摘要表的欄號
+                For jHead = 2 To totalCol - 1    ' 標題從第2欄到合計前一欄
+                    If wsSum.Cells(1, jHead).Value = measType Then
+                        wsSum.Cells(iSum, jHead).Value = subtotal
+                        Exit For
+                    End If
+                Next jHead
+            End If
+        Next iData
+
+        ' 7. 寫入合計
+        wsSum.Cells(iSum, totalCol).Value = sumAll
+    Next iSum
+
+    MsgBox "摘要表已更新完成！", vbInformation
+End Sub
+```
+
+---
+
+### 為什麼這樣寫？
+
+1. **只需兩張表**
+
+   * `wsSum`：你的第一張「摘要表」，欄 A 為申報代號，欄 B 以後是各衡量方式，最後一欄為「合計」。
+   * `wsData`：第二張「SQL 結果表」，假設欄 A = `AssetMeasurementType`（衡量方式）、欄 B = `Category`（申報代號）、欄 C = `SubtotalBalance`。
+
+2. **一次找出「合計」欄**
+
+   * 在一開始就抓到摘要表最右側空白欄位，並把表頭填入「合計」，免去重複計算或硬寫欄號。
+
+3. **三層迴圈，但結構清晰**
+
+   * **外層**：跑摘要表每個申報代號 (`iSum`)。
+   * **中層**：跑 SQL 結果表每筆資料 (`iData`)，挑出相同申報代號。
+   * **內層**：在摘要表的第一列標題中，找出這筆資料對應的「衡量方式」欄位位置。
+
+4. **一邊貼值、一邊累計**
+
+   * 找到匹配的資料列，就把那一筆 `SubtotalBalance` 貼到摘要表對應欄，並同時加到 `sumAll` 裡。
+   * 中層迴圈結束後，把 `sumAll` 一次寫到「合計」欄。
+
+5. **易於維護**
+
+   * 如果未來增加新的衡量方式，只要在摘要表加一個新標題，就能自動對應，不用再改 VBA。
+   * SQL 表只要維持那三欄順序 (A/B/C)，程式碼不用動。
+
+如有任何欄位名稱或工作表名稱與你的檔案不同，只要調整 `Worksheets("…")` 或 `Cells(…, "A")` 中的參數即可。希望這版正符合你的需求！
