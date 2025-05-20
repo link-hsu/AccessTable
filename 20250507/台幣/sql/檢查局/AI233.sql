@@ -189,3 +189,96 @@
 
 
 數字哪邊來的這要問
+
+
+
+
+
+
+
+
+
+PARAMETERS DataMonthParam TEXT;
+SELECT
+    AccountCodeMap.AssetMeasurementSubType & "_" & AccountCodeMap.Category As MeasurementCategory,
+    SUM(ab.Amount) As SubtotalAmount
+FROM AccountCodeMap
+INNER JOIN
+    (
+        SELECT AccountBalance.AccountCode, AccountBalance.Amount
+        FROM AccountBalance
+        WHERE AccountBalance.DataMonthString = [DataMonthParam]
+        AND AccountBalance.BalanceType = '餘額C'
+    ) AS ab
+ON
+    AccountCodeMap.AccountCode = ab.AccountCode
+WHERE
+    AccountCodeMap.GroupFlag IN ('台幣債', '股權', '受益憑證', 'CP', 'Derivative', 'Bill')
+    AND AccountCodeMap.Category IN ('Cost' , 'ValuationAdjust', 'ImpairmentLoss', 'ImpairmentAllowance')
+    AND AccountCodeMap.SingleOrSubtotal = 'Single'
+GROUP BY
+    AccountCodeMap.AssetMeasurementType,
+    AccountCodeMap.AssetMeasurementSubType,
+    AccountCodeMap.Category;
+
+
+
+
+PARAMETERS DataMonthParam TEXT;
+SELECT
+    AccountCodeMap.AssetMeasurementSubType & "_" & AccountCodeMap.Category As MeasurementCategory
+FROM AccountCodeMap
+WHERE
+    AccountCodeMap.GroupFlag IN ('台幣債', '股權', '受益憑證', 'CP', 'Derivative', 'Bill')
+    AND AccountCodeMap.Category IN ('Cost' , 'ValuationAdjust', 'ImpairmentLoss', 'ImpairmentAllowance')
+    AND AccountCodeMap.SingleOrSubtotal = 'Single'
+GROUP BY
+    AccountCodeMap.AssetMeasurementType,
+    AccountCodeMap.AssetMeasurementSubType,
+    AccountCodeMap.Category;
+
+
+
+
+MeasurementCategory
+AC_CompanyBond_Domestic_Cost
+AC_CompanyBond_Domestic_ImpairmentLoss
+AC_GovBond_Domestic_Cost
+AC_GovBond_Domestic_ImpairmentLoss
+AC_NCD_CentralBank_Cost
+AC_NCD_CentralBank_ImpairmentLoss
+AFS_FinancialBond_Domestic_Cost
+AFS_FinancialBond_Domestic_ValuationAdjust
+EquityMethod_Other_Cost
+FVOCI_CompanyBond_Domestic_Cost
+FVOCI_CompanyBond_Domestic_ImpairmentAllowance
+FVOCI_CompanyBond_Domestic_ValuationAdjust
+FVOCI_GovBond_Domestic_Cost
+FVOCI_GovBond_Domestic_ImpairmentAllowance
+FVOCI_GovBond_Domestic_ValuationAdjust
+FVOCI_NCD_CentralBank_Cost
+FVOCI_NCD_CentralBank_ImpairmentAllowance
+FVOCI_NCD_CentralBank_ValuationAdjust
+FVOCI_Stock_普通股_上市_Cost
+FVOCI_Stock_普通股_上市_ValuationAdjust
+FVOCI_Stock_普通股_上櫃_Cost
+FVOCI_Stock_普通股_上櫃_ValuationAdjust
+FVOCI_Equity_Other_Cost
+FVOCI_Equity_Other_ValuationAdjust
+FVPL_AssetCertificate_Cost
+FVPL_AssetCertificate_ValuationAdjust
+FVPL_CompanyBond_Domestic_Cost
+FVPL_CompanyBond_Domestic_ValuationAdjust
+FVPL_CP_Cost
+FVPL_CP_ValuationAdjust
+FVPL_CVASWAP_ValuationAdjust
+FVPL_GovBond_Domestic_Cost
+FVPL_GovBond_Domestic_ValuationAdjust
+FVPL_Stock_特別股_上市_Cost
+FVPL_Stock_特別股_上市_ValuationAdjust
+FVPL_Stock_普通股_上市_Cost
+FVPL_Stock_普通股_上市_ValuationAdjust
+FVPL_Stock_普通股_上櫃_Cost
+FVPL_Stock_普通股_上櫃_ValuationAdjust
+FVPL_SWAP_Cost
+FVPL_SWAP_ValuationAdjust
