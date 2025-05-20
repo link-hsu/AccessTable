@@ -27,3 +27,22 @@ S欄位 面額
     - 央行可轉讓定期存單
 =SUMIF('票券交易明細表選首購、承銷發行)'!L:L,"央行NCD",'票券交易明細表選首購、承銷發行)'!S:S)
 
+
+
+
+BillTransactionDetails
+
+
+BillType
+
+
+PARAMETERS DataMonthParam TEXT;
+SELECT 
+    BillTransactionDetails.BillType As '類型'
+    COUNT(BillTransactionDetails.BillType) AS '筆數'
+FROM 
+    BillTransactionDetails
+WHERE
+    BillTransactionDetails.DataMonthString = [DataMonthParam]
+GROUP BY
+    BillTransactionDetails.BillType;
