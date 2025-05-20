@@ -15,4 +15,14 @@ Repayment
 PNCD設定弄一個表
 
 
-
+PARAMETERS DataMonthParam TEXT;
+SELECT
+    PNCDCAL.Code
+    PNCDCAL.LastMonthBalance
+    PNCDCAL.InterestRate
+    PNCDCAL.IssueAmount
+    PNCDCAL.Repayment
+FROM 
+    PNCDCAL
+WHERE
+    PNCDCAL.DataMonthString = [DataMonthParam];
