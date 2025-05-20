@@ -136,3 +136,30 @@ VLOOKUP(120070903,E!$A:$C,3,0)/1000
 VLOOKUP(140030147,E!A:C,3,0)/1000
 
     按攤銷後成本衡量之債務工具投資2 C
+
+
+
+
+
+PARAMETERS DataMonthParam TEXT;
+SELECT
+    AccountCodeMap.AssetMeasurementSubType & "_" & AccountCodeMap.Category As MeasurementCategory,
+    SUM(ab.Amount) As SubtotalAmount
+FROM AccountCodeMap
+INNER JOIN
+    (
+        SELECT AccountBalance.AccountCode, AccountBalance.Amount
+        FROM AccountBalance
+        WHERE AccountBalance.DataMonthString = [DataMonthParam]
+        AND AccountBalance.BalanceType = '餘額E'
+    ) AS ab
+ON
+    AccountCodeMap.AccountCode = ab.AccountCode
+WHERE
+    AccountCodeMap.GroupFlag IN ('台幣債', '股權', '受益憑證', 'Bill', 'CP')
+    AND AccountCodeMap.Category IN ('Cost' , 'ValuationAdjust', 'ImpairmentLoss')
+    AND AccountCodeMap.SingleOrSubtotal = 'Single'
+GROUP BY
+    AccountCodeMap.AssetMeasurementType,
+    AccountCodeMap.AssetMeasurementSubType,
+    AccountCodeMap.Category;
