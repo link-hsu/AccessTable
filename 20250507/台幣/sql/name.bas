@@ -266,3 +266,99 @@ End Sub
 * **UI 觸發**：按鈕或快捷鍵
 
 這三種方式都可以靈活地在不同檔案或情境下，快速呼叫並帶入你的命名邏輯。
+
+
+
+
+answer4.
+
+你可以再寫一支 VBA 巨集，把剛剛在活頁簿裡建立的所有名稱 (Names) 逐一抓出，然後把名稱和對應的參照 (RefersTo) 輸出到文字檔。以下是一個範例，示範如何把活頁簿中所有以 `Table10_` 為前綴的名稱，匯出到和活頁簿同一個資料夾底下的 `NamesList.txt`：
+
+```vb
+Option Explicit
+
+Public Sub ExportTable10NamesToText()
+    Dim nm      As Name
+    Dim fnum    As Integer
+    Dim outPath As String
+    
+    ' 1. 決定輸出檔案的位置（這裡用與活頁簿相同的資料夾）
+    outPath = ThisWorkbook.Path & Application.PathSeparator & "NamesList.txt"
+    
+    ' 2. 開啟文字檔，準備寫入
+    fnum = FreeFile
+    Open outPath For Output As #fnum
+    
+    ' 3. 走訪所有名稱
+    For Each nm In ThisWorkbook.Names
+        ' 如果只想輸出剛剛建的 Table10_ 前綴名稱，可以用 InStr 檢查
+        If InStr(1, nm.Name, "Table10_", vbTextCompare) = 1 Then
+            ' 把「名稱」與「對應的儲存格位址」寫一行
+            Print #fnum, nm.Name & vbTab & nm.RefersTo
+        End If
+    Next nm
+    
+    ' 4. 關檔 + 通知
+    Close #fnum
+    MsgBox "已匯出 Table10_ 開頭的所有名稱到：" & vbCrLf & outPath, vbInformation
+End Sub
+```
+
+---
+
+## 程式說明
+
+1. **outPath**
+
+   ```vb
+   outPath = ThisWorkbook.Path & Application.PathSeparator & "NamesList.txt"
+   ```
+
+   👉 讓文字檔輸出到和目前活頁簿相同的資料夾下，檔名叫 `NamesList.txt`。
+
+2. **Open/Print/Close**
+
+   ```vb
+   fnum = FreeFile
+   Open outPath For Output As #fnum
+   …
+   Print #fnum, … 
+   Close #fnum
+   ```
+
+   👉 VBA 傳統的檔案作業：`FreeFile` 取得可用檔號、`Open` 打開、`Print` 列印文字、`Close` 關閉。
+
+3. **篩選前綴**
+
+   ```vb
+   If InStr(1, nm.Name, "Table10_", vbTextCompare) = 1 Then
+   ```
+
+   👉 只挑出名稱以 `Table10_` 開頭的那一批；若要匯出所有名稱，就把這個 `If` 拿掉。
+
+4. **輸出格式**
+
+   ```vb
+   Print #fnum, nm.Name & vbTab & nm.RefersTo
+   ```
+
+   👉 用 Tab 分隔「名稱」和「參照位址」，你也可以改成用逗號（`,`）或其他分隔符。
+
+---
+
+## 執行方式
+
+1. 按 **Alt+F11** 開 VBA 編輯器，貼到同一個 Module 裡。
+2. 回到 Excel 按 **Alt+F8**，選 `ExportTable10NamesToText` → **執行**。
+3. 完成後會跳出訊息，告訴你檔案路徑。
+
+打開那支 `NamesList.txt`，就可以看到每一行是：
+
+```
+Table10_列名_欄名    =Sheet1!A2
+Table10_列名_欄名    =Sheet1!B2
+…
+```
+
+如有任何格式或篩選需求，再告訴我！
+
