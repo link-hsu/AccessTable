@@ -95,3 +95,28 @@
             - 避險之金融負債5
                 - 成本 A
                 - 公允價值6 B        
+
+
+
+
+
+PARAMETERS DataMonthParam TEXT;
+SELECT
+    AccountCodeMap.AssetMeasurementSubType & "_" & AccountCodeMap.Category As MeasurementCategory,
+    SUM(ab.Amount) As SubtotalAmount
+FROM AccountCodeMap
+INNER JOIN
+    (
+        SELECT AccountBalance.AccountCode, AccountBalance.Amount
+        FROM AccountBalance
+        WHERE AccountBalance.DataMonthString = [DataMonthParam]
+        AND AccountBalance.BalanceType = '餘額E'
+    ) AS ab
+ON
+    AccountCodeMap.AccountCode = ab.AccountCode
+WHERE
+    AccountCodeMap.GroupFlag IN ('Derivative')
+    AND AccountCodeMap.Category IN ('Cost' , 'ValuationAdjust')
+GROUP BY
+    AccountCodeMap.AssetMeasurementSubType,
+    AccountCodeMap.Category;
