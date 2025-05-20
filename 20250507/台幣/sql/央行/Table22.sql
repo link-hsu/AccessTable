@@ -9,3 +9,20 @@ S欄位 面  額
         - 民營企業
 =ROUND(SUM(票券交易明細表!S:S)/1000000,0)-E6-E10
 
+
+
+
+
+
+PARAMETERS DataMonthParam TEXT;
+SELECT 
+    IIf([BillTransactionDetails.Counterparty] LIKE "*銀行", "銀行",
+        IIf([BillTransactionDetails.Counterparty] LIKE "*票券", "票券", "其他")) AS 交易對手類別,
+    SUM([BillTransactionDetails.FaceValue]) AS 總面額
+FROM 
+    BillTransactionDetails
+WHERE
+    BillTransactionDetails.DataMonthString = [DataMonthParam]
+GROUP BY 
+    IIf([BillTransactionDetails.Counterparty] LIKE "*銀行", "銀行",
+        IIf([BillTransactionDetails.Counterparty] LIKE "*票券", "票券", "其他"));
