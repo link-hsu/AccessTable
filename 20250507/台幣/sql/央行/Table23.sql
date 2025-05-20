@@ -22,3 +22,33 @@ AE欄位
 V欄位 天數
 S欄位 面額
 U欄位 成交利率
+
+
+我有 BillTransactionDetails 資料表，
+我想將Days欄位0-30天，30-90天，90-180天，180-270天，270-365天各自分組，
+然後將各自的加總算出來，其中加總項目為
+FaceValue欄位 * TradeYield欄位
+，請問microsoft access要怎麼寫?
+
+
+=IF(V23<=30,30,IF(V23<=90,90,IF(V23<=180,180,IF(V23<=270,270,365))))
+
+
+PARAMETERS DataMonthParam TEXT;
+SELECT 
+    IIf([BillTransactionDetails.Days] >= 0 AND [BillTransactionDetails.Days] <= 30, '0-30天',
+    IIf([BillTransactionDetails.Days] > 30 AND [BillTransactionDetails.Days] <= 90, '31-90天',
+    IIf([BillTransactionDetails.Days] > 90 AND [BillTransactionDetails.Days] <= 180, '91-180天',
+    IIf([BillTransactionDetails.Days] > 180 AND [BillTransactionDetails.Days] <= 270, '181-270天',
+    IIf([BillTransactionDetails.Days] > 270 AND [BillTransactionDetails.Days] <= 365, '271-365天', '其他'))))) AS DayPeriod,
+    SUM([BillTransactionDetails.FaceValue] * [BillTransactionDetails.TradeYield]) AS 'FaceValue*TradeYield'
+FROM 
+    BillTransactionDetails
+WHERE
+    BillTransactionDetails.DataMonthString = [DataMonthParam]
+GROUP BY 
+    IIf([BillTransactionDetails.Days] >= 0 AND [BillTransactionDetails.Days] <= 30, '0-30天',
+    IIf([BillTransactionDetails.Days] > 30 AND [BillTransactionDetails.Days] <= 90, '31-90天',
+    IIf([BillTransactionDetails.Days] > 90 AND [BillTransactionDetails.Days] <= 180, '91-180天',
+    IIf([BillTransactionDetails.Days] > 180 AND [BillTransactionDetails.Days] <= 270, '181-270天',
+    IIf([BillTransactionDetails.Days] > 270 AND [BillTransactionDetails.Days] <= 365, '271-365天', '其他')))));
