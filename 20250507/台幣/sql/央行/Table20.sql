@@ -1,3 +1,5 @@
+餘額E
+
 - 民營企業
     - 其他到期日
         - 公債
@@ -11,3 +13,22 @@
 
 3.與債券RP/RS報表核對是否有餘額
 這部分要詢問是核對什麼，是否也抓出表的資料可以直接核對
+
+
+
+PARAMETERS DataMonthParam TEXT;
+SELECT
+    AccountCodeMap.AssetMeasurementSubType & "_" & AccountCodeMap.Category As MeasurementCategory,
+    ab.Amount
+FROM AccountCodeMap
+INNER JOIN
+    (
+        SELECT AccountBalance.AccountCode, AccountBalance.Amount
+        FROM AccountBalance
+        WHERE AccountBalance.DataMonthString = [DataMonthParam]
+        AND AccountBalance.BalanceType = '餘額E'
+    ) AS ab
+ON
+    AccountCodeMap.AccountCode = ab.AccountCode
+WHERE
+    AccountCodeMap.GroupFlag IN ('RPRS');
