@@ -908,3 +908,105 @@ End Sub
 * Process 也只多一段迴圈示範
 
 如果有需要再幫你加上錯誤檢查或「命名不存在」警告，再告訴我！
+
+
+
+
+
+
+
+
+很好，你的理解是正確的，也提出了進一步的要求，下面我來詳細說明：
+
+---
+
+## ✅ 回答你的問題
+
+### 🔸 Q1：是只要命名被更改都會提醒嗎？
+
+是的。只要：
+
+* **命名被刪除**
+* **命名的範圍（RefersTo）被改變**（例如從 `=Sheet1!$A$1` 改成 `=Sheet1!$B$1`）
+
+這個 VBA 就會發出警告。
+
+---
+
+### 🔸 Q2：儲存格參照的欄位變動也會偵測嗎？
+
+是的。只要你在「名稱管理員」中去更改命名所對應的儲存格（例如命名 `MyCell` 原本對應 `A1`，你改成 `B1`），這段程式都會偵測出來，因為 RefersTo 會不同。
+
+---
+
+## 🔧 接下來：加上「自動復原被更動的命名」
+
+以下是完整版程式碼，會：
+
+1. 在開啟檔案時記錄命名
+2. 每次使用者切換工作表就檢查命名是否被更動
+3. 發現異常 → 警告 → 自動復原命名（或重新建立）
+
+請將以下程式碼貼在 **ThisWorkbook** 模組中：
+
+```vba
+Private OriginalNames As Collection
+
+Private Sub Workbook_Open()
+    Call 記錄原始命名
+End Sub
+
+Private Sub Workbook_SheetActivate(ByVal Sh As Object)
+    Call 檢查命名是否被更動
+End Sub
+
+Private Sub 記錄原始命名()
+    Dim nm As Name
+    Set OriginalNames = New Collection
+    For Each nm In ThisWorkbook.Names
+        ' 儲存命名名稱與對應範圍
+        OriginalNames.Add nm.RefersTo, nm.Name
+    Next nm
+End Sub
+
+Private Sub 檢查命名是否被更動()
+    Dim nmName As Variant
+    Dim expectedRef As String
+    On Error Resume Next
+    
+    For Each nmName In OriginalNames
+        expectedRef = OriginalNames(nmName)
+        
+        ' 名稱被刪除
+        If ThisWorkbook.Names(nmName) Is Nothing Then
+            MsgBox "命名 """ & nmName & """ 已被刪除，系統將自動復原！", vbCritical
+            ThisWorkbook.Names.Add Name:=nmName, RefersTo:=expectedRef
+        Else
+            ' 名稱存在但範圍被改了
+            If ThisWorkbook.Names(nmName).RefersTo <> expectedRef Then
+                MsgBox "命名 """ & nmName & """ 的參照已被更改，系統將自動復原！", vbExclamation
+                ' 刪除錯誤命名並重新建立正確的
+                ThisWorkbook.Names(nmName).Delete
+                ThisWorkbook.Names.Add Name:=nmName, RefersTo:=expectedRef
+            End If
+        End If
+    Next
+    On Error GoTo 0
+End Sub
+```
+
+---
+
+## 💡 補充建議
+
+* 若你希望這段監控程式在「儲存時」或「工作表變更時」也觸發，可以額外補上：
+
+  * `Workbook_SheetChange`
+  * `Workbook_BeforeSave`
+
+我也可以幫你加上這些額外觸發點，如果你有需要。
+
+---
+
+需要我幫你轉成繁體變數/註解、或讓你選擇是否復原嗎？我也可以強化這段程式。只要說一聲！
+
