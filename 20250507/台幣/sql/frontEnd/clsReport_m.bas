@@ -172,3 +172,107 @@ Public Sub Init(ByVal reportName As String, _
         ' 如有其他報表，依需求加入不同工作表及欄位定義
     End Select
 End Sub
+
+
+
+
+
+
+
+Q:
+請問class clsReport中的init method裡面的rptFieldInfo，
+要怎麼共用到主執行程序中的Process也可以使用?
+
+A:
+要讓 `rptFieldInfo` 這份「報表→工作表範圍設定」的對應表，不只在 `clsReport.Init` 裡面用得到，主執行程序的各個 `Process_XXX` 也能共用，最乾淨的做法是把它從「類別私有」提出，放到一個共用的標準 Module 裡，讓雙方都可以呼叫。
+
+---
+
+### 步驟 1：建立一個新的標準 Module（例如取名 `modRptConfig`）
+
+```vb
+' Module: modRptConfig
+Option Explicit
+
+' 回傳整份 rptFieldInfo Dictionary
+Public Function GetRptFieldInfo() As Object
+    Dim dict As Object
+    Set dict = CreateObject("Scripting.Dictionary")
+    
+    With dict
+        .Add "TABLE10", Array( _
+            Array("FOA", "S2:S21,W2:W21,AA2:AA21,AE2:AE21,AI2:AI21,AM2:AM21,AQ2:AQ21", _
+                        "U2:U21,Y2:Y21,AC2:AC21,AG2:AG21,AK2:AK21,AO2:AO21,AS2:AS21") )
+        .Add "TABLE15A", Array( _
+            Array("FOA", "S2:S10,W2:W10,AA2:AA10,AE2:AE10,AI2:AI10", _
+                        "U2:U10,Y2:Y10,AC2:AC10,AG2:AG10,AK2:AK10") )
+        .Add "TABLE15B", Array()  ' 空陣列
+        ' …（把原本 Init 內 With rptFieldInfo 的所有 .Add 都搬過來）…
+        .Add "AI605", Array( _
+            Array("Table1", "S2:S3,W2:W3,AA2:AA3,AE2:AE3,AI2:AI3,AM2:AM3,AQ2:AQ3,AU2:AU3", _
+                        "U2:U3,Y2:Y3,AC2:AC3,AG2:AG3,AK2:AK3,AO2:AO3,AS2:AS3,AW2:AW3"), _
+            Array("Table3", "S5:S6,W5:W6", "U5:U6,Y5:Y6") )
+    End With
+    
+    Set GetRptFieldInfo = dict
+End Function
+```
+
+---
+
+### 步驟 2：在 `clsReport.Init` 裡呼叫這個 Function
+
+把原本自己 `CreateObject("Scripting.Dictionary")` 然後 `.Add …` 的區塊刪掉，改成：
+
+```vb
+Public Sub Init( _ 
+    ByVal reportName As String, _
+    ByVal dataMonthStringROC As String, _
+    ByVal dataMonthStringROC_NUM As String, _
+    ByVal dataMonthStringROC_F1F2 As String)
+
+    Dim rptFieldInfo As Object
+    Dim rptToInit As Variant
+    ' ← 由共用 Module 拿設定
+    Set rptFieldInfo = GetRptFieldInfo()
+
+    clsReportName = reportName
+    Set clsWorksheets = CreateObject("Scripting.Dictionary")
+
+    If rptFieldInfo.Exists(reportName) Then
+        rptToInit = rptFieldInfo(reportName)
+        ' …（後面不用動）…
+    End If
+    ' …Select Case etc.…
+End Sub
+```
+
+---
+
+### 步驟 3：在主程式或 `Process_XXX` 也同樣呼叫
+
+假設你在某個 `Process_TABLE10` 想看它的「範圍定義」：
+
+```vb
+Public Sub Process_TABLE10()
+    Dim rptFieldInfo As Object
+    Set rptFieldInfo = GetRptFieldInfo()
+
+    Dim defs As Variant
+    defs = rptFieldInfo("TABLE10")
+    ' defs 就是一個二維陣列，你可以拿來做進一步驗證或其他……
+    
+    ' 例如印出第一組定義的第一欄名稱：
+    Debug.Print defs(0)(0)   ' FOA
+End Sub
+```
+
+---
+
+#### 為什麼這樣做？
+
+1. **單一來源**：所有報表的範圍定義只寫在一份 Module 裡，維護一次，各處都生效。
+2. **類別專注職責**：`clsReport` 只負責「拿到定義、初始化自己」，不必同時管理這一大段靜態設定。
+3. **Process 也能拿**：主程式的任何 Sub/Function，只要 `Set dict = GetRptFieldInfo()`，就能取到一模一樣的設定，避免重複寫、不同步的風險。
+
+照著上面三個步驟，把原本散落在 `clsReport.Init` 裡的那整段 `.Add`，移到新的 `GetRptFieldInfo` Function，就能達到「共用」的效果。
