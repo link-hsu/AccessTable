@@ -1,6 +1,4 @@
 1.這是我的主執行程序
-Option Explicit
-
 '=== Global Config Settings ===
 Public gDataMonthString As String         ' 使用者輸入的資料月份
 Public gDataMonthStringROC As String      ' 資料月份ROC Format
@@ -50,7 +48,7 @@ Public Sub Main()
     ' ========== 宣告所有報表 ==========
     ' 製作報表List
     ' gReportNames 少FB1 FM5
-    allReportNames = Array("CNY1", "FB1", "FB2", "FB3", "FB3A", "FM5", "FM11", "FM13", "AI821", "Table2", "FB5", "FB5A", "FM2", "FM10", "F1_F2", "Table41", "AI602", "AI240", "AI822")
+    allReportNames = Array("TABLE10", "TABLE15A", "TABLE15B", "TABLE16", "TABLE20", "TABLE22", "TABLE23", "TABLE24", "TABLE27", "TABLE36", "AI233", "AI345", "AI405", "AI410", "AI430", "AI601", "AI605")
 
     ' =====testArray=====
     ' allReportNames = Array("AI822")
@@ -112,24 +110,6 @@ Public Sub Main()
     ' 定義每張報表必需由使用者填入／確認的儲存格名稱
     Dim req As Object
     Set req = CreateObject("Scripting.Dictionary")
-    req.Add "TABLE41", Array("Table41_國外部_一利息收入", _
-                             "Table41_國外部_一利息收入_利息", _
-                             "Table41_國外部_一利息收入_利息_存放銀行同業", _
-                             "Table41_國外部_二金融服務收入", _
-                             "Table41_國外部_一利息支出", _
-                             "Table41_國外部_一利息支出_利息", _
-                             "Table41_國外部_一利息支出_利息_外國人外匯存款", _
-                             "Table41_國外部_二金融服務支出", _
-                             "Table41_企銷處_一利息支出", _
-                             "Table41_企銷處_一利息支出_利息", _
-                             "Table41_企銷處_一利息支出_利息_外國人新台幣存款")
-                            
-    req.Add "AI822", Array("AI822_會計科_上年度決算後淨值", _
-                           "AI822_國外部_直接往來之授信", _
-                           "AI822_國外部_間接往來之授信", _
-                           "AI822_授管處_直接往來之授信")
-
-    ' 暫存要移除的報表
     Dim toRemove As Collection
     Set toRemove = New Collection
 
@@ -257,25 +237,23 @@ Public Sub Main()
     
     For Each rptName In gReportNames
         Select Case UCase(rptName)
-            Case "CNY1":    Call Process_CNY1
-            Case "FB1":     Call Process_FB1
-            Case "FB2":     Call Process_FB2
-            Case "FB3":     Call Process_FB3
-            Case "FB3A":    Call Process_FB3A
-            Case "FM5":     Call Process_FM5
-            Case "FM11":    Call Process_FM11
-            Case "FM13":    Call Process_FM13
-            Case "AI821":   Call Process_AI821
-            Case "TABLE2":  Call Process_Table2
-            Case "FB5":     Call Process_FB5
-            Case "FB5A":    Call Process_FB5A
-            Case "FM2":     Call Process_FM2
-            Case "FM10":    Call Process_FM10
-            Case "F1_F2":   Call Process_F1_F2
-            Case "TABLE41": Call Process_Table41
-            Case "AI602":   Call Process_AI602
-            Case "AI240":   Call Process_AI240
-            Case "AI822":   Call Process_AI822
+            Case "TABLE10":    Call Process_TABLE10
+            Case "TABLE15A":    Call Process_TABLE15A
+            Case "TABLE15B":    Call Process_TABLE15B
+            Case "TABLE16":    Call Process_TABLE16
+            Case "TABLE20":    Call Process_TABLE20
+            Case "TABLE22":    Call Process_TABLE22
+            Case "TABLE23":    Call Process_TABLE23
+            Case "TABLE24":    Call Process_TABLE24
+            Case "TABLE27":    Call Process_TABLE27
+            Case "TABLE36":    Call Process_TABLE36
+            Case "AI233":    Call Process_AI233
+            Case "AI345":    Call Process_AI345
+            Case "AI405":    Call Process_AI405
+            Case "AI410":    Call Process_AI410
+            Case "AI430":    Call Process_AI430
+            Case "AI601":    Call Process_AI601
+            Case "AI605":    Call Process_AI605
             Case Else
                 MsgBox "未知的報表名稱: " & rptName, vbExclamation
                 WriteLog "未知的報表名稱: " & rptName
@@ -313,9 +291,7 @@ Public Sub InitializeReports()
     ' MsgBox "完成'報表初始欄位資訊儲存'及'初始資料庫資料建立'"
     WriteLog "完成'報表初始欄位資訊儲存'及'初始資料庫資料建立'"
 End Sub
-
 2.這是我的clsReport
-
 Option Explicit
 
 ' Report Title
@@ -710,11 +686,14 @@ Public Function GetFieldFromXlRanges(ByVal rptSheetName As String, _
     GetFieldFromXlRanges = fieldDefs
 End Function
 
+
+
 '=== 報表名稱屬性 ===  
 Public Property Get ReportName() As String
     ReportName = clsReportName
 End Property
 
 
-
-請幫我確認我的初始化流程那樣子定義會不會有問題，幫我檢查看有沒有錯誤，我沒有預設有錯誤或是沒錯誤，只是需要你幫我通盤確認過
+請幫我確認我的初始化流程那樣子定義會不會有問題，
+幫我檢查看有沒有錯誤，我沒有預設有錯誤或是沒錯誤，
+只是需要你幫我通盤確認過
