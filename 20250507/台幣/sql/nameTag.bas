@@ -1,4 +1,87 @@
 Option Explicit
+' 透過row col 組合中間的value
+Public Sub FillTableLabels( _
+    Optional ByVal headerRow As Long = 1, _
+    Optional ByVal headerCol As Long = 1)
+
+    Dim ws        As Worksheet
+    Dim lastRow   As Long, lastCol As Long
+    Dim r         As Long, c As Long
+    Dim rowHdr    As String, colHdr As String
+    Dim target    As Range
+    
+    Set ws = ThisWorkbook.Worksheets("ai605")
+    
+    ' 找出範圍邊界
+    With ws
+        lastRow = .Cells(.Rows.Count, headerCol).End(xlUp).Row
+        lastCol = .Cells(headerRow, .Columns.Count).End(xlToLeft).Column
+    End With
+    
+    Application.ScreenUpdating = False
+    
+    ' 逐一把 "rowHeader_colHeader" 填入對應儲存格，並靠左上對齊
+    For r = headerRow + 1 To lastRow
+        rowHdr = Trim$(ws.Cells(r, headerCol).Value)
+        If rowHdr = "" Then GoTo ContinueRows
+        
+        ' 清理：只留字母、數字和底線
+        rowHdr = Replace(Application.WorksheetFunction.Clean(rowHdr), " ", "_")
+        
+        For c = headerCol + 1 To lastCol
+            colHdr = Trim$(ws.Cells(headerRow, c).Value)
+            If colHdr = "" Then GoTo ContinueCols
+            
+            colHdr = Replace(Application.WorksheetFunction.Clean(colHdr), " ", "_")
+            
+            ' 填入組合字串
+            Set target = ws.Cells(r, c)
+            target.Value = rowHdr & "_" & colHdr
+            With target
+                .HorizontalAlignment = xlLeft
+                .VerticalAlignment = xlTop
+                .WrapText = False
+            End With
+            
+ContinueCols:
+        Next c
+ContinueRows:
+    Next r
+    
+    Application.ScreenUpdating = True
+    
+    MsgBox "填值完成！共處理 " & _
+           (lastRow - headerRow) * (lastCol - headerCol) & " 個儲存格。", vbInformation
+
+End Sub
+
+
+Public Sub testSub()
+    Call FillTableLabels(headerRow:=1, headerCol:=1)
+End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+' 將value加入nameTag中
+
+Option Explicit
 
 Sub NameMultipleSheetCellsByValue_NoRestrictions()
     Dim config As Variant
