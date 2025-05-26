@@ -1,3 +1,6 @@
+https://chatgpt.com/share/68346637-7e60-8010-acea-a716d7b853ef
+
+
 Q:
 
 1.這是我的clsReport
