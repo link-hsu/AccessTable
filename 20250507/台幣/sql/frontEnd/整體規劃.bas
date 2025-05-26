@@ -1,6 +1,3 @@
-https://chatgpt.com/share/68346637-7e60-8010-acea-a716d7b853ef
-
-
 Q:
 
 1.這是我的clsReport
@@ -1210,7 +1207,141 @@ End Sub
 以上是第 1 部分的解决方案，若理解 OK 或有细节要讨论，我们再进到第 2 部分！请告诉我继续哪个问题。
 
 
+' ****************************
+' ****************************
+以上第一部分修改
 
+非常好，感謝你提供原本的用法。你使用 `AddWorksheetFields` 的方式是一次傳入：
+
+```vb
+AddWorksheetFields "工作表名稱", Array( _
+    Array("NameTag1", "儲存格位置1", 預設值1), _
+    Array("NameTag2", "儲存格位置2", 預設值2), _
+    ...
+)
+```
+
+而我上面寫的版本是多次呼叫 `AddWorksheetFields`，每次只有一組欄位：
+
+```vb
+AddWorksheetFields sheetName, Array( _
+    Array(nameTag, addr, Null) _
+)
+```
+
+### ✅ 相容性檢查與調整
+
+其實你的一次傳多組是完全正確且更有效率的方式，我會根據這個做法修改，讓我們的程式邏輯可以**從 PositionMap 抓多筆資料**，然後**一次傳入 AddWorksheetFields**，這樣才和你現有的架構一致。
+
+---
+
+## 🔧 修正後的完整版本
+
+### 📍**修改 1：`GetPositionMapData` 函數**（**保持不變**）
+
+這部分我們上面提供的程式可以直接使用，回傳一個 `Variant` 的 2D 陣列，格式為：
+
+```vb
+results(i, 0) = TargetSheetName  
+results(i, 1) = SourceNameTag  
+results(i, 2) = TargetCellAddress  
+```
+
+這部分不用修改。
+
+---
+
+### 📍**修改 2：clsReport.Init 函數中「載入 PositionMap 設定」的邏輯**
+
+改成將**同一工作表的所有欄位先蒐集起來，最後再用一次 `AddWorksheetFields` 傳入。**
+
+#### ✅ 修正後程式：
+
+```vb
+Public Sub Init(ByVal reportName As String, _
+                ByVal dataMonthStringROC As String, _
+                ByVal dataMonthStringROC_NUM As String, _
+                ByVal dataMonthStringROC_F1F2 As String)
+    
+    Dim mappings As Variant
+    Dim i As Long
+    Dim sheetName As String, nameTag As String, addr As String
+    
+    clsReportName = reportName
+    Set clsWorksheets = CreateObject("Scripting.Dictionary")
+
+    ' === 從 Access 讀取 PositionMap 資料 ===
+    mappings = GetPositionMapData(gDBPath, reportName)
+
+    Dim wsFields As Object
+    Set wsFields = CreateObject("Scripting.Dictionary")
+
+    If IsArray(mappings) And UBound(mappings) >= 0 Then
+        For i = 0 To UBound(mappings, 1)
+            sheetName = mappings(i, 0)
+            nameTag = mappings(i, 1)
+            addr = mappings(i, 2)
+
+            If Len(Trim(nameTag)) > 0 And Len(Trim(addr)) > 0 Then
+                If Not wsFields.exists(sheetName) Then
+                    wsFields.Add sheetName, Array()
+                End If
+
+                ' 先取出目前該 sheet 的陣列
+                Dim tmpList As Variant
+                tmpList = wsFields(sheetName)
+
+                ' 將新欄位加入陣列
+                ReDim Preserve tmpList(0 To UBound(tmpList) + 1)
+                tmpList(UBound(tmpList)) = Array(nameTag, addr, Null)
+
+                ' 寫回 dictionary
+                wsFields(sheetName) = tmpList
+            End If
+        Next i
+
+        ' 最後，依每個工作表將欄位群一次性加到報表設定中
+        Dim key As Variant
+        For Each key In wsFields.Keys
+            AddWorksheetFields key, wsFields(key)
+        Next key
+
+    Else
+        WriteLog "Init 未在 PositionMap 找到報表：" & reportName
+    End If
+
+    ' === 原有的動態欄位設定邏輯保留 ===
+    Select Case reportName
+        Case "TABLE10"
+            AddDynamicField reportName, "TABLE10_申報時間", "D2", dataMonthStringROC
+        Case "TABLE11"
+            AddDynamicField reportName, "TABLE11_申報時間", "D2", dataMonthStringROC
+        ' ... 其他報表
+    End Select
+End Sub
+```
+
+---
+
+## ✅ 這次修改項目總整理
+
+| 區塊                   | 修改內容                                                  | 位置                           |
+| -------------------- | ----------------------------------------------------- | ---------------------------- |
+| `GetPositionMapData` | 保留不動，回傳 `2D Array` 結構                                 | `modDataAccess`              |
+| `clsReport.Init`     | ✅ 改成先蒐集所有欄位後，一次性呼叫 `AddWorksheetFields`<br>✅ 保留動態欄位設定 | `clsReport.cls` 中的 `Init` 函數 |
+
+---
+
+接下來如果你確認這段 OK，我們可以處理第 2 部分：「Process\_FM11 中如何從 QueryMap 撈取查詢名稱與 Excel 放置欄位」。
+
+請告訴我是否繼續 👍
+
+
+
+
+
+' ****************************
+' ****************************
 ' =========================
 
 
