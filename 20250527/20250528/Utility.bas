@@ -348,9 +348,6 @@ Public Function GetMapData(ByVal DBPath As String, _
     Dim i As Long
     Dim arr As Variant
 
-    WriteLog "DBPath: " & DBPath
-    WriteLog "tableName: " & tableName
-
     ' 1. 建立 ADO 连接
     Set conn = CreateObject("ADODB.Connection")
     conn.Open "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & DBPath
@@ -373,8 +370,6 @@ Public Function GetMapData(ByVal DBPath As String, _
             GetMapData = Array()
             Exit Function
     End Select
-
-    WriteLog "sql: " & sql
     
     Set rs = conn.Execute(sql)
     If rs.EOF Then

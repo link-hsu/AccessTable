@@ -17,6 +17,7 @@ Public Sub Init(ByVal reportName As String, _
     Dim addressMap As Variant
     addressMap = GetMapData(gDBPath, reportName, "FiedlValuePositionMap")
     If IsNull(addressMap) Then
+        MsgBox "Init階段FieldMap回傳Null，無法取得報表 " & reportName & " 初始化資料。"
         WriteLog "Init階段FieldMap回傳Null，無法取得報表 " & reportName & " 初始化資料。" 
         Exit Sub
     End If    
@@ -32,8 +33,7 @@ Public Sub Init(ByVal reportName As String, _
             sheetName = addressMap(i, 0) &  ""
             nameTag = addressMap(i, 1) &  ""
             addr = addressMap(i, 2) &  ""
-
-            
+    
             If Len(Trim(nameTag)) > 0 And Len(Trim(addr)) > 0 Then
                 If Not wsFields.Exists(sheetName) Then
                     wsFields.Add sheetName, Array()
@@ -54,9 +54,6 @@ Public Sub Init(ByVal reportName As String, _
         WriteLog "未找到需初始化之報表： " & reportName
     End If
 
-    WriteLog "dataMonthStringROC" & dataMonthStringROC
-    WriteLog "dataMonthStringROC_NUM" & dataMonthStringROC_NUM
-    
     Select Case reportName
         Case "TABLE10"
             AddDynamicField "FOA", "TABLE10_申報時間", "D2", dataMonthStringROC
