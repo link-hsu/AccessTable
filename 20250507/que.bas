@@ -611,78 +611,293 @@ Public Sub InitializeReports()
     WriteLog "完成'報表初始欄位資訊儲存'及'初始資料庫資料建立'"
 End Sub
 
-Public Sub Process_TABLE()
+Public Sub Process_TABLE10()
     '=== Equal Setting ===
-    'Fetch Query Access DB table
-    Dim dataArr As Variant
-
-    'Declare worksheet and handle data
-    Dim xlsht As Worksheet
-
-    Dim i As Integer, j As Integer
-    Dim lastRow As Integer
-
-    Dim reportTitle As String
-    Dim queryTable As String
-
     'Setting class clsReport
     Dim rpt As clsReport
-    Set rpt = gReports("FB2")
+    Set rpt = gReports("TABLE10")
 
-    reportTitle = rpt.ReportName
-    queryTable = "FB2_OBU_AC4620B"
+    Dim reportTitle As String
+    reportTitle = rpt.ReportName    
 
-    ' dataArr = GetAccessDataAsArray(gDBPath, queryTable, gDataMonthString)
-    dataArr = GetAccessDataAsArray(gDBPath, queryTable, gDataMonthString)
-
+    Dim xlsht As Worksheet
     Set xlsht = ThisWorkbook.Sheets(reportTitle)
     
     'Clear Excel Data
-    xlsht.Range("A:F").ClearContents
-    xlsht.Range("T2:T100").ClearContents
+    ' xlsht.Range("A:G").ClearContents
+    ' xlsht.Range("T2:T100").ClearContents
 
-    '=== Paste Queyr Table into Excel ===
-    If Err.Number <> 0 Or LBound(dataArr) > UBound(dataArr) Then
-        MsgBox "資料有誤: " & reportTitle & "| " & queryTable & " 資料表無資料"
-        WriteLog "資料有誤: " & reportTitle & "| " & queryTable & " 資料表無資料"
-    Else
-        For j = 0 To UBound(dataArr, 2)
-            For i = 0 To UBound(dataArr, 1)
-                xlsht.Cells(i + 1, j + 1).Value = dataArr(i, j)
-            Next i
-        Next j
+    ' xlsht.Cells.ClearContents  ' 或只清指定区
+    
+    ' === 【修改】 改为调用通用函数 GetMapData(..., "Query") ===
+    Dim queryMap As Variant
+    queryMap = GetMapData(gDBPath, reportTitle, "QueryTableMap")
+
+    '【修改】改為正確判斷 Array 且至少有一筆
+    If Not IsArray(queryMap) Or UBound(queryMap, 1) < 0 Then
+        WriteLog "未在 QueryTableMap 找到 " & reportTitle & " 的任何配置"
+        Exit Sub
     End If
+    
+    Dim iMap As Long
+    For iMap = 0 To UBound(queryMap, 1)
+        Dim tblName As String
+        Dim startColLetter As String
+        Dim numCols As Long
+        Dim dataArr As Variant
+        Dim r As Long, c As Long
 
+        tblName = queryMap(iMap, 0)
+        startColLetter = queryMap(iMap, 1)
+        numCols = CLng(queryMap(iMap, 2))
+        
+        dataArr = GetAccessDataAsArray(gDBPath, tblName, gDataMonthString)
+
+        '【修改】正確判斷是否有回傳陣列，且至少要有 header（row 0）跟一筆資料（row 1）
+        If Not IsArray(dataArr) Or UBound(dataArr, 1) < 1 Then
+            WriteLog "資料有誤: " & reportTitle & " | " & tblName & " 無法取得資料或只有欄位名稱"
+            GoTo NextMap
+        End If
+
+        ' 取得欄位起始欄號        
+        Dim startCol As Long
+        startCol = xlsht.Range(startColLetter & "1").Column
+
+        ' 將整個 dataArr（含 header）貼到 Excel，上下：0..UBound(dataArr,1)，左右：0..UBound(dataArr,2)
+        '【修改】改用 UBound(..., 1)/(..., 2) 以符合 VB 陣列維度
+        For r = 0 To UBound(dataArr, 1)
+            For c = 0 To UBound(dataArr, 2)
+                xlsht.Cells(r + 1, startCol + c).Value = dataArr(r, c)
+            Next c
+        Next r
+
+NextMap:
+    Next iMap
+    '--------------
+    'Unique Setting
+    '--------------
     '--------------
     'Unique Setting
     '--------------
     Dim rngs As Range
     Dim rng As Range
 
-    Dim loanAmount As Double
-    Dim loanInterest As Double
-    Dim totalAsset As Double
+    Dim AC_CompanyBond_Domestic_Cost As Double
+    Dim AC_CompanyBond_Domestic_ImpairmentLoss As Double
 
-    loanAmount = 0
-    loanInterest = 0
-    totalAsset = 0
-    lastRow = xlsht.Cells(xlsht.Rows.Count, 1).End(xlUp).Row
-    Set rngs = xlsht.Range("C2:C" & lastRow)
+    Dim AC_GovBond_Domestic_Cost As Double
+    Dim AC_GovBond_Domestic_ImpairmentLoss As Double
 
-    '
+    Dim AC_NCD_CentralBank_Cost As Double
+    Dim AC_NCD_CentralBank_ImpairmentLoss As Double
+
+    Dim AFS_FinancialBond_Domestic_Cost As Double
+    Dim AFS_FinancialBond_Domestic_ValuationAdjust As Double
+
+    Dim EquityMethod_Other_Cost As Double
+    
+    Dim FVOCI_CompanyBond_Domestic_Cost As Double
+    Dim FVOCI_CompanyBond_Domestic_ValuationAdjust As Double
+
+    Dim FVOCI_GovBond_Domestic_Cost As Double
+    Dim FVOCI_GovBond_Domestic_ValuationAdjust As Double
+
+    Dim FVOCI_NCD_CentralBank_Cost As Double
+    Dim FVOCI_NCD_CentralBank_ValuationAdjust As Double
+
+    ' FVOCI_Stock_特別股_上市_ValuationAdjust
+    Dim FVOCI_Stock_PreferredStock_Listed_ValuationAdjust As Double
+
+    ' FVOCI_Stock_普通股_上市_Cost
+    Dim FVOCI_Stock_CommonStock_Listed_Cost As Double
+    ' FVOCI_Stock_普通股_上市_ValuationAdjust
+    Dim FVOCI_Stock_CommonStock_Listed_ValuationAdjust As Double
+
+    ' FVOCI_Stock_普通股_上櫃_Cost
+    Dim FVOCI_Stock_CommonStock_OTC_Cost As Double
+    ' FVOCI_Stock_普通股_上櫃_ValuationAdjust
+    Dim FVOCI_Stock_CommonStock_OTC_ValuationAdjust As Double
+
+    ' FVOCI_Stock_普通股_興櫃_Cost
+    Dim FVOCI_Stock_CommonStock_Emergin_Cost As Double
+    ' FVOCI_Stock_普通股_興櫃_ValuationAdjust
+    Dim FVOCI_Stock_CommonStock_Emergin_ValuationAdjust As Double
+
+    Dim FVOCI_Equity_Other_Cost As Double
+    Dim FVOCI_Equity_Other_ValuationAdjust As Double
+
+    Dim FVPL_AssetCertificate_Cost As Double
+    Dim FVPL_AssetCertificate_ValuationAdjust As Double
+
+    Dim FVPL_CompanyBond_Domestic_Cost As Double
+    Dim FVPL_CompanyBond_Domestic_ValuationAdjust As Double
+
+    Dim FVPL_CP_Cost As Double
+    Dim FVPL_CP_ValuationAdjust As Double
+
+    公債原始成本
+    FVPL_GovBond_Domestic_Cost + FVOCI_GovBond_Domestic_Cost + AC_GovBond_Domestic_Cost
+
+    公債
+    透過損益按公允價值衡量之金融資產2 A
+    FVPL_GovBond_Domestic_Cost + FVPL_GovBond_Domestic_ValuationAdjust
+
+    公債
+    透過其他綜合損益按公允價值衡量之金融資產2 B
+
+    FVOCI_GovBond_Domestic_Cost + FVOCI_GovBond_Domestic_ValuationAdjust
+
+    公債
+    ac
+    AC_GovBond_Domestic_Cost + AC_GovBond_Domestic_ImpairmentLoss
+
+
+    2.公司債		
+    2.1.公營事業		
+        原始取得成本1		
+    120050121		強制FVPL金融資產-普通公司債(公營)                 
+    121110121		FVOCI債務工具-普通公司債（公營）                  
+    122010121		AC債務工具投資-普通公司債(公營)
+
+    FVPL_CompanyBond_Domestic_Cost + FVOCI_CompanyBond_Domestic_Cost + AC_CompanyBond_Domestic_Cost
+            
+        透過損益按公允價值衡量之金融資產2 A		
+    120050121		強制FVPL金融資產-普通公司債(公營)                 
+    120070121		強制FVPL金融資產評價調整-普通公司債(公營)   
+    
+    FVPL_CompanyBond_Domestic_Cost + 
+            
+        透過其他綜合損益按公允價值衡量之金融資產2 B		
+    121110121		FVOCI債務工具-普通公司債（公營）                  
+            
+        按攤銷後成本衡量之債務工具投資2 C		
+    122010121		AC債務工具投資-普通公司債(公營)                   
+            
+    2.2.民營企業-國內公司債		
+        原始取得成本1		
+    120050123		強制FVPL金融資產-普通公司債(民營)                 
+            
+        透過損益按公允價值衡量之金融資產2 A		
+    120050123		強制FVPL金融資產-普通公司債(民營)                 
+    120070123		強制FVPL金融資產評價調整-普通公司債(民營)         
+            
+        透過其他綜合損益按公允價值衡量之金融資產2 B		
+    121110123		FVOCI債務工具-普通公司債（民營）                  
+            
+        按攤銷後成本衡量之債務工具投資2 C		
+    122010123		AC債務工具投資-普通公司債(民營)                   
+    
+    
+
+
+
+    Dim FVPL_GovBond_Domestic_Cost As Double
+    Dim FVPL_GovBond_Domestic_ValuationAdjust As Double
+
+    ' FVPL_Stock_特別股_上市_Cost
+    Dim FVPL_Stock_PreferredStock_Listed_Cost As Double
+    ' FVPL_Stock_特別股_上市_ValuationAdjust
+    Dim FVPL_Stock_PreferredStock_Listed_ValuationAdjust As Double
+
+    ' FVPL_Stock_普通股_上市_Cost
+    Dim FVPL_Stock_CommonStock_Listed_Cost As Double
+    ' FVPL_Stock_普通股_上市_ValuationAdjust
+    Dim FVPL_Stock_CommonStock_Listed_ValuationAdjust As Double
+
+    ' FVPL_Stock_普通股_上櫃_Cost
+    Dim FVPL_Stock_CommonStock_OTC_Cost As Double
+    ' FVPL_Stock_普通股_上櫃_ValuationAdjust
+    Dim FVPL_Stock_CommonStock_OTC_ValuationAdjust As Double
+
+    ' FVPL_Stock_普通股_興櫃_Cost
+    Dim FVPL_Stock_CommonStock_Emergin_Cost As Double
+    ' FVPL_Stock_普通股_興櫃_ValuationAdjust
+    Dim FVPL_Stock_CommonStock_Emergin_ValuationAdjust As Double
+    
+    lastRow = xlsht.Cells(xlsht.Rows.Count, "A").End(xlUp).Row
+    Set rngs = xlsht.Range("A2:A" & lastRow)
+
     For Each rng In rngs
-        If CStr(rng.Value) = "115037101" Then
-            loanAmount = loanAmount + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "115037105" Then
-            loanAmount = loanAmount + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "115037115" Then
-            loanAmount = loanAmount + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "130152771" Then
-            loanInterest = loanInterest + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "130152773" Then
-            loanInterest = loanInterest + rng.Offset(0, 2).Value
-        ElseIf CStr(rng.Value) = "130152777" Then
-            loanInterest = loanInterest + rng.Offset(0, 2).Value
+        If CStr(rng.Value) = "AC_CompanyBond_Domestic_Cost" Then
+            AC_CompanyBond_Domestic_Cost = AC_CompanyBond_Domestic_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "AC_CompanyBond_Domestic_ImpairmentLoss" Then
+            AC_CompanyBond_Domestic_ImpairmentLoss = AC_CompanyBond_Domestic_ImpairmentLoss + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "AC_GovBond_Domestic_Cost" Then
+            AC_GovBond_Domestic_Cost = AC_GovBond_Domestic_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "AC_GovBond_Domestic_ImpairmentLoss" Then
+            AC_GovBond_Domestic_ImpairmentLoss = AC_GovBond_Domestic_ImpairmentLoss + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "AC_NCD_CentralBank_Cost" Then
+            AC_NCD_CentralBank_Cost = AC_NCD_CentralBank_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "AC_NCD_CentralBank_ImpairmentLoss" Then
+            AC_NCD_CentralBank_ImpairmentLoss = AC_NCD_CentralBank_ImpairmentLoss + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "AFS_FinancialBond_Domestic_Cost" Then
+            AFS_FinancialBond_Domestic_Cost = AFS_FinancialBond_Domestic_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "AFS_FinancialBond_Domestic_ValuationAdjust" Then
+            AFS_FinancialBond_Domestic_ValuationAdjust = AFS_FinancialBond_Domestic_ValuationAdjust + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "EquityMethod_Other_Cost" Then
+            EquityMethod_Other_Cost = EquityMethod_Other_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVOCI_CompanyBond_Domestic_Cost" Then
+            FVOCI_CompanyBond_Domestic_Cost = FVOCI_CompanyBond_Domestic_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVOCI_CompanyBond_Domestic_ValuationAdjust" Then
+            FVOCI_CompanyBond_Domestic_ValuationAdjust = FVOCI_CompanyBond_Domestic_ValuationAdjust + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVOCI_GovBond_Domestic_Cost" Then
+            FVOCI_GovBond_Domestic_Cost = FVOCI_GovBond_Domestic_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVOCI_GovBond_Domestic_ValuationAdjust" Then
+            FVOCI_GovBond_Domestic_ValuationAdjust = FVOCI_GovBond_Domestic_ValuationAdjust + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVOCI_NCD_CentralBank_Cost" Then
+            FVOCI_NCD_CentralBank_Cost = FVOCI_NCD_CentralBank_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVOCI_NCD_CentralBank_ValuationAdjust" Then
+            FVOCI_NCD_CentralBank_ValuationAdjust = FVOCI_NCD_CentralBank_ValuationAdjust + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVOCI_Stock_特別股_上市_ValuationAdjust" Then
+            FVOCI_Stock_PreferredStock_Listed_ValuationAdjust = FVOCI_Stock_PreferredStock_Listed_ValuationAdjust + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVOCI_Stock_普通股_上市_Cost" Then
+            FVOCI_Stock_CommonStock_Listed_Cost = FVOCI_Stock_CommonStock_Listed_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVOCI_Stock_普通股_上市_ValuationAdjust" Then
+            FVOCI_Stock_CommonStock_Listed_ValuationAdjust = FVOCI_Stock_CommonStock_Listed_ValuationAdjust + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVOCI_Stock_普通股_上櫃_Cost" Then
+            FVOCI_Stock_CommonStock_OTC_Cost = FVOCI_Stock_CommonStock_OTC_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVOCI_Stock_普通股_上櫃_ValuationAdjust" Then
+            FVOCI_Stock_CommonStock_OTC_ValuationAdjust = FVOCI_Stock_CommonStock_OTC_ValuationAdjust + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVOCI_Stock_普通股_興櫃_Cost" Then
+            FVOCI_Stock_CommonStock_Emergin_Cost = FVOCI_Stock_CommonStock_Emergin_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVOCI_Stock_普通股_興櫃_ValuationAdjust" Then
+            FVOCI_Stock_CommonStock_Emergin_ValuationAdjust = FVOCI_Stock_CommonStock_Emergin_ValuationAdjust + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVOCI_Equity_Other_Cost" Then
+            FVOCI_Equity_Other_Cost = FVOCI_Equity_Other_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVOCI_Equity_Other_ValuationAdjust" Then
+            FVOCI_Equity_Other_ValuationAdjust = FVOCI_Equity_Other_ValuationAdjust + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_AssetCertificate_Cost" Then
+            FVPL_AssetCertificate_Cost = FVPL_AssetCertificate_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_AssetCertificate_ValuationAdjust" Then
+            FVPL_AssetCertificate_ValuationAdjust = FVPL_AssetCertificate_ValuationAdjust + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_CompanyBond_Domestic_Cost" Then
+            FVPL_CompanyBond_Domestic_Cost = FVPL_CompanyBond_Domestic_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_CompanyBond_Domestic_ValuationAdjust" Then
+            FVPL_CompanyBond_Domestic_ValuationAdjust = FVPL_CompanyBond_Domestic_ValuationAdjust + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_CP_Cost" Then
+            FVPL_CP_Cost = FVPL_CP_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_CP_ValuationAdjust" Then
+            FVPL_CP_ValuationAdjust = FVPL_CP_ValuationAdjust + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_GovBond_Domestic_Cost" Then
+            FVPL_GovBond_Domestic_Cost = FVPL_GovBond_Domestic_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_GovBond_Domestic_ValuationAdjust" Then
+            FVPL_GovBond_Domestic_ValuationAdjust = FVPL_GovBond_Domestic_ValuationAdjust + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_Stock_特別股_上市_Cost" Then
+            FVPL_Stock_PreferredStock_Listed_Cost = FVPL_Stock_PreferredStock_Listed_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_Stock_特別股_上市_ValuationAdjust" Then
+            FVPL_Stock_PreferredStock_Listed_ValuationAdjust = FVPL_Stock_PreferredStock_Listed_ValuationAdjust + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_Stock_普通股_上市_Cost" Then
+            FVPL_Stock_CommonStock_Listed_Cost = FVPL_Stock_CommonStock_Listed_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_Stock_普通股_上市_ValuationAdjust" Then
+            FVPL_Stock_CommonStock_Listed_ValuationAdjust = FVPL_Stock_CommonStock_Listed_ValuationAdjust + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_Stock_普通股_上櫃_Cost" Then
+            FVPL_Stock_CommonStock_OTC_Cost = FVPL_Stock_CommonStock_OTC_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_Stock_普通股_上櫃_ValuationAdjust" Then
+            FVPL_Stock_CommonStock_OTC_ValuationAdjust = FVPL_Stock_CommonStock_OTC_ValuationAdjust + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_Stock_普通股_興櫃_Cost" Then
+            FVPL_Stock_CommonStock_Emergin_Cost = FVPL_Stock_CommonStock_Emergin_Cost + rng.Offset(0, 1).Value
+        ElseIf CStr(rng.Value) = "FVPL_Stock_普通股_興櫃_ValuationAdjust" Then
+            FVPL_Stock_CommonStock_Emergin_ValuationAdjust = FVPL_Stock_CommonStock_Emergin_ValuationAdjust + rng.Offset(0, 1).Value
         End If
     Next rng
 
@@ -727,15 +942,7 @@ Public Sub Process_TABLE()
     xlsht.Tab.ColorIndex = 6
 End Sub
 
-有關
-rpt.SetField "FOA", "FB2_資產總計", CStr(totalAsset)
-這個部分，我不想手動逐一去進行寫入，
-我會在事先先在Range()中的NameTag把值輸入進去，
-請修改下列函數，取得fiedlvaluepositionmap資料表中的，
-SourceNameTag及TargetSheetName
-逐一使用Range("SourceNameTag")將資料表中所有紀錄要填的數值
-逐一執行rpt.SetField TargetSheetName, SourceNameTag, Range("SourceNameTag")，
-請問要怎麼修改，請給我完整版本，並告訴我修改了哪邊
+
 
 Public Function GetMapData(ByVal DBPath As String, _
                            ByVal reportName As String, _
@@ -799,3 +1006,24 @@ Public Function GetMapData(ByVal DBPath As String, _
     rs.Close: conn.Close
     Set rs = Nothing: Set conn = Nothing
 End Function
+
+1.以上那是有關取得FiedlValuePositionMap表中資料的Function，
+看是要另外寫一隻function或是修改這隻function和其他程序併用，
+你在評估，function用途還是取得資料表資料
+
+主要迴圈等程序還是必須在Process那邊執行
+主要目的是在
+rpt.SetField "FOA", "FB2_資產總計", CStr(totalAsset)
+這個部分，我不想手動逐一去進行寫入，
+我會在事先先在Range()中的NameTag把值輸入進去，
+請修改下列函數，取得fiedlvaluepositionmap資料表中的，
+SourceNameTag及TargetSheetName
+逐一使用Range("SourceNameTag")將資料表中所有紀錄要填的數值
+逐一執行rpt.SetField TargetSheetName, SourceNameTag, Range("SourceNameTag")，
+請問要怎麼修改，請給我完整版本，並告訴我修改了哪邊
+
+
+2.另外有一個問題是，我在ProcessTABLE10中上半段的有從資料庫動態抓取資料丟入工作表中，
+我想要先把Equal Setting階段startColLetter資料紀錄起來(或是有其他需要紀錄的資料也請一併修改)，
+在下面的Unique階段我想更動態的取得欄位，更簡潔的將相關資料放入變數中，儲存在相對應的儲存格中，
+請問要怎麼修改，請給我完整版，並詳細標記修改哪些地方
