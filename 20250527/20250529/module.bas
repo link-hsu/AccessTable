@@ -587,38 +587,45 @@ Public Sub Process_TABLE10()
     ' HANDLE方式
     
     公債原始成本
+    GovBond_Domestic_Cost
+
     FVPL_GovBond_Domestic_Cost + FVOCI_GovBond_Domestic_Cost + AC_GovBond_Domestic_Cost
 
     公債
     透過損益按公允價值衡量之金融資產2 A
+    FVPL_GovBond_Domestic
     FVPL_GovBond_Domestic_Cost + FVPL_GovBond_Domestic_ValuationAdjust
 
     公債
     透過其他綜合損益按公允價值衡量之金融資產2 B
-
+    FVOCI_GovBond_Domestic
     FVOCI_GovBond_Domestic_Cost + FVOCI_GovBond_Domestic_ValuationAdjust
 
     公債
     ac
+    AC_GovBond_Domestic
     AC_GovBond_Domestic_Cost + AC_GovBond_Domestic_ImpairmentLoss
 
     2.公司債		
     2.1.公營事業		
         原始取得成本1		
+    CompanyBond_Public_Domestic_Cost
     120050121		強制FVPL金融資產-普通公司債(公營)                 
     121110121		FVOCI債務工具-普通公司債（公營）                  
     122010121		AC債務工具投資-普通公司債(公營)
-
+    
     FVPL_CompanyBond_Public_Domestic_Cost + FVOCI_CompanyBond_Public_Domestic_Cost + AC_CompanyBond_Public_Domestic_Cost
 
             
         透過損益按公允價值衡量之金融資產2 A		
+    FVPL_CompanyBond_Public_Domestic
     120050121		強制FVPL金融資產-普通公司債(公營)                 
     120070121		強制FVPL金融資產評價調整-普通公司債(公營)   
     FVPL_CompanyBond_Public_Domestic_Cost + FVPL_CompanyBond_Public_Domestic_ValuationAdjust
     
             
         透過其他綜合損益按公允價值衡量之金融資產2 B		
+    FVOCI_CompanyBond_Public_Domestic
     121110121
     121130121
     ' 重新勾稽
@@ -631,6 +638,7 @@ Public Sub Process_TABLE10()
 
 
         按攤銷後成本衡量之債務工具投資2 C		
+    AC_CompanyBond_Public_Domestic
     122010121		AC債務工具投資-普通公司債(公營)                   
             
 
@@ -639,6 +647,7 @@ Public Sub Process_TABLE10()
 
     2.2.民營企業-國內公司債		
         原始取得成本1		
+    CompanyBond_Private_Domestic_Cost
     120050123		強制FVPL金融資產-普通公司債(民營)                 
     121110123		FVOCI債務工具-普通公司債（民營）                  
     122010123		AC債務工具投資-普通公司債(民營)                   
@@ -647,18 +656,21 @@ Public Sub Process_TABLE10()
 
 
         透過損益按公允價值衡量之金融資產2 A		
+    FVPL_CompanyBond_Private_Domestic
     120050123		強制FVPL金融資產-普通公司債(民營)                 
     120070123		強制FVPL金融資產評價調整-普通公司債(民營)         
 
     FVPL_CompanyBond_Private_Domestic_Cost + FVPL_CompanyBond_Private_Domestic_ValuationAdjust
 
         透過其他綜合損益按公允價值衡量之金融資產2 B		
+    FVOCI_CompanyBond_Private_Domestic
     121110123		FVOCI債務工具-普通公司債（民營）                  
     121130123		FVOCI債務工具評價調整-普通公司債（民營)               
 
     FVOCI_CompanyBond_Private_Domestic_Cost + FVOCI_CompanyBond_Private_Domestic_ValuationAdjust
 
         按攤銷後成本衡量之債務工具投資2 C		
+    AC_CompanyBond_Private_Domestic
     122010123		AC債務工具投資-普通公司債(民營)                   
     AC_CompanyBond_Private_Domestic_Cost +
     
@@ -667,6 +679,7 @@ Public Sub Process_TABLE10()
     
 
         原始取得成本1		    
+    Stock_Cost
     1200503
     1210103
     15501
@@ -687,6 +700,7 @@ Public Sub Process_TABLE10()
     EquityMethod_Other_Cost +
             
         透過損益按公允價值衡量之金融資產2 A		
+    FVPL_Stock
     1200503
     1200703
     ' 重新勾稽
@@ -698,6 +712,7 @@ Public Sub Process_TABLE10()
     FVPL_Stock_CommonStock_Listed_ValuationAdjust + FVPL_Stock_CommonStock_OTC_ValuationAdjust + FVPL_Stock_CommonStock_Emergin_ValuationAdjust + FVPL_Stock_PreferredStock_Listed_ValuationAdjust
     
         透過其他綜合損益按公允價值衡量之金融資產2 B		
+    FVOCI_Stock
     1210103
     1210303
     1210199
@@ -717,6 +732,8 @@ Public Sub Process_TABLE10()
         按攤銷後成本衡量之債務工具投資2 C		
         		
         採用權益法之投資-淨額2 E		
+    EquityMethod_Stock
+    
     15001		採用權益法之投資成本 
     EquityMethod_Other_Cost +                              
     15003		加（減）：採用權益法認列之投資權益調整            
@@ -724,11 +741,13 @@ Public Sub Process_TABLE10()
     4.受益憑證-其他		
             
         原始取得成本1		
+    AssetCertificate_Cost
     1200505		強制FVPL金融資產-受益憑證              
     
     FVPL_AssetCertificate_Cost +
             
         透過損益按公允價值衡量之金融資產2 A		
+    FVPL_AssetCertificate
     1200505		強制FVPL金融資產-受益憑證                         
     1200705		強制FVPL金融資產評價調整-受益憑證                 
     FVPL_AssetCertificate_Cost + FVPL_AssetCertificate_ValuationAdjust
@@ -740,6 +759,7 @@ Public Sub Process_TABLE10()
     5.新台幣可轉讓定期存單-中央銀行發行		
             
         原始取得成本1		
+    NCD_CentralBank_Cost
     121110911		FVOCI債務工具-央行NCD                             
     122010911		AC債務工具投資-央行NCD   
     FVOCI_NCD_CentralBank_Cost + AC_NCD_CentralBank_Cost
@@ -747,11 +767,13 @@ Public Sub Process_TABLE10()
         透過損益按公允價值衡量之金融資產2 A		
             
         透過其他綜合損益按公允價值衡量之金融資產2 B		
+    FVOCI_NCD_CentralBank
     121110911		FVOCI債務工具-央行NCD                             
     121130911		FVOCI債務工具評價調整-央行NCD                     
     FVOCI_NCD_CentralBank_Cost + FVOCI_NCD_CentralBank_ValuationAdjust
             
         按攤銷後成本衡量之債務工具投資2 C		
+    AC_NCD_CentralBank
     122010911		AC債務工具投資-央行NCD                            
     122030911		累積減損-AC債務工具投資-央行NCD                   
 
@@ -760,11 +782,13 @@ Public Sub Process_TABLE10()
     6.商業本票-民營企業		
             
         原始取得成本1		
+    CP_Cost
     120050903		強制FVPL金融資產-商業本票                         
     FVPL_CP_Cost + 
     
             
         透過損益按公允價值衡量之金融資產2 A		
+    FVPL_CP
     120050903		強制FVPL金融資產-商業本票                         
     120070903		強制FVPL金融資產評價調整-商業本票                 
     FVPL_CP_Cost + FVPL_CP_ValuationAdjust
@@ -776,6 +800,7 @@ Public Sub Process_TABLE10()
     7.國外機構發行-在國外發行-長期債票券6		
             
         原始取得成本1		
+    FinancialBond_Domestic_Cost
     140010147		備供出售-金融債券-海外                  
     AFS_FinancialBond_Domestic_Cost +
     
@@ -783,6 +808,7 @@ Public Sub Process_TABLE10()
         透過損益按公允價值衡量之金融資產2 A		
             
         透過其他綜合損益按公允價值衡量之金融資產2 B		
+    AFS_FinancialBond_Domestic
     140010147		備供出售-金融債券-海外                            
     140030147		備供出售評價調整-金融債券-海外                    
 
