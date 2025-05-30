@@ -37,18 +37,22 @@ BillType
 FaceValue
 
 
+-- 要確認是用交易日票券明細表還是交割日
 
+AI410_BillTradeIPO
 
 PARAMETERS DataMonthParam TEXT;
 SELECT 
-    BillTransactionDetails.BillType AS 類型, 
-    COUNT(BillTransactionDetails.BillType) AS 筆數, 
-    SUM(BillTransactionDetails.FaceValue) AS 總面額
+    BillTransactionBySettlementDate.BillType AS 類型, 
+    COUNT(BillTransactionBySettlementDate.BillType) AS 筆數, 
+    SUM(BillTransactionBySettlementDate.FaceValue) AS 總面額
 FROM 
-    BillTransactionDetails
+    BillTransactionBySettlementDate
 WHERE 
-    BillTransactionDetails.DataMonthString = [DataMonthParam]
+    BillTransactionBySettlementDate.TransactionType IN ('首購', '承銷發行')
+    AND BillTransactionBySettlementDate.DataMonthString = [DataMonthParam]
+    
 GROUP BY 
-    BillTransactionDetails.BillType;
+    BillTransactionBySettlementDate.BillType;
 
         找 CP2 和 央行NCD

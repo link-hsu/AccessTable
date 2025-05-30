@@ -39,7 +39,7 @@ L欄位 名目本金
 K欄位 買回本金
 
 
-
+-- old
 PARAMETERS DataMonthParam TEXT;
 SELECT 
     IIf(Left(BondTransactionDetails.Issuer, 1) IN ("A", "H"), "公債",
@@ -56,7 +56,7 @@ GROUP BY
 
 
 
-
+-- new
 PARAMETERS DataMonthParam TEXT;
 SELECT 
     IIf(Left(BondTransactionDetails.BondCode, 1) IN ("A", "H"), "公債", 
@@ -218,7 +218,7 @@ ai405
 
 PARAMETERS DataMonthParam TEXT;
 SELECT
-    AccountCodeMap.AssetMeasurementSubType & "_" & AccountCodeMap.Category As MeasurementCategory,
+    AccountCodeMap.Category,
     SUM(ab.Amount) As SubtotalAmount
 FROM AccountCodeMap
 INNER JOIN
@@ -231,10 +231,7 @@ INNER JOIN
 ON
     AccountCodeMap.AccountCode = ab.AccountCode
 WHERE
-    AccountCodeMap.GroupFlag IN ('外幣債', '台幣債', 'RPRS', 'Derivative')
-    AND AccountCodeMap.Category IN ('Cost')
-    AND AccountCodeMap.SingleOrSubtotal = 'Single'
+    AccountCodeMap.GroupFlag <> '外幣債'
+    AND AccountCodeMap.Category = 'Cost'
 GROUP BY
-    AccountCodeMap.AssetMeasurementType,
-    AccountCodeMap.AssetMeasurementSubType,
     AccountCodeMap.Category;

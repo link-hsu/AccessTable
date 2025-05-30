@@ -39,10 +39,9 @@ S欄位 面額
 
 PARAMETERS DataMonthParam TEXT;
 SELECT
-    AccountCodeMap.AccountCode,
+    AccountCodeMap.GroupFlag,
     AccountCodeMap.AccountTitle,
-    AccountCodeMap.AssetMeasurementSubType,
-    AccountCodeMap.Category,
+    AccountCodeMap.AssetType,
     ab.Amount
 FROM AccountCodeMap
 INNER JOIN
