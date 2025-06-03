@@ -111,22 +111,66 @@ Public Sub Main()
     ' 定義每張報表必需由使用者填入／確認的儲存格名稱
     Dim req As Object
     Set req = CreateObject("Scripting.Dictionary")
-    ' req.Add "TABLE41", Array("Table41_國外部_一利息收入", _
-    '                          "Table41_國外部_一利息收入_利息", _
-    '                          "Table41_國外部_一利息收入_利息_存放銀行同業", _
-    '                          "Table41_國外部_二金融服務收入", _
-    '                          "Table41_國外部_一利息支出", _
-    '                          "Table41_國外部_一利息支出_利息", _
-    '                          "Table41_國外部_一利息支出_利息_外國人外匯存款", _
-    '                          "Table41_國外部_二金融服務支出", _
-    '                          "Table41_企銷處_一利息支出", _
-    '                          "Table41_企銷處_一利息支出_利息", _
-    '                          "Table41_企銷處_一利息支出_利息_外國人新台幣存款")
+
+    Dim rowNames_TABLE24 As Variant, colNames_TABLE24 As Variant
+    Dim fieldTotal_TABLE24 As Long
+    Dim array_TABLE24() As String   
+
+    rowNames_TABLE24 = Array("Table24_101_30天_公營企業", _
+                             "Table24_102_30天_民營企業", _
+                             "Table24_102_30天_小計", _
+                             "Table24_201_90天_公營企業", _
+                             "Table24_202_90天_民營企業", _
+                             "Table24_202_90天_小計", _
+                             "Table24_301_180天_公營企業", _
+                             "Table24_302_180天_民營企業", _
+                             "Table24_302_180天_小計", _
+                             "Table24_401_181天以上_公營企業", _
+                             "Table24_402_181天以上_民營企業", _
+                             "Table24_402_181天以上_小計", _
+                             "Table24_合計")
+                             
+    colNames_TABLE24 = Array("上月筆數", _
+                             "上月金額", _
+                             "本月發行筆數", _
+                             "本月發行金額", _
+                             "本月償還筆數", _
+                             "本月償還金額", _
+                             "本月筆數", _
+                             "本月金額")
+
+
+
+    Dim rowNames_TABLE27 As Variant, colNames_TABLE27 As Variant
+    Dim fieldTotal_TABLE27 As Long
+    Dim array_TABLE27() As String
+         
+    fieldTotal_TABLE24 = (UBound(rowNames_TABLE24) - LBound(rowNames_TABLE24) + 1) * (UBound(colNames_TABLE24) - LBound(colNames_TABLE24) + 1)
+
+    fieldTotal_TABLE27 = (UBound(rowNames_TABLE27) - LBound(rowNames_TABLE27) + 1) * (UBound(colNames_TABLE27) - LBound(colNames_TABLE27) + 1)
+    
+    ReDim array_TABLE24(0 To fieldTotal_TABLE24 - 1)
+    ReDim array_TABLE27(0 To fieldTotal_TABLE27 - 1)
+    
+    Dim loc As Long
+    loc = 0
+    For i = LBound(rowNames_TABLE24) To UBound(rowNames_TABLE24)
+        For j = LBound(colNames_TABLE24) To UBound(colNames_TABLE24)
+            array_TABLE24(loc) = rowNames_TABLE24(i) & "_" & colNames_TABLE24(j)
+            loc = loc + 1
+        Next j
+    Next i
+
+    For i = LBound(rowNames_TABLE27) To UBound(rowNames_TABLE27)
+        For j = LBound(colNames_TABLE27) To UBound(colNames_TABLE27)
+            array_TABLE27(loc) = rowNames_TABLE27(i) & "_" & colNames_TABLE27(j)
+            loc = loc + 1
+        Next j
+    Next i
+
+    req.Add "TABLE24", array_TABLE24
                             
-    ' req.Add "AI822", Array("AI822_會計科_上年度決算後淨值", _
-    '                        "AI822_國外部_直接往來之授信", _
-    '                        "AI822_國外部_間接往來之授信", _
-    '                        "AI822_授管處_直接往來之授信")
+    req.Add "TABLE27", array_TABLE27
 
     ' 暫存要移除的報表
     Dim toRemove As Collection
@@ -337,6 +381,7 @@ Public Sub Process_TABLE10()
     Set importCols = ImportQueryTables(gDBPath, xlsht, reportTitle, gDataMonthString)
 
     If importCols Is Nothing Or importCols.Count = 0 Then
+        WriteLog reportTitle & ": " & queryTable & " 資料表無資料，跳出報表Process程序"        
         Exit Sub
     End If    
 
@@ -369,19 +414,19 @@ Public Sub Process_TABLE10()
     ' 2.1.公營事業		
     ' 原始取得成本1		
     Dim CompanyBond_Public_Domestic_Cost As Double: CompanyBond_Public_Domestic_Cost = 0
-    Table10_1050000_國內_五公司債_原始取得成本
+    Table10_1050100_國內_五公司債_公營事業_原始取得成本
     
     ' 透過損益按公允價值衡量之金融資產2 A		
     Dim FVPL_CompanyBond_Public_Domestic As Double: FVPL_CompanyBond_Public_Domestic = 0
-    Table10_1050000_國內_五公司債_透過損益按公允價值衡量之金融資產
+    Table10_1050100_國內_五公司債_公營事業_透過損益按公允價值衡量之金融資產
     
     ' 透過其他綜合損益按公允價值衡量之金融資產2 B		
     Dim FVOCI_CompanyBond_Public_Domestic As Double: FVOCI_CompanyBond_Public_Domestic = 0
-    Table10_1050000_國內_五公司債_透過其他綜合損益按公允價值衡量之金融資產
+    Table10_1050100_國內_五公司債_公營事業_透過其他綜合損益按公允價值衡量之金融資產
 
     ' 按攤銷後成本衡量之債務工具投資2 C		
     Dim AC_CompanyBond_Public_Domestic As Double: AC_CompanyBond_Public_Domestic = 0
-    Table10_1050000_國內_五公司債_按攤銷後成本衡量之債務工具投資
+    Table10_1050100_國內_五公司債_公營事業_按攤銷後成本衡量之債務工具投資
 
     ' 2.2.民營企業-國內公司債		
     ' 原始取得成本1		
@@ -940,22 +985,138 @@ Public Sub Process_TABLE10()
     FinancialBond_Domestic_Cost = Round(FinancialBond_Domestic_Cost / 1000, 0)
     AFS_FinancialBond_Domestic = Round(AFS_FinancialBond_Domestic / 1000, 0)
     
+
+    ' 公債原始成本
+    ' Dim GovBond_Domestic_Cost As Double: GovBond_Domestic_Cost = 0
+    xlsht.Range("Table10_1040000_國內_四公債_原始取得成本").Value = GovBond_Domestic_Cost
+
+    ' 公債
+    ' 透過損益按公允價值衡量之金融資產2 A
+    ' Dim FVPL_GovBond_Domestic As Double: FVPL_GovBond_Domestic = 0
+    xlsht.Range("Table10_1040000_國內_四公債_透過損益按公允價值衡量之金融資產").Value = FVPL_GovBond_Domestic
+
+    ' 公債
+    ' 透過其他綜合損益按公允價值衡量之金融資產2 B
+    ' Dim FVOCI_GovBond_Domestic As Double: FVOCI_GovBond_Domestic = 0
+    xlsht.Range("Table10_1040000_國內_四公債_透過其他綜合損益按公允價值衡量之金融資產").Value = FVOCI_GovBond_Domestic
+
+    ' 公債
+    ' ac
+    ' Dim AC_GovBond_Domestic As Double: AC_GovBond_Domestic = 0
+    xlsht.Range("Table10_1040000_國內_四公債_按攤銷後成本衡量之債務工具投資").Value = AC_GovBond_Domestic
+
+    ' 2.公司債		
+    ' 2.1.公營事業		
+    ' 原始取得成本1		
+    ' Dim CompanyBond_Public_Domestic_Cost As Double: CompanyBond_Public_Domestic_Cost = 0
+    xlsht.Range("Table10_1050100_國內_五公司債_公營事業_原始取得成本").Value = CompanyBond_Public_Domestic_Cost
     
-    xlsht.Range("FM11_一利息股息收入_利息_其他").Value = foreignInterestRevenue
+    ' 透過損益按公允價值衡量之金融資產2 A		
+    ' Dim FVPL_CompanyBond_Public_Domestic As Double: FVPL_CompanyBond_Public_Domestic = 0
+    xlsht.Range("Table10_1050100_國內_五公司債_公營事業_透過損益按公允價值衡量之金融資產").Value = FVPL_CompanyBond_Public_Domestic
 
-    xlsht.Range("FM11_三證券投資處分利益_一年期以上之債權證券").Value = gainOnSecuritiesDisposal
+    ' 透過其他綜合損益按公允價值衡量之金融資產2 B		
+    ' Dim FVOCI_CompanyBond_Public_Domestic As Double: FVOCI_CompanyBond_Public_Domestic = 0
+    xlsht.Range("Table10_1050100_國內_五公司債_公營事業_透過其他綜合損益按公允價值衡量之金融資產").Value = FVOCI_CompanyBond_Public_Domestic
 
-    xlsht.Range("FM11_三證券投資處分損失_一年期以上之債權證券").Value = lossOnSecuritiesDisposal
+    ' 按攤銷後成本衡量之債務工具投資2 C		
+    ' Dim AC_CompanyBond_Public_Domestic As Double: AC_CompanyBond_Public_Domestic = 0
+    xlsht.Range("Table10_1050100_國內_五公司債_公營事業_按攤銷後成本衡量之債務工具投資").Value = AC_CompanyBond_Public_Domestic
 
-    xlsht.Range("FM11_五證券投資評價及減損迴轉利益_一年期以上之債權證券").Value = reversalImpairmentPL
+    ' 2.2.民營企業-國內公司債		
+    ' 原始取得成本1		
+    ' Dim CompanyBond_Private_Domestic_Cost As Double: CompanyBond_Private_Domestic_Cost = 0
+    xlsht.Range("Table10_1050201_國內_五公司債_民營企業國內_原始取得成本").Value = CompanyBond_Private_Domestic_Cost
 
-    xlsht.Range("FM11_五證券投資評價及減損損失_一年期以上之債權證券").Value = valuationImpairmentLoss
+    ' 透過損益按公允價值衡量之金融資產2 A		
+    ' Dim FVPL_CompanyBond_Private_Domestic As Double: FVPL_CompanyBond_Private_Domestic = 0
+    xlsht.Range("Table10_1050201_國內_五公司債_民營企業國內_透過損益按公允價值衡量之金融資產").Value = FVPL_CompanyBond_Private_Domestic
 
-    xlsht.Range("FM11_一利息收入_自中華民國境內其他客戶").Value = domesticInterestRevenue
+    ' 透過其他綜合損益按公允價值衡量之金融資產2 B		
+    ' Dim FVOCI_CompanyBond_Private_Domestic As Double: FVOCI_CompanyBond_Private_Domestic = 0
+    xlsht.Range("Table10_1050201_國內_五公司債_民營企業國內_透過其他綜合損益按公允價值衡量之金融資產").Value = FVOCI_CompanyBond_Private_Domestic
+
+    ' 按攤銷後成本衡量之債務工具投資2 C		
+    ' Dim AC_CompanyBond_Private_Domestic As Double: AC_CompanyBond_Private_Domestic = 0
+    xlsht.Range("Table10_1050201_國內_五公司債_民營企業國內_按攤銷後成本衡量之債務工具投資").Value = AC_CompanyBond_Private_Domestic
+
+    ' 3.股票及股權投資-民營企業
+    ' 原始取得成本1		    
+    ' Dim Stock_Cost As Double: Stock_Cost = 0
+    xlsht.Range("Table10_1060200_國內_六股票及股權投資_民營企業_原始取得成本").Value = Stock_Cost
     
-    xlsht.Range("T2:T100").NumberFormat = "#,##,##"
+    ' 透過損益按公允價值衡量之金融資產2 A		
+    ' Dim FVPL_Stock As Double: FVPL_Stock = 0
+    xlsht.Range("Table10_1060200_國內_六股票及股權投資_民營企業_透過損益按公允價值衡量之金融資產").Value = FVPL_Stock
 
-    rpt.SetField "FOA", "FM11_一利息股息收入_利息_其他", CStr(foreignInterestRevenue)
+    ' 透過其他綜合損益按公允價值衡量之金融資產2 B		
+    ' Dim FVOCI_Stock As Double: FVOCI_Stock = 0
+    xlsht.Range("Table10_1060200_國內_六股票及股權投資_民營企業_透過其他綜合損益按公允價值衡量之金融資產").Value = FVOCI_Stock
+    
+    ' 按攤銷後成本衡量之債務工具投資2 C		
+    ' 採用權益法之投資-淨額2 E		
+    ' Dim EquityMethod_Stock As Double: EquityMethod_Stock = 0
+    xlsht.Range("Table10_1060200_國內_六股票及股權投資_民營企業_採用權益法之投資").Value = EquityMethod_Stock
+
+    ' 4.受益憑證-其他		
+    ' 原始取得成本1		
+    ' Dim AssetCertificate_Cost As Double: AssetCertificate_Cost = 0
+    xlsht.Range("Table10_1070300_國內_七受益憑證_其他_原始取得成本").Value = AssetCertificate_Cost
+    
+    ' 透過損益按公允價值衡量之金融資產2 A		
+    ' Dim FVPL_AssetCertificate As Double: FVPL_AssetCertificate = 0
+    xlsht.Range("Table10_1070300_國內_七受益憑證_其他_透過損益按公允價值衡量之金融資產").Value = FVPL_AssetCertificate
+
+    ' 透過其他綜合損益按公允價值衡量之金融資產2 B		
+    ' xlsht.Range("Table10_1110000_國內_十一新台幣可轉讓定期存單_透過其他綜合損益按公允價值衡量之金融資產").Value = 
+
+
+    ' 按攤銷後成本衡量之債務工具投資2 C		
+    ' xlsht.Range("Table10_1110000_國內_十一新台幣可轉讓定期存單_按攤銷後成本衡量之債務工具投資").Value = 
+
+    ' 5.新台幣可轉讓定期存單-中央銀行發行		
+    ' 原始取得成本1		
+    ' Dim NCD_CentralBank_Cost As Double: NCD_CentralBank_Cost = 0
+    xlsht.Range("Table10_1110100_國內_十一新台幣可轉讓定期存單_中央銀行發行_原始取得成本").Value = NCD_CentralBank_Cost
+    
+    ' 透過損益按公允價值衡量之金融資產2 A		
+    ' xlsht.Range("Table10_1110100_國內_十一新台幣可轉讓定期存單_中央銀行發行_透過損益按公允價值衡量之金融資產").Value = 
+
+    ' 透過其他綜合損益按公允價值衡量之金融資產2 B		
+    ' Dim FVOCI_NCD_CentralBank As Double: FVOCI_NCD_CentralBank = 0
+    xlsht.Range("Table10_1110100_國內_十一新台幣可轉讓定期存單_中央銀行發行_透過其他綜合損益按公允價值衡量之金融資產").Value = FVOCI_NCD_CentralBank
+
+    ' 按攤銷後成本衡量之債務工具投資2 C		
+    ' Dim AC_NCD_CentralBank As Double: AC_NCD_CentralBank = 0
+    xlsht.Range("Table10_1110100_國內_十一新台幣可轉讓定期存單_中央銀行發行_按攤銷後成本衡量之債務工具投資").Value = AC_NCD_CentralBank
+    
+    ' 6.商業本票-民營企業		
+    ' 原始取得成本1		
+    ' Dim CP_Cost As Double: CP_Cost = 0
+    xlsht.Range("Table10_1130200_國內_十四商業本票_民營企業_原始取得成本").Value = CP_Cost
+    
+    ' 透過損益按公允價值衡量之金融資產2 A		
+    ' Dim FVPL_CP As Double: FVPL_CP = 0
+    xlsht.Range("Table10_1130200_國內_十四商業本票_民營企業_透過損益按公允價值衡量之金融資產").Value = FVPL_CP
+    
+    ' 透過其他綜合損益按公允價值衡量之金融資產2 B		
+    ' xlsht.Range("Table10_1130200_國內_十四商業本票_民營企業_透過其他綜合損益按公允價值衡量之金融資產").Value = 
+    
+    ' 按攤銷後成本衡量之債務工具投資2 C		
+    ' xlsht.Range("Table10_1130200_國內_十四商業本票_民營企業_按攤銷後成本衡量之債務工具投資").Value = 
+    
+    ' 7.國外機構發行-在國外發行-長期債票券6		      
+    ' 原始取得成本1		
+    ' Dim FinancialBond_Domestic_Cost As Double: FinancialBond_Domestic_Cost = 0
+    xlsht.Range("Table10_2010102_國外_一在國外發行_長期債券_原始取得成本").Value = FinancialBond_Domestic_Cost
+    
+    ' 透過損益按公允價值衡量之金融資產2 A		
+    ' xlsht.Range("Table10_2010102_國外_一在國外發行_長期債券_透過損益按公允價值衡量之金融資產").Value = 
+    
+    ' 透過其他綜合損益按公允價值衡量之金融資產2 B		
+    ' Dim AFS_FinancialBond_Domestic As Double: AFS_FinancialBond_Domestic = 0
+    xlsht.Range("Table10_2010102_國外_一在國外發行_長期債券_透過其他綜合損益按公允價值衡量之金融資產").Value = AFS_FinancialBond_Domestic    
+
 
     ' 資料一開始要先清掉
 
@@ -1160,6 +1321,7 @@ Public Sub Process_TABLE15B()
     Set importCols = ImportQueryTables(gDBPath, xlsht, reportTitle, gDataMonthString)
 
     If importCols Is Nothing Or importCols.Count = 0 Then
+        WriteLog reportTitle & ": " & queryTable & " 資料表無資料，跳出報表Process程序"
         Exit Sub
     End If
 
@@ -1244,6 +1406,7 @@ Public Sub Process_TABLE16()
     Set importCols = ImportQueryTables(gDBPath, xlsht, reportTitle, gDataMonthString)
 
     If importCols Is Nothing Or importCols.Count = 0 Then
+        WriteLog reportTitle & ": " & queryTable & " 資料表無資料，跳出報表Process程序"
         Exit Sub
     End If
 
@@ -1326,6 +1489,7 @@ Public Sub Process_TABLE20()
     Set importCols = ImportQueryTables(gDBPath, xlsht, reportTitle, gDataMonthString)
 
     If importCols Is Nothing Or importCols.Count = 0 Then
+        WriteLog reportTitle & ": " & queryTable & " 資料表無資料，跳出報表Process程序"
         Exit Sub
     End If
     
@@ -1551,7 +1715,7 @@ Public Sub Process_TABLE22()
     Bank_FaceValue = Round(Bank_FaceValue / 1000000, 0)
     BillSecurity_FaceValue = Round(BillSecurity_FaceValue / 1000000, 0)
     Other_FaceValue = Round(Other_FaceValue / 1000000, 0)
-    
+
     xlsht.Range("Table22_001銀行_融資性商業本票").Value = Bank_FaceValue
     xlsht.Range("Table22_002票券金融公司_融資性商業本票").Value = BillSecurity_FaceValue
     xlsht.Range("Table22_006民營企業_融資性商業本票").Value = Other_FaceValue
@@ -1619,6 +1783,7 @@ Public Sub Process_TABLE23()
     Set importCols = ImportQueryTables(gDBPath, xlsht, reportTitle, gDataMonthString)
 
     If importCols Is Nothing Or importCols.Count = 0 Then
+        WriteLog reportTitle & ": " & queryTable & " 資料表無資料，跳出報表Process程序"        
         Exit Sub
     End If
 
@@ -1725,16 +1890,12 @@ Public Sub Process_TABLE24()
     Set importCols = ImportQueryTables(gDBPath, xlsht, reportTitle, gDataMonthString)
 
     If importCols Is Nothing Or importCols.Count = 0 Then
-        Exit Sub
+        WriteLog reportTitle & ": " & queryTable & " 資料表無資料"        
     End If
     
     '--------------
     'Unique Setting
     '--------------
-
-    Dim RP_GovBond_Cost As Double: RP_GovBond_Cost = 0
-
-
     Dim lastRow1 As Long, lastRow2 As Long
     Dim rngs1 As Range, rngs2 As Range, rng As Range
 
@@ -1745,21 +1906,13 @@ Public Sub Process_TABLE24()
         
         For Each rng In rngs1
             Select Case CStr(rng.Value)
-                Case "RP_GovBond_Cost"
-                    RP_GovBond_Cost = RP_GovBond_Cost + rng.Offset(0, 1).Value
-                Case "AC_CompanyBond_Domestic_ImpairmentLoss"
-                    RP_CompanyBond_Cost = RP_CompanyBond_Cost + rng.Offset(0, 1).Value
+
             End Select
         Next rng
     End If
-    
-    
-    RP_GovBond_Cost = Round(RP_GovBond_Cost / 1000, 0)
+
 
     
-    xlsht.Range("Table20_0200_二公債_民營企業_其他到期日").Value = RP_GovBond_Cost
-    
-    ' 資料一開始要先清掉
 
     ' --- 【修改2】用 FieldValuePositionMap 批次填 rpt ---
     Dim SetFieldMap As Variant
@@ -1821,6 +1974,7 @@ Public Sub Process_TABLE27()
     Set importCols = ImportQueryTables(gDBPath, xlsht, reportTitle, gDataMonthString)
 
     If importCols Is Nothing Or importCols.Count = 0 Then
+        WriteLog reportTitle & ": " & queryTable & " 資料表無資料，跳出報表Process程序"        
         Exit Sub
     End If
     
@@ -1918,6 +2072,7 @@ Public Sub Process_TABLE36()
     Set importCols = ImportQueryTables(gDBPath, xlsht, reportTitle, gDataMonthString)
 
     If importCols Is Nothing Or importCols.Count = 0 Then
+        WriteLog reportTitle & ": " & queryTable & " 資料表無資料，跳出報表Process程序"        
         Exit Sub
     End If
     
@@ -1974,7 +2129,6 @@ Public Sub Process_TABLE36()
     xlsht.Range("Table36_0400_商業本票_民營企業").Value = BillByBillInsti_Amount
     xlsht.Range("Table36_0400_商業本票_貨幣機構").Value = BillByBank_Amount
     
-    ' 資料一開始要先清掉
 
     ' --- 【修改2】用 FieldValuePositionMap 批次填 rpt ---
     Dim SetFieldMap As Variant
@@ -2036,6 +2190,7 @@ Public Sub Process_AI233()
     Set importCols = ImportQueryTables(gDBPath, xlsht, reportTitle, gDataMonthString)
 
     If importCols Is Nothing Or importCols.Count = 0 Then
+        WriteLog reportTitle & ": " & queryTable & " 資料表無資料，跳出報表Process程序"        
         Exit Sub
     End If
     
@@ -2146,8 +2301,8 @@ Public Sub Process_AI233()
      Dim AC_NCD_CentralBank_BV As Double: AC_NCD_CentralBank_BV = 0
 
 
-    Dim lastRow1 As Long, lastRow2 As Long
-    Dim rngs1 As Range, rngs2 As Range, rng As Range
+    Dim lastRow1 As Long, lastRow2 As Long, lastRow3 As Long
+    Dim rngs1 As Range, rngs2 As Range, rngs3 As Range, rng As Range
 
     ' --- 【修改1.2】不迴圈，直接取用 importCols(1) 和 importCols(2) ---
     If importCols.Count >= 1 Then
@@ -2274,7 +2429,294 @@ Public Sub Process_AI233()
     End If
     
 
+    If importCols.Count >= 2 Then
+        lastRow2 = xlsht.Cells(xlsht.Rows.Count, importCols(2)).End(xlUp).Row
+        Set rngs2 = xlsht.Range(xlsht.Cells(2, importCols(2)), xlsht.Cells(lastRow2, importCols(2)))
+        
+        For Each rng In rngs2
+            ' 如果第二筆表也有需要累計的 tag，可以在這裡加
+            *50/1000
+            Select Case CStr(rng.Value)
+                Case "A"
+                    RP_GovBond_Cost = RP_GovBond_Cost + rng.Offset(0, 1).Value
+                Case "B"
+                    RP_CompanyBond_Cost = RP_CompanyBond_Cost + rng.Offset(0, 1).Value
+                Case "H"
+                    RP_CompanyBond_Cost = RP_CompanyBond_Cost + rng.Offset(0, 1).Value                    
+            End Select
+        Next rng
+    End If
+
+
+    If importCols.Count >= 3 Then
+        lastRow3 = xlsht.Cells(xlsht.Rows.Count, importCols(3)).End(xlUp).Row
+        Set rngs3 = xlsht.Range(xlsht.Cells(2, importCols(3)), xlsht.Cells(lastRow2, importCols(3)))
+        
+        For Each rng In rngs3
+            ' 如果第二筆表也有需要累計的 tag，可以在這裡加
+            Select Case CStr(rng.Value)
+                Case "RP_GovBond_Cost"
+                    RP_GovBond_Cost = RP_GovBond_Cost + rng.Offset(0, 1).Value
+                Case "AC_CompanyBond_Domestic_ImpairmentLoss"
+                    RP_CompanyBond_Cost = RP_CompanyBond_Cost + rng.Offset(0, 1).Value
+            End Select
+        Next rng
+    End If    
+
+
     ' 單位：新臺幣千元
+
+
+
+
+AI233_情境一_本期損益_政府公債A_FVPL
+AI233_情境二_本期損益_政府公債A_FVPL
+FVPL_GovBond_Case1_DV01
+FVPL_GovBond_Case2_DV01
+
+
+AI233_情境一_其他綜合損益_政府公債A_FVOCI
+AI233_情境二_其他綜合損益_政府公債A_FVOCI
+FVOCI_GovBond_Case1_DV01
+FVOCI_GovBond_Case2_DV01
+
+AI233_情境一_潛在評估損益_政府公債A_AC
+AI233_情境二_潛在評估損益_政府公債A_AC
+AC_GovBond_Case1_DV01
+AC_GovBond_Case2_DV01
+
+AI233_情境一_本期損益_公司債B_FVPL
+AI233_情境二_本期損益_公司債B_FVPL
+FVPL_CompanyBond_Case1_DV01
+FVPL_CompanyBond_Case2_DV01
+
+AI233_情境一_其他綜合損益_公司債B_FVOCI
+AI233_情境二_其他綜合損益_公司債B_FVOCI
+FVOCI_CompanyBond_Case1_DV01
+FVOCI_CompanyBond_Case2_DV01
+
+
+AI233_情境一_潛在評估損益_公司債B_AC
+AI233_情境二_潛在評估損益_公司債B_AC
+AC_CompanyBond_Case1_DV01
+AC_CompanyBond_Case2_DV01
+
+
+AI233_情境一_本期損益_其他投資部位G
+AI233_情境二_本期損益_其他投資部位G
+FVPL_Other_Case1_DV01
+FVPL_Other_Case2_DV01
+
+
+AI233_情境一_其他綜合損益_央行可轉讓定期存單H_FVOCI
+AI233_情境二_其他綜合損益_央行可轉讓定期存單H_FVOCI
+FVOCI_NCD_CentralBank_Case1_DV01
+FVOCI_NCD_CentralBank_Case2_DV01
+
+
+AI233_情境一_潛在評估損益_央行可轉讓定期存單H_AC
+AI233_情境二_潛在評估損益_央行可轉讓定期存單H_AC
+AC_NCD_CentralBank_Case1_DV01
+AC_NCD_CentralBank_Case2_DV01
+
+    
+    ' - 透過損益按公允價值衡量A1		
+    ' - 投資成本		
+    ' - 政府公債A		
+    Dim FVPL_GovBond_Domestic_Cost As Double: FVPL_GovBond_Domestic_Cost = 0
+    AI233_投資成本_政府公債A_FVPL
+
+
+
+    ' - 公司債B		
+    Dim FVPL_CompanyBond_Domestic_Cost As Double: FVPL_CompanyBond_Domestic_Cost = 0
+    AI233_投資成本_公司債B_FVPL
+
+
+    ' - 金融債券C市
+    ' - 權益證券投資D
+    Dim FVPL_Stock_Cost As Double: FVPL_Stock_Cost = 0
+    AI233_投資成本_權益證券投資D_FVPL
+
+    ' - 結構型商品E		
+    ' - 證券化商品F		
+    ' - 其它投資部位G		
+    Dim FVPL_Other_Cost As Double: FVPL_Other_Cost = 0
+    AI233_投資成本_其他投資部位G
+
+
+    ' - 央行可轉讓定期存單H		
+    ' - 帳面價值 = 投資成本 + 以下		
+    ' - 政府公債A		
+    Dim FVPL_GovBond_Domestic_BV As Double: FVPL_GovBond_Domestic_BV = 0
+    AI233_帳面價值_政府公債A_FVPL
+
+    ' - 公司債B		
+    Dim FVPL_CompanyBond_Domestic_BV As Double: FVPL_CompanyBond_Domestic_BV = 0
+    AI233_帳面價值_公司債B_FVPL
+
+
+    ' - 金融債券C
+    ' - 權益證券投資D
+    Dim FVPL_Stock_BV As Double: FVPL_Stock_BV = 0
+    AI233_帳面價值_權益證券投資D_FVPL
+
+
+    ' - 結構型商品E		
+    ' - 證券化商品F		
+    ' - 其它投資部位G		
+    Dim FVPL_Other_BV As Double: FVPL_Other_BV = 0
+    AI233_帳面價值_其他投資部位G
+
+
+    ' - 央行可轉讓定期存單H
+
+    ' - 透過其他綜合損益按公允價值衡量A6		
+    ' - 投資成本		
+    ' - 政府公債A		
+    Dim FVOCI_GovBond_Domestic_Cost As Double: FVOCI_GovBond_Domestic_Cost = 0
+    AI233_投資成本_政府公債A_FVOCI
+
+
+    ' - 公司債B		
+    Dim FVOCI_CompanyBond_Domestic_Cost As Double: FVOCI_CompanyBond_Domestic_Cost = 0
+    AI233_投資成本_公司債B_FVOCI
+
+
+    
+    ' - 金融債券C		
+    ' - 權益證券投資D		
+    Dim FVOCI_Stock_Cost As Double: FVOCI_Stock_Cost = 0
+    AI233_投資成本_權益證券投資D_FVOCI
+    
+
+    ' - 結構型商品E
+    ' - 證券化商品F
+    ' - 其它投資部位G
+    ' - 央行可轉讓定期存單H
+    Dim FVOCI_NCD_CentralBank_Cost As Double: FVOCI_NCD_CentralBank_Cost = 0
+    AI233_投資成本_央行可轉讓定期存單H_FVOCI
+
+
+    ' - 帳面價值
+    ' - 政府公債A
+    Dim FVOCI_GovBond_Domestic_BV As Double: FVOCI_GovBond_Domestic_BV = 0
+    AI233_帳面價值_政府公債A_FVOCI
+
+
+    ' - 公司債B
+    Dim FVOCI_CompanyBond_Domestic_BV As Double: FVOCI_CompanyBond_Domestic_BV = 0
+    AI233_帳面價值_公司債B_FVOCI
+
+
+    ' - 金融債券C		
+    ' - 權益證券投資D		
+    Dim FVOCI_Stock_BV As Double: FVOCI_Stock_BV = 0
+    AI233_帳面價值_權益證券投資D_FVOCI
+
+
+    ' - 結構型商品E
+    ' - 證券化商品F
+    ' - 其它投資部位G
+    ' - 央行可轉讓定期存單H
+    Dim FVOCI_NCD_CentralBank_BV As Double: FVOCI_NCD_CentralBank_BV = 0
+    AI233_帳面價值_央行可轉讓定期存單H_FVOCI
+
+
+    ' - 按攤銷後成本衡量A7
+    ' - 投資成本
+    ' - 政府公債A
+    Dim AC_GovBond_Domestic_Cost As Double: AC_GovBond_Domestic_Cost = 0
+    AI233_投資成本_政府公債A_AC
+
+    ' - 公司債B
+    Dim AC_CompanyBond_Domestic_Cost As Double: AC_CompanyBond_Domestic_Cost = 0
+    AI233_投資成本_公司債B_AC
+
+
+    ' - 金融債券C
+    ' - 權益證券投資D
+    ' - 結構型商品E
+    ' - 證券化商品F
+    ' - 其它投資部位G
+    ' - 央行可轉讓定期存單H
+    Dim AC_NCD_CentralBank_Cost As Double: AC_NCD_CentralBank_Cost = 0
+    AI233_投資成本_央行可轉讓定期存單H_AC
+
+
+    ' - 帳面價值
+    ' - 政府公債A
+    Dim AC_GovBond_Domestic_BV As Double: AC_GovBond_Domestic_BV = 0
+    AI233_帳面價值_政府公債A_AC
+
+    ' - 公司債B
+    Dim AC_CompanyBond_Domestic_BV As Double: AC_CompanyBond_Domestic_BV = 0
+    AI233_帳面價值_公司債B_AC
+
+
+
+    ' - 金融債券C
+    ' - 權益證券投資D
+    ' - 結構型商品E
+    ' - 證券化商品F
+    ' - 其它投資部位G
+    ' - 央行可轉讓定期存單H
+    Dim AC_NCD_CentralBank_BV As Double: AC_NCD_CentralBank_BV = 0
+    AI233_帳面價值_央行可轉讓定期存單H_AC
+
+
+    ' AI233_情境一_本期損益_政府公債A_FVPL
+    ' AI233_情境二_本期損益_政府公債A_FVPL
+    Dim FVPL_GovBond_Case1_DV01 As Double: FVPL_GovBond_Case1_DV01 = 0
+    Dim FVPL_GovBond_Case2_DV01 As Double: FVPL_GovBond_Case2_DV01 = 0
+    
+    
+    ' AI233_情境一_其他綜合損益_政府公債A_FVOCI
+    ' AI233_情境二_其他綜合損益_政府公債A_FVOCI
+    Dim FVOCI_GovBond_Case1_DV01 As Double: FVOCI_GovBond_Case1_DV01 = 0
+    Dim FVOCI_GovBond_Case2_DV01 As Double: FVOCI_GovBond_Case2_DV01 = 0
+    
+    ' AI233_情境一_潛在評估損益_政府公債A_AC
+    ' AI233_情境二_潛在評估損益_政府公債A_AC
+    Dim AC_GovBond_Case1_DV01 As Double: AC_GovBond_Case1_DV01 = 0
+    Dim AC_GovBond_Case2_DV01 As Double: AC_GovBond_Case2_DV01 = 0
+    
+    ' AI233_情境一_本期損益_公司債B_FVPL
+    ' AI233_情境二_本期損益_公司債B_FVPL
+    Dim FVPL_CompanyBond_Case1_DV01 As Double: FVPL_CompanyBond_Case1_DV01 = 0
+    Dim FVPL_CompanyBond_Case2_DV01 As Double: FVPL_CompanyBond_Case2_DV01 = 0
+    
+    ' AI233_情境一_其他綜合損益_公司債B_FVOCI
+    ' AI233_情境二_其他綜合損益_公司債B_FVOCI
+    Dim FVOCI_CompanyBond_Case1_DV01 As Double: FVOCI_CompanyBond_Case1_DV01 = 0
+    Dim FVOCI_CompanyBond_Case2_DV01 As Double: FVOCI_CompanyBond_Case2_DV01 = 0
+    
+    
+    ' AI233_情境一_潛在評估損益_公司債B_AC
+    ' AI233_情境二_潛在評估損益_公司債B_AC
+    Dim AC_CompanyBond_Case1_DV01 As Double: AC_CompanyBond_Case1_DV01 = 0
+    Dim AC_CompanyBond_Case2_DV01 As Double: AC_CompanyBond_Case2_DV01 = 0
+    
+    
+    ' AI233_情境一_本期損益_其他投資部位G
+    ' AI233_情境二_本期損益_其他投資部位G
+    Dim FVPL_Other_Case1_DV01 As Double: FVPL_Other_Case1_DV01 = 0
+    Dim FVPL_Other_Case2_DV01 As Double: FVPL_Other_Case2_DV01 = 0
+    
+    
+    ' AI233_情境一_其他綜合損益_央行可轉讓定期存單H_FVOCI
+    ' AI233_情境二_其他綜合損益_央行可轉讓定期存單H_FVOCI
+    Dim FVOCI_NCD_CentralBank_Case1_DV01 As Double: FVOCI_NCD_CentralBank_Case1_DV01 = 0
+    Dim FVOCI_NCD_CentralBank_Case2_DV01 As Double: FVOCI_NCD_CentralBank_Case2_DV01 = 0
+    
+    
+    ' AI233_情境一_潛在評估損益_央行可轉讓定期存單H_AC
+    ' AI233_情境二_潛在評估損益_央行可轉讓定期存單H_AC
+    Dim AC_NCD_CentralBank_Case1_DV01 As Double: AC_NCD_CentralBank_Case1_DV01 = 0
+    Dim AC_NCD_CentralBank_Case2_DV01 As Double: AC_NCD_CentralBank_Case2_DV01 = 0
+
+
+
 
 
     RP_CP_Cost = Round(RP_CP_Cost / 1000, 0)
@@ -2345,6 +2787,7 @@ Public Sub Process_AI345()
     Set importCols = ImportQueryTables(gDBPath, xlsht, reportTitle, gDataMonthString)
 
     If importCols Is Nothing Or importCols.Count = 0 Then
+        WriteLog reportTitle & ": " & queryTable & " 資料表無資料，跳出報表Process程序"        
         Exit Sub
     End If
     
@@ -2459,6 +2902,7 @@ Public Sub Process_AI405()
     Set importCols = ImportQueryTables(gDBPath, xlsht, reportTitle, gDataMonthString)
 
     If importCols Is Nothing Or importCols.Count = 0 Then
+        WriteLog reportTitle & ": " & queryTable & " 資料表無資料，跳出報表Process程序"        
         Exit Sub
     End If
     
@@ -2579,6 +3023,7 @@ Public Sub Process_AI410()
     Set importCols = ImportQueryTables(gDBPath, xlsht, reportTitle, gDataMonthString)
 
     If importCols Is Nothing Or importCols.Count = 0 Then
+        WriteLog reportTitle & ": " & queryTable & " 資料表無資料，跳出報表Process程序"        
         Exit Sub
     End If
     
@@ -2692,6 +3137,7 @@ Public Sub Process_AI415()
     Set importCols = ImportQueryTables(gDBPath, xlsht, reportTitle, gDataMonthString)
 
     If importCols Is Nothing Or importCols.Count = 0 Then
+        WriteLog reportTitle & ": " & queryTable & " 資料表無資料，跳出報表Process程序"        
         Exit Sub
     End If
     
@@ -2805,6 +3251,7 @@ Public Sub Process_AI430()
     Set importCols = ImportQueryTables(gDBPath, xlsht, reportTitle, gDataMonthString)
 
     If importCols Is Nothing Or importCols.Count = 0 Then
+        WriteLog reportTitle & ": " & queryTable & " 資料表無資料，跳出報表Process程序"        
         Exit Sub
     End If
     
@@ -3185,6 +3632,7 @@ Public Sub Process_AI601()
     Set importCols = ImportQueryTables(gDBPath, xlsht, reportTitle, gDataMonthString)
 
     If importCols Is Nothing Or importCols.Count = 0 Then
+        WriteLog reportTitle & ": " & queryTable & " 資料表無資料，跳出報表Process程序"        
         Exit Sub
     End If
     
@@ -3318,6 +3766,7 @@ Public Sub Process_AI605()
     Set importCols = ImportQueryTables(gDBPath, xlsht, reportTitle, gDataMonthString)
 
     If importCols Is Nothing Or importCols.Count = 0 Then
+        WriteLog reportTitle & ": " & queryTable & " 資料表無資料，跳出報表Process程序"        
         Exit Sub
     End If
     
