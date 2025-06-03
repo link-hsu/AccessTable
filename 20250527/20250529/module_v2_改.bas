@@ -2197,7 +2197,7 @@ Public Sub Process_AI233()
     '--------------
     'Unique Setting
     '--------------
-     Dim RP_GovBond_Cost As Double: RP_GovBond_Cost = 0
+
      ' - 透過損益按公允價值衡量A1		
      ' - 投資成本		
      ' - 政府公債A		
@@ -2299,6 +2299,57 @@ Public Sub Process_AI233()
      ' - 其它投資部位G
      ' - 央行可轉讓定期存單H
      Dim AC_NCD_CentralBank_BV As Double: AC_NCD_CentralBank_BV = 0
+
+
+    ' AI233_情境一_本期損益_政府公債A_FVPL
+    ' AI233_情境二_本期損益_政府公債A_FVPL
+    Dim FVPL_GovBond_Case1_DV01 As Double: FVPL_GovBond_Case1_DV01 = 0
+    Dim FVPL_GovBond_Case2_DV01 As Double: FVPL_GovBond_Case2_DV01 = 0
+    
+    
+    ' AI233_情境一_其他綜合損益_政府公債A_FVOCI
+    ' AI233_情境二_其他綜合損益_政府公債A_FVOCI
+    Dim FVOCI_GovBond_Case1_DV01 As Double: FVOCI_GovBond_Case1_DV01 = 0
+    Dim FVOCI_GovBond_Case2_DV01 As Double: FVOCI_GovBond_Case2_DV01 = 0
+    
+    ' AI233_情境一_潛在評估損益_政府公債A_AC
+    ' AI233_情境二_潛在評估損益_政府公債A_AC
+    Dim AC_GovBond_Case1_DV01 As Double: AC_GovBond_Case1_DV01 = 0
+    Dim AC_GovBond_Case2_DV01 As Double: AC_GovBond_Case2_DV01 = 0
+    
+    ' AI233_情境一_本期損益_公司債B_FVPL
+    ' AI233_情境二_本期損益_公司債B_FVPL
+    Dim FVPL_CompanyBond_Case1_DV01 As Double: FVPL_CompanyBond_Case1_DV01 = 0
+    Dim FVPL_CompanyBond_Case2_DV01 As Double: FVPL_CompanyBond_Case2_DV01 = 0
+    
+    ' AI233_情境一_其他綜合損益_公司債B_FVOCI
+    ' AI233_情境二_其他綜合損益_公司債B_FVOCI
+    Dim FVOCI_CompanyBond_Case1_DV01 As Double: FVOCI_CompanyBond_Case1_DV01 = 0
+    Dim FVOCI_CompanyBond_Case2_DV01 As Double: FVOCI_CompanyBond_Case2_DV01 = 0
+    
+    
+    ' AI233_情境一_潛在評估損益_公司債B_AC
+    ' AI233_情境二_潛在評估損益_公司債B_AC
+    Dim AC_CompanyBond_Case1_DV01 As Double: AC_CompanyBond_Case1_DV01 = 0
+    Dim AC_CompanyBond_Case2_DV01 As Double: AC_CompanyBond_Case2_DV01 = 0
+    
+    
+    ' AI233_情境一_本期損益_其他投資部位G
+    ' AI233_情境二_本期損益_其他投資部位G
+    Dim FVPL_Other_Case1_DV01 As Double: FVPL_Other_Case1_DV01 = 0
+    Dim FVPL_Other_Case2_DV01 As Double: FVPL_Other_Case2_DV01 = 0
+    
+    
+    ' AI233_情境一_其他綜合損益_央行可轉讓定期存單H_FVOCI
+    ' AI233_情境二_其他綜合損益_央行可轉讓定期存單H_FVOCI
+    Dim FVOCI_NCD_CentralBank_Case1_DV01 As Double: FVOCI_NCD_CentralBank_Case1_DV01 = 0
+    Dim FVOCI_NCD_CentralBank_Case2_DV01 As Double: FVOCI_NCD_CentralBank_Case2_DV01 = 0
+    
+    
+    ' AI233_情境一_潛在評估損益_央行可轉讓定期存單H_AC
+    ' AI233_情境二_潛在評估損益_央行可轉讓定期存單H_AC
+    Dim AC_NCD_CentralBank_Case1_DV01 As Double: AC_NCD_CentralBank_Case1_DV01 = 0
+    Dim AC_NCD_CentralBank_Case2_DV01 As Double: AC_NCD_CentralBank_Case2_DV01 = 0     
 
 
     Dim lastRow1 As Long, lastRow2 As Long, lastRow3 As Long
@@ -2437,12 +2488,28 @@ Public Sub Process_AI233()
             ' 如果第二筆表也有需要累計的 tag，可以在這裡加
             *50/1000
             Select Case CStr(rng.Value)
-                Case "A"
-                    RP_GovBond_Cost = RP_GovBond_Cost + rng.Offset(0, 1).Value
+                Case "A", "H"
+                    If rng.Offset(0, 1).Value = "FVPL" Then
+                        FVPL_GovBond_Case1_DV01 = (rng.Offset(0, 2).Value * 50) / 1000
+                        FVPL_GovBond_Case2_DV01 = FVPL_GovBond_Case1_DV01 * 2
+                    ElseIf rng.Offset(0, 1).Value = "FVOCI" Then
+                        FVOCI_GovBond_Case1_DV01 = (rng.Offset(0, 2).Value * 50) / 1000
+                        FVOCI_GovBond_Case2_DV01 = FVOCI_GovBond_Case1_DV01 * 2
+                    ElseIf rng.Offset(0, 1).Value = "AC" Then
+                        AC_GovBond_Case1_DV01 = (rng.Offset(0, 2).Value * 50) / 1000
+                        AC_GovBond_Case2_DV01 = AC_GovBond_Case1_DV01 * 2
+                    End If
                 Case "B"
-                    RP_CompanyBond_Cost = RP_CompanyBond_Cost + rng.Offset(0, 1).Value
-                Case "H"
-                    RP_CompanyBond_Cost = RP_CompanyBond_Cost + rng.Offset(0, 1).Value                    
+                    If rng.Offset(0, 1).Value = "FVPL" Then
+                        FVPL_CompanyBond_Case1_DV01 = (rng.Offset(0, 2).Value * 50) / 1000
+                        FVPL_CompanyBond_Case2_DV01 = FVPL_CompanyBond_Case1_DV01 * 2
+                    ElseIf rng.Offset(0, 1).Value = "FVOCI" Then
+                        FVOCI_CompanyBond_Case1_DV01 = (rng.Offset(0, 2).Value * 50) / 1000
+                        FVOCI_CompanyBond_Case2_DV01 = FVOCI_CompanyBond_Case1_DV01 * 2
+                    ElseIf rng.Offset(0, 1).Value = "AC" Then
+                        AC_CompanyBond_Case1_DV01 = (rng.Offset(0, 2).Value * 50) / 1000
+                        AC_CompanyBond_Case2_DV01 = AC_CompanyBond_Case1_DV01 * 2
+                    End If        
             End Select
         Next rng
     End If
@@ -2455,9 +2522,9 @@ Public Sub Process_AI233()
         For Each rng In rngs3
             ' 如果第二筆表也有需要累計的 tag，可以在這裡加
             Select Case CStr(rng.Value)
-                Case "RP_GovBond_Cost"
+                Case "CP2"
                     RP_GovBond_Cost = RP_GovBond_Cost + rng.Offset(0, 1).Value
-                Case "AC_CompanyBond_Domestic_ImpairmentLoss"
+                Case "央行NCD"
                     RP_CompanyBond_Cost = RP_CompanyBond_Cost + rng.Offset(0, 1).Value
             End Select
         Next rng
@@ -2665,55 +2732,7 @@ AC_NCD_CentralBank_Case2_DV01
     AI233_帳面價值_央行可轉讓定期存單H_AC
 
 
-    ' AI233_情境一_本期損益_政府公債A_FVPL
-    ' AI233_情境二_本期損益_政府公債A_FVPL
-    Dim FVPL_GovBond_Case1_DV01 As Double: FVPL_GovBond_Case1_DV01 = 0
-    Dim FVPL_GovBond_Case2_DV01 As Double: FVPL_GovBond_Case2_DV01 = 0
-    
-    
-    ' AI233_情境一_其他綜合損益_政府公債A_FVOCI
-    ' AI233_情境二_其他綜合損益_政府公債A_FVOCI
-    Dim FVOCI_GovBond_Case1_DV01 As Double: FVOCI_GovBond_Case1_DV01 = 0
-    Dim FVOCI_GovBond_Case2_DV01 As Double: FVOCI_GovBond_Case2_DV01 = 0
-    
-    ' AI233_情境一_潛在評估損益_政府公債A_AC
-    ' AI233_情境二_潛在評估損益_政府公債A_AC
-    Dim AC_GovBond_Case1_DV01 As Double: AC_GovBond_Case1_DV01 = 0
-    Dim AC_GovBond_Case2_DV01 As Double: AC_GovBond_Case2_DV01 = 0
-    
-    ' AI233_情境一_本期損益_公司債B_FVPL
-    ' AI233_情境二_本期損益_公司債B_FVPL
-    Dim FVPL_CompanyBond_Case1_DV01 As Double: FVPL_CompanyBond_Case1_DV01 = 0
-    Dim FVPL_CompanyBond_Case2_DV01 As Double: FVPL_CompanyBond_Case2_DV01 = 0
-    
-    ' AI233_情境一_其他綜合損益_公司債B_FVOCI
-    ' AI233_情境二_其他綜合損益_公司債B_FVOCI
-    Dim FVOCI_CompanyBond_Case1_DV01 As Double: FVOCI_CompanyBond_Case1_DV01 = 0
-    Dim FVOCI_CompanyBond_Case2_DV01 As Double: FVOCI_CompanyBond_Case2_DV01 = 0
-    
-    
-    ' AI233_情境一_潛在評估損益_公司債B_AC
-    ' AI233_情境二_潛在評估損益_公司債B_AC
-    Dim AC_CompanyBond_Case1_DV01 As Double: AC_CompanyBond_Case1_DV01 = 0
-    Dim AC_CompanyBond_Case2_DV01 As Double: AC_CompanyBond_Case2_DV01 = 0
-    
-    
-    ' AI233_情境一_本期損益_其他投資部位G
-    ' AI233_情境二_本期損益_其他投資部位G
-    Dim FVPL_Other_Case1_DV01 As Double: FVPL_Other_Case1_DV01 = 0
-    Dim FVPL_Other_Case2_DV01 As Double: FVPL_Other_Case2_DV01 = 0
-    
-    
-    ' AI233_情境一_其他綜合損益_央行可轉讓定期存單H_FVOCI
-    ' AI233_情境二_其他綜合損益_央行可轉讓定期存單H_FVOCI
-    Dim FVOCI_NCD_CentralBank_Case1_DV01 As Double: FVOCI_NCD_CentralBank_Case1_DV01 = 0
-    Dim FVOCI_NCD_CentralBank_Case2_DV01 As Double: FVOCI_NCD_CentralBank_Case2_DV01 = 0
-    
-    
-    ' AI233_情境一_潛在評估損益_央行可轉讓定期存單H_AC
-    ' AI233_情境二_潛在評估損益_央行可轉讓定期存單H_AC
-    Dim AC_NCD_CentralBank_Case1_DV01 As Double: AC_NCD_CentralBank_Case1_DV01 = 0
-    Dim AC_NCD_CentralBank_Case2_DV01 As Double: AC_NCD_CentralBank_Case2_DV01 = 0
+
 
 
 
