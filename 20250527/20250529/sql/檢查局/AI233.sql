@@ -191,6 +191,8 @@
 數字哪邊來的這要問
 
 
+AI233_SubtotalACCList
+
 PARAMETERS DataMonthParam TEXT;
 SELECT
     AccountCodeMap.AssetMeasurementSubType & "_" & AccountCodeMap.Category As MeasurementCategory,
@@ -213,6 +215,43 @@ GROUP BY
     AccountCodeMap.AssetMeasurementType,
     AccountCodeMap.AssetMeasurementSubType,
     AccountCodeMap.Category;
+
+
+
+
+AI233_BondDV01Subtotal
+
+PARAMETERS DataMonthParam TEXT;
+SELECT
+    IIf(
+      Left([BondRiskPositionBalance.BondCode],1) In ('A','H','B','G','F'),
+      Left([BondRiskPositionBalance.BondCode],1),
+      '其他'
+    ) AS BondCodePrefix,
+    BondRiskPositionBalance.AccountingPurpose,
+    Sum(BondRiskPositionBalance.DV01) AS SubtotalDV01
+FROM
+    BondRiskPositionBalance
+GROUP BY
+    IIf(
+      Left([BondRiskPositionBalance.BondCode],1) In ('A','H','B','G','F'),
+      Left([BondRiskPositionBalance.BondCode],1),
+      '其他'
+    ),
+    BondRiskPositionBalance.AccountingPurpose;
+
+AI233_BillDV01Subtotal
+
+PARAMETERS DataMonthParam TEXT;
+SELECT
+    BillRiskPositionBalance.BillType,
+    BillRiskPositionBalance.AccountingPurpose,
+    Sum(BillRiskPositionBalance.DV01) AS SubtotalDV01
+FROM
+    BillRiskPositionBalance
+GROUP BY
+    BillRiskPositionBalance.BillType,
+    BillRiskPositionBalance.AccountingPurpose;
 
 
 
