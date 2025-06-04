@@ -2,3 +2,4 @@
 
 - 更改table36 RPRS到期時序表的表格欄位
 - 注意是不是EXCEL沒有 AI415 
+- 新增一開始要先清除Database資料，從function拉出的col欄位計算要清除多少欄，後面在處理
