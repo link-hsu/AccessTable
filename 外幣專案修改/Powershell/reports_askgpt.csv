@@ -1,0 +1,111 @@
+報表名稱,原始檔案路徑,目標檔案路徑
+CNY1,外幣月報\{ROCYM}\DBU_AC5601_31_AC_E_{InputDate}.txt,RelationData\RawData\DBU_AC5601_31_AC_E_{InputDate}.txt
+CNY1,外幣月報\{ROCYM}\DBU_AC5601_31_AC_E_{InputDate}.xls,RelationData\RawData\DBU_AC5601_31_AC_E_{InputDate}.xls
+CNY1,外幣月報\{ROCYM}\DBU_AC5601_31_AC_E_{InputDate}.pdf,外幣報表產製_final\CNY\DBU_AC5601_31_AC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\CNY1\DBU_AC5601_31_AC_E_{InputDate}.pdf
+表2,外幣月報\{ROCYM}\DBU_AC5602_31_AC_E_{InputDate}.xls,RelationData\RawData\DBU_AC5602_31_AC_E_{InputDate}.xls
+表2,外幣月報\{ROCYM}\DBU_AC5602_31_AC_E_{InputDate}.pdf,外幣報表產製_final\表2表41\表2\DBU_AC5602_31_AC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\表2\DBU_AC5602_31_AC_E_{InputDate}.pdf
+F1_F2,外幣月報\{ROCYM}\DBU_CM2810_31_AC_E_{InputDate}.xls,RelationData\RawData\DBU_CM2810_31_AC_E_{InputDate}.xls;外幣報表產製_final\F1F2\DBU_CM2810_31_AC_E_{InputDate}.xls
+F1_F2,外幣月報\{ROCYM}\DBU_DL6850_31_AC_E_{InputDate}.xls,RelationData\RawData\DBU_DL6850_31_AC_E_{InputDate}.xls;外幣報表產製_final\F1F2\DBU_DL6850_31_AC_E_{InputDate}.xls
+F1_F2,外幣月報\{ROCYM}\DBU_DL6850_31_AC_E_{InputDate}.pdf,外幣報表產製_final\F1F2\DBU_DL6850_31_AC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\F1_F2\DBU_DL6850_31_AC_E_{InputDate}.pdf
+AI240,外幣月報\{ROCYM}\DBU_DL6850_31_AC_E_{InputDate}.xls,RelationData\RawData\DBU_DL6850_31_AC_E_{InputDate}.xls;外幣報表產製_final\AI\AI240\DBU_DL6850_31_AC_E_{InputDate}.xls
+AI240,外幣月報\{ROCYM}\DBU_DL6850_31_AC_E_{InputDate}.pdf,外幣報表產製_final\AI\AI240\DBU_DL6850_31_AC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\AI240\DBU_DL6850_31_AC_E_{InputDate}.pdf
+表41,外幣月報\{ROCYM}\DBU_DL9360_31_AC_E_{InputDate}.xls,RelationData\RawData\DBU_DL9360_31_AC_E_{InputDate}.xls
+表41,外幣月報\{ROCYM}\DBU_DL9360_31_AC_E_{InputDate}.pdf,外幣報表產製_final\表2表41\表41\DBU_DL9360_31_AC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\表41\DBU_DL9360_31_AC_E_{InputDate}.pdf
+FM10,外幣月報\{ROCYM}\OBU_AC4603_33_AC_E_{InputDate}.xls,RelationData\RawData\OBU_AC4603_33_AC_E_{InputDate}.xls;外幣報表產製_final\FM\FM10\OBU_AC4603_33_AC_E_{InputDate}.xls
+FM10,外幣月報\{ROCYM}\OBU_AC4603_33_AC_E_{InputDate}.pdf,外幣報表產製_final\FM\FM10\OBU_AC4603_33_AC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\FM10\OBU_AC4603_33_AC_E_{InputDate}.pdf
+FB2,外幣月報\{ROCYM}\OBU_AC4620B_33_AC_E_{InputDate}.txt,RelationData\RawData\OBU_AC4620B_33_AC_E_{InputDate}.txt
+FB2,外幣月報\{ROCYM}\OBU_AC4620B_33_AC_E_{InputDate}.xls,RelationData\RawData\OBU_AC4620B_33_AC_E_{InputDate}.xls
+FB2,外幣月報\{ROCYM}\OBU_AC4620B_33_AC_E_{InputDate}.pdf,外幣報表產製_final\FB\OBU_AC4620B_33_AC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\FM2\OBU_AC4620B_33_AC_E_{InputDate}.pdf
+FM11,外幣月報\{ROCYM}\OBU_AC5411B_33_AC_E_{InputDate}.xls,RelationData\RawData\OBU_AC5411B_33_AC_E_{InputDate}.xls;外幣報表產製_final\FM\FM11\OBU_AC5411B_33_AC_E_{InputDate}.xls
+FM11,外幣月報\{ROCYM}\OBU_AC5411B_33_AC_E_{InputDate}.pdf,外幣報表產製_final\FM\FM11\OBU_AC5411B_33_AC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\11407\FM11\OBU_AC5411B_33_AC_E_{InputDate}.pdf
+FB5,外幣月報\{ROCYM}\OBU_CF6320_33_AC_E_{InputDate}.xls,RelationData\RawData\OBU_CF6320_33_AC_E_{InputDate}.xls
+FB5,外幣月報\{ROCYM}\OBU_CF6320_33_AC_E_{InputDate}.pdf,外幣報表產製_final\FB\OBU_CF6320_33_AC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\FB5\OBU_CF6320_33_AC_E_{InputDate}.pdf
+FB5,外幣月報\{ROCYM}\OBU_DL6320_33_AC_E_{InputDate}.xls,RelationData\RawData\OBU_DL6320_33_AC_E_{InputDate}.xls
+FB5,外幣月報\{ROCYM}\OBU_DL6320_33_AC_E_{InputDate}.pdf,外幣報表產製_final\FB\OBU_DL6320_33_AC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\FB5\OBU_DL6320_33_AC_E_{InputDate}.pdf
+FB5,外幣月報\{ROCYM}\OBU_FC7700B_33_FC_E_{InputDate}.xls,RelationData\RawData\OBU_FC7700B_33_FC_E_{InputDate}.xls
+FB5,外幣月報\{ROCYM}\OBU_FC7700B_33_FC_E_{InputDate}.pdf,外幣報表產製_final\FB\OBU_FC7700B_33_FC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\FB5\OBU_FC7700B_33_FC_E_{InputDate}.pdf
+FM5,外幣月報\{ROCYM}\OBU_FC9450B_33_FC_E_{InputDate}.xls,RelationData\RawData\OBU_FC9450B_33_FC_E_{InputDate}.xls
+FM5,外幣月報\{ROCYM}\OBU_FC9450B_33_FC_E_{InputDate}.pdf,外幣報表產製_final\FM\FM5\OBU_FC9450B_33_FC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\FM5\OBU_FC9450B_33_FC_E_{InputDate}.pdf
+FB3,外幣月報\{ROCYM}\OBU_MM4901B_33_MM_E_{InputDate}.xls,RelationData\RawData\OBU_MM4901B_33_MM_E_{InputDate}.xls
+FB3,外幣月報\{ROCYM}\OBU_MM4901B_33_MM_E_{InputDate}.pdf,外幣報表產製_final\FB\OBU_MM4901B_33_MM_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\FB3\OBU_MM4901B_33_MM_E_{InputDate}.pdf
+FM2,外幣月報\{ROCYM}\OBU_MM4901B_33_MM_E_{InputDate}.xls,RelationData\RawData\OBU_MM4901B_33_MM_E_{InputDate}.xls;外幣報表產製_final\FM\FM2\OBU_MM4901B_33_MM_E_{InputDate}.xls
+FM2,外幣月報\{ROCYM}\OBU_MM4901B_33_MM_E_{InputDate}.pdf,外幣報表產製_final\FM\FM2\OBU_MM4901B_33_MM_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\FM2\OBU_MM4901B_33_MM_E_{InputDate}.pdf
+AI821,外幣月報\{ROCYM}\OBU_MM4901B_33_MM_E_{InputDate}.xls,RelationData\RawData\OBU_MM4901B_33_MM_E_{InputDate}.xls
+AI821,外幣月報\{ROCYM}\OBU_MM4901B_33_MM_E_{InputDate}.pdf,外幣報表產製_final\AI\AI821\OBU_MM4901B_33_MM_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\AI821\OBU_MM4901B_33_MM_E_{InputDate}.pdf
+FM13,外幣月報\{ROCYM}\金融資產減損 {ROCYMDate}.xlsx,RelationData\RawData\金融資產減損 {ROCYMDate}.xlsx;外幣報表產製_final\FM\FM13\金融資產減損 {ROCYMDate}.xlsx
+FM13,外幣月報\{ROCYM}\{InputDate}外幣債損益評估表(月底)對AC5100B.xlsx,RelationData\RawData\{InputDate}外幣債損益評估表(月底)對AC5100B.xlsx;外幣報表產製_final\FM\FM13\{InputDate}外幣債損益評估表(月底)對AC5100B.xlsx
+
+我需要使用powershell建立一個程序，要執行項目如下
+
+1.我有一個reports.csv如下資料，目的是要將 原始檔案路徑欄位的路徑檔案，複製一份到目標路徑檔案，
+報表名稱,原始檔案路徑,目標檔案路徑
+CNY1,外幣月報\{ROCYM}\DBU_AC5601_31_AC_E_{InputDate}.txt,RelationData\RawData\DBU_AC5601_31_AC_E_{InputDate}.txt
+CNY1,外幣月報\{ROCYM}\DBU_AC5601_31_AC_E_{InputDate}.xls,RelationData\RawData\DBU_AC5601_31_AC_E_{InputDate}.xls
+CNY1,外幣月報\{ROCYM}\DBU_AC5601_31_AC_E_{InputDate}.pdf,外幣報表產製_final\CNY\DBU_AC5601_31_AC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\CNY1\DBU_AC5601_31_AC_E_{InputDate}.pdf
+表2,外幣月報\{ROCYM}\DBU_AC5602_31_AC_E_{InputDate}.xls,RelationData\RawData\DBU_AC5602_31_AC_E_{InputDate}.xls
+表2,外幣月報\{ROCYM}\DBU_AC5602_31_AC_E_{InputDate}.pdf,外幣報表產製_final\表2表41\表2\DBU_AC5602_31_AC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\表2\DBU_AC5602_31_AC_E_{InputDate}.pdf
+F1_F2,外幣月報\{ROCYM}\DBU_CM2810_31_AC_E_{InputDate}.xls,RelationData\RawData\DBU_CM2810_31_AC_E_{InputDate}.xls;外幣報表產製_final\F1F2\DBU_CM2810_31_AC_E_{InputDate}.xls
+F1_F2,外幣月報\{ROCYM}\DBU_DL6850_31_AC_E_{InputDate}.xls,RelationData\RawData\DBU_DL6850_31_AC_E_{InputDate}.xls;外幣報表產製_final\F1F2\DBU_DL6850_31_AC_E_{InputDate}.xls
+F1_F2,外幣月報\{ROCYM}\DBU_DL6850_31_AC_E_{InputDate}.pdf,外幣報表產製_final\F1F2\DBU_DL6850_31_AC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\F1_F2\DBU_DL6850_31_AC_E_{InputDate}.pdf
+AI240,外幣月報\{ROCYM}\DBU_DL6850_31_AC_E_{InputDate}.xls,RelationData\RawData\DBU_DL6850_31_AC_E_{InputDate}.xls;外幣報表產製_final\AI\AI240\DBU_DL6850_31_AC_E_{InputDate}.xls
+AI240,外幣月報\{ROCYM}\DBU_DL6850_31_AC_E_{InputDate}.pdf,外幣報表產製_final\AI\AI240\DBU_DL6850_31_AC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\AI240\DBU_DL6850_31_AC_E_{InputDate}.pdf
+表41,外幣月報\{ROCYM}\DBU_DL9360_31_AC_E_{InputDate}.xls,RelationData\RawData\DBU_DL9360_31_AC_E_{InputDate}.xls
+表41,外幣月報\{ROCYM}\DBU_DL9360_31_AC_E_{InputDate}.pdf,外幣報表產製_final\表2表41\表41\DBU_DL9360_31_AC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\表41\DBU_DL9360_31_AC_E_{InputDate}.pdf
+FM10,外幣月報\{ROCYM}\OBU_AC4603_33_AC_E_{InputDate}.xls,RelationData\RawData\OBU_AC4603_33_AC_E_{InputDate}.xls;外幣報表產製_final\FM\FM10\OBU_AC4603_33_AC_E_{InputDate}.xls
+FM10,外幣月報\{ROCYM}\OBU_AC4603_33_AC_E_{InputDate}.pdf,外幣報表產製_final\FM\FM10\OBU_AC4603_33_AC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\FM10\OBU_AC4603_33_AC_E_{InputDate}.pdf
+FB2,外幣月報\{ROCYM}\OBU_AC4620B_33_AC_E_{InputDate}.txt,RelationData\RawData\OBU_AC4620B_33_AC_E_{InputDate}.txt
+FB2,外幣月報\{ROCYM}\OBU_AC4620B_33_AC_E_{InputDate}.xls,RelationData\RawData\OBU_AC4620B_33_AC_E_{InputDate}.xls
+FB2,外幣月報\{ROCYM}\OBU_AC4620B_33_AC_E_{InputDate}.pdf,外幣報表產製_final\FB\OBU_AC4620B_33_AC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\FM2\OBU_AC4620B_33_AC_E_{InputDate}.pdf
+FM11,外幣月報\{ROCYM}\OBU_AC5411B_33_AC_E_{InputDate}.xls,RelationData\RawData\OBU_AC5411B_33_AC_E_{InputDate}.xls;外幣報表產製_final\FM\FM11\OBU_AC5411B_33_AC_E_{InputDate}.xls
+FM11,外幣月報\{ROCYM}\OBU_AC5411B_33_AC_E_{InputDate}.pdf,外幣報表產製_final\FM\FM11\OBU_AC5411B_33_AC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\11407\FM11\OBU_AC5411B_33_AC_E_{InputDate}.pdf
+FB5,外幣月報\{ROCYM}\OBU_CF6320_33_AC_E_{InputDate}.xls,RelationData\RawData\OBU_CF6320_33_AC_E_{InputDate}.xls
+FB5,外幣月報\{ROCYM}\OBU_CF6320_33_AC_E_{InputDate}.pdf,外幣報表產製_final\FB\OBU_CF6320_33_AC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\FB5\OBU_CF6320_33_AC_E_{InputDate}.pdf
+FB5,外幣月報\{ROCYM}\OBU_DL6320_33_AC_E_{InputDate}.xls,RelationData\RawData\OBU_DL6320_33_AC_E_{InputDate}.xls
+FB5,外幣月報\{ROCYM}\OBU_DL6320_33_AC_E_{InputDate}.pdf,外幣報表產製_final\FB\OBU_DL6320_33_AC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\FB5\OBU_DL6320_33_AC_E_{InputDate}.pdf
+FB5,外幣月報\{ROCYM}\OBU_FC7700B_33_FC_E_{InputDate}.xls,RelationData\RawData\OBU_FC7700B_33_FC_E_{InputDate}.xls
+FB5,外幣月報\{ROCYM}\OBU_FC7700B_33_FC_E_{InputDate}.pdf,外幣報表產製_final\FB\OBU_FC7700B_33_FC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\FB5\OBU_FC7700B_33_FC_E_{InputDate}.pdf
+FM5,外幣月報\{ROCYM}\OBU_FC9450B_33_FC_E_{InputDate}.xls,RelationData\RawData\OBU_FC9450B_33_FC_E_{InputDate}.xls
+FM5,外幣月報\{ROCYM}\OBU_FC9450B_33_FC_E_{InputDate}.pdf,外幣報表產製_final\FM\FM5\OBU_FC9450B_33_FC_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\FM5\OBU_FC9450B_33_FC_E_{InputDate}.pdf
+FB3,外幣月報\{ROCYM}\OBU_MM4901B_33_MM_E_{InputDate}.xls,RelationData\RawData\OBU_MM4901B_33_MM_E_{InputDate}.xls
+FB3,外幣月報\{ROCYM}\OBU_MM4901B_33_MM_E_{InputDate}.pdf,外幣報表產製_final\FB\OBU_MM4901B_33_MM_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\FB3\OBU_MM4901B_33_MM_E_{InputDate}.pdf
+FM2,外幣月報\{ROCYM}\OBU_MM4901B_33_MM_E_{InputDate}.xls,RelationData\RawData\OBU_MM4901B_33_MM_E_{InputDate}.xls;外幣報表產製_final\FM\FM2\OBU_MM4901B_33_MM_E_{InputDate}.xls
+FM2,外幣月報\{ROCYM}\OBU_MM4901B_33_MM_E_{InputDate}.pdf,外幣報表產製_final\FM\FM2\OBU_MM4901B_33_MM_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\FM2\OBU_MM4901B_33_MM_E_{InputDate}.pdf
+AI821,外幣月報\{ROCYM}\OBU_MM4901B_33_MM_E_{InputDate}.xls,RelationData\RawData\OBU_MM4901B_33_MM_E_{InputDate}.xls
+AI821,外幣月報\{ROCYM}\OBU_MM4901B_33_MM_E_{InputDate}.pdf,外幣報表產製_final\AI\AI821\OBU_MM4901B_33_MM_E_{InputDate}.pdf;外幣報表產製_final\SAVE_PDF\{ROCYM}\AI821\OBU_MM4901B_33_MM_E_{InputDate}.pdf
+FM13,外幣月報\{ROCYM}\金融資產減損 {ROCYMDate}.xlsx,RelationData\RawData\金融資產減損 {ROCYMDate}.xlsx;外幣報表產製_final\FM\FM13\金融資產減損 {ROCYMDate}.xlsx
+FM13,外幣月報\{ROCYM}\{InputDate}外幣債損益評估表(月底)對AC5100B.xlsx,RelationData\RawData\{InputDate}外幣債損益評估表(月底)對AC5100B.xlsx;外幣報表產製_final\FM\FM13\{InputDate}外幣債損益評估表(月底)對AC5100B.xlsx
+
+我要使用powershell建立一個自動搬遷檔案的程序，
+在執行ps時會需要傳入一個參數例如20250731，
+上面的 {InputDate} 格式為 西元年月日 如 20250731
+、{ROCYM} 格式為 民國年月 如 11407、{ROCYMDate} 格式為 民國年月日
+
+原始檔案路徑中的檔案名稱有下面情況
+類型1:
+DBU_AC5602_31_AC_E_20250731.xls
+中的 20250731 為變動的，因為是月報每個月檔名會不一樣，會需要再執行ps時傳入參數帶入
+且原始路徑檔名可能是西元年(例如:20250731)或民國年(1140731)
+
+類型2:
+1754300085627-cm2610.xls
+這邊的檔案名稱 1754300085627 為亂碼，只要抓取到包含 cm2610 名稱即可(需要配對到*cm2610.xls)
+
+因為目標檔案路徑 外幣報表產製_final\SAVE_PDF\{ROCYM}\ 一開始並未建立SAVE_PDF之下的{ROCYM}資料夾，
+需要隨著輸入的參數日期建立(日期名稱動態處理)，並且在{ROCYM}資料夾之下要建立 rptFolders = Array("AI821","CNY1","FB1","FB2","FB3","FB3A","FB5","FB5A","FM5","表2","FM13","FM11","表41","FM2","FM10","F1_F2","AI240") 中的資料夾，後續才有辦法將檔案一個一個複製到目標路徑
+
+3.所以在執行ps時會需要傳入一個參數例如20250731，
+因為reports.csv檔案中的原始檔案路徑及目標檔案路徑都是相對路徑，這部分也要考慮進去，
+
+4.然後就可以逐一去跑csv檔案中，將原始檔案路徑中的檔案，逐一貼到目標檔案路徑中(可能複數)(檔案名稱中包含亂碼如xxxxxxcm2610.xls，需要處理抓取檔案規則)
+
+請幫我將以上內容寫一個 powershell 處理程序，並且詳細說明如何運作
+
+
+============================================================
+
+2.我需要每個報表名稱中的原始檔案名稱拋到目標檔案路徑，
+逐一跑每一個報表中的原始檔案路徑複製到目標檔案路徑，
+有一個不同的地方是，目標檔案路徑其中一個directory會隨著輸入日期而不同需要動態處理
+D:\DavidHsu\ReportCreator\外幣報表產製_final_Test\SAVE_PDF\11407\FB5A
+例如上面路徑中的 11407 如果輸入日期是 20250731 時，則需要建立11407的檔案名稱，及批次建立 rptFolders = Array("AI821","CNY1","FB1","FB2","FB3","FB3A","FB5","FB5A","FM5","表2","FM13","FM11","表41","FM2","FM10","F1_F2","AI240")
+11407\項下的資料夾，
