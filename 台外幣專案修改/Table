@@ -1,0 +1,310 @@
+- tblReports
+
+| 報表名稱ReportID | 報表類型ReportType | 底稿路徑TplPathPattern | 底稿路徑檔名格式TplPathTimeFormat | 申報檔路徑DeclPathPattern | 申報檔路徑檔名格式DeclPathTimeFormat | 報表日期表頭分頁及儲存格位置HeaderTimeSheetRange | 報表日期表頭格式HeaderTimeFormat | 是否產生申報檔IsToCreateDeclFile | 是否刪除舊底稿IsDeleteTplPattern | 執行底稿巨集ProcessingMacro | PDF父資料夾PDFParentFolder |  |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 表6 | 月報 | 央行\YYYYMM 表6 主要業務概況月報表：Ａ+放款對 (3)2.xlsx | ROC_YYYMM |  |  | FOA!D4 | NEW_ROC_CHINESE_YYYMM | FALSE | TRUE | FALSE | FALSE |  |
+| 表7 | 月報 | 央行\YYYYMM 表7 主要業務概況月報表：B++放款2.xlsx | ROC_YYYMM |  |  | FOA!J4 | NEW_ROC_CHINESE_YYYMM | FALSE | TRUE | FALSE | FALSE |  |
+| 表10 | 月報 | 央行\YYYYMM 表10.表40.買入票券及投資簡明表-新版.xls | ROC_YYYMM | 央行\(010)買入證券及投資統計表.xlsx |  | 表10!A2 | NEW_ROC_CHINESE_YYYMM | TRUE | TRUE | FALSE | FALSE |  |
+| 表15A | 月報 | 央行\YYYYMM 表15A.可轉讓定期存單發行償還及餘額統計表.xls | ROC_YYYMM | 央行\(015A)新台幣可轉讓定期存單發行、償還及餘額統計表.xlsx |  | 新台幣可轉讓定期存單發行、償還及餘額統計表!A2 | NEW_ROC_CHINESE_YYYMM | TRUE | TRUE | FALSE | FALSE |  |
+| 表15B | 月報 | 央行\YYYYMM 表15B-外幣可轉讓定期存單發行、償還及餘額統計表.xls | ROC_YYYMM | 央行\(015B)外幣可轉讓定期存單發行、償還及餘額統計表.xlsx |  | 外幣可轉讓定期存單發行、償還及餘額統計表!A2 | NEW_ROC_CHINESE_YYYMM | TRUE | TRUE | FALSE | FALSE |  |
+| 表16 | 月報 | 央行\YYYYMM 表16.可轉讓定期存單每日持有額.xls | ROC_YYYMM | 央行\(016)可轉讓定期存單每日持有額.xlsx |  | 可轉讓定期存單每日持有額!B2 | NEW_ROC_CHINESE_YYYMM | TRUE | TRUE | FALSE | FALSE |  |
+| 表20 | 月報 | 央行\YYYYMM 表20.賣出附買回約定票(債)券交易餘額統計表.xls | ROC_YYYMM | 央行\(020)附買回票券及債券負債餘額統計表.xlsx |  | 表20!G3 | NEW_ROC_CHINESE_YYYMM | TRUE | TRUE | FALSE | FALSE |  |
+| 表22 | 月報 | 央行\YYYYMM 表22.票券交易統計表.xls | ROC_YYYMM | 央行\(022)票券交易統計表.xlsx |  | 表22!A2 | NEW_ROC_CHINESE_YYYMM | TRUE | TRUE | FALSE | FALSE |  |
+| 表23 | 月報 | 央行\YYYYMM 表23.票券利率統計表.xls | ROC_YYYMM | 央行\(023)票券利率統計表.xlsx |  | 票券利率統計表!E2 | NEW_ROC_CHINESE_YYYMM | TRUE | TRUE | FALSE | FALSE |  |
+| 表24 | 月報 | 央行\YYYYMM 表24.承銷商業本票統計表.xls | ROC_YYYMM | 央行\(024)承銷商業本票統計表.xlsx |  | 表24!E2 | NEW_ROC_CHINESE_YYYMM | TRUE | TRUE | FALSE | FALSE |  |
+| 表27 | 月報 | 央行\YYYYMM 表27.金融債券發行償還及餘額統計表.xls | ROC_YYYMM | 央行\(027)金融債券統計表.xlsx |  | 表27!D3 | NEW_ROC_CHINESE_YYYMM | TRUE | TRUE | FALSE | FALSE |  |
+| 表36 | 月報 | 央行\YYYYMM 表36 附賣回債(票)券投資餘額統計表.xls | ROC_YYYMM | 央行\(036)RS餘額統計表.xlsx |  | 表36!E3 | NEW_ROC_CHINESE_YYYMM | TRUE | TRUE | FALSE | FALSE |  |
+| AI233 | 月報 | AI233\YYYYMM AI233 新臺幣投資明細之利率變動情境分析表AI233.xlsx | ROC_YYYMM | AI233\AI233-新臺幣投資明細之利率變動情境分析表-EXCEL上傳檔案.xls |  | Table1!B3 | NEW_ROC_YYYMM | TRUE | TRUE | FALSE | FALSE |  |
+| AI345 | 月報 | AI345\YYYYMM AI345 本國銀行不良資產彙總暨評估明細表.xls | ROC_YYYMM | AI345\11406 AI345 本國銀行不良資產彙總暨評估明細表.xls |  | AI345_NEW!A2 | NEW_ROC_YYYMM | FALSE | TRUE | FALSE | FALSE |  |
+| AI405 | 月報 | AI405\YYYYMM AI405 首次買入金額交易量及持有餘額申報表.xls | ROC_YYYMM | AI405\AI405債券發行首次買入金額交易量及持有餘額資料表 - 複製.xls |  | Table1!B3 | NEW_ROC_YYYMM | TRUE | TRUE | FALSE | FALSE |  |
+| AI410 | 月報 | AI410\YYYYMM AI410 票券發行及首次買入金額資料申報表.xls | ROC_YYYMM | AI410\AI410票券發行及首次買入金額資料申報表.xls |  | Table1!B3 | NEW_ROC_YYYMM | TRUE | TRUE | FALSE | FALSE |  |
+| AI415 | 月報 | AI415\YYYYMM AI415 票券交易量資料.xls | ROC_YYYMM | AI415\AI415票券交易量申報表.xls |  | Table1!B3 | NEW_ROC_YYYMM | TRUE | TRUE | FALSE | FALSE |  |
+| AI430 | 月報 | AI430\YYYYMM AI430 票券持有餘額資料.xls | ROC_YYYMM | AI430\AI430票券持有餘額資料申報表.xls |  | Table1!B3 | NEW_ROC_YYYMM | TRUE | TRUE | FALSE | FALSE |  |
+| AI601 | 月報 | AI601\YYYYMM AI601 本國銀行投資明細表.xls | ROC_YYYMM | AI601\AI601-投資明細表.xls |  | Table1!B3 | NEW_ROC_YYYMM | TRUE | TRUE | FALSE | FALSE |  |
+| AI816 | 月報 | AI816\YYYYMM AI816 銀行辦理大陸地區法人票券金融業務統計表.xls | ROC_YYYMM | AI816\AI816銀行辦理大陸地區法人票券金融業務統計表.xls |  | Table1!B3 | NEW_ROC_YYYMM | TRUE | TRUE | FALSE | FALSE |  |
+| AI271 | 季報 | 季報\YYYYMM-AI271-證券化與結構型商品統計表（一）發行證券化商品.xls | ROC_SEASON_YYYMM | 季報\AI271-證券化與結構型商品統計表（一）發行證券化商品.xls |  | Table1!B3 | NEW_ROC_SEASON | TRUE | TRUE | FALSE | FALSE |  |
+| AI272 | 季報 | 季報\YYYYMM-AI272-證券化與結構型商品統計表（二）辦理結構型商品_附表1.xls | ROC_SEASON_YYYMM | 季報\AI272-證券化與結構型商品統計表（二）辦理結構型商品_附表1.xls |  | Table1!B3 | NEW_ROC_SEASON | TRUE | TRUE | FALSE | FALSE |  |
+| AI273 | 季報 | 季報\YYYYMM-AI273-證券化與結構型商品統計表（二）辦理結構型商品_附表2.xls | ROC_SEASON_YYYMM | 季報\AI273-證券化與結構型商品統計表（二）辦理結構型商品_附表2.xls |  | Table1!B3 | NEW_ROC_SEASON | TRUE | TRUE | FALSE | FALSE |  |
+| AI281 | 季報 | 季報\YYYYMM-AI281-證券化與結構型商品統計表（三）投資證券化商品.xls | ROC_SEASON_YYYMM | 季報\AI281-證券化與結構型商品統計表（三）投資證券化商品.xls |  | Table1!B3 | NEW_ROC_SEASON | TRUE | TRUE | FALSE | FALSE |  |
+| AI282 | 季報 | 季報\YYYYMM-AI282-證券化與結構型商品統計表（四）投資結構型商品.xls | ROC_SEASON_YYYMM | 季報\AI282-證券化與結構型商品統計表（四）投資結構型商品.xls |  | Table1!B3 | NEW_ROC_SEASON | TRUE | TRUE | FALSE | FALSE |  |
+| AI605 | 半年報 | AI605_半年報\YYYYMM AI605按攤銷後成本法衡量之債務工具投資、對其他個體權益及嵌入式衍生工具統計表.xlsx | ROC_HALF_YYYMM | AI605_半年報\AI605-按攤銷後成本衡量之債務工具投資、對其他個體權益及嵌入式衍生工具統計表-new.xls |  | Table1!B3 | NEW_ROC_SEASON | TRUE | TRUE | FALSE | FALSE |  |
+| CNY1 | 月報 | CNY1外匯指定銀行人民幣資產負債表及表外項目_YYYYMM.xlsx | ROC_YYYMM | CNY\CNY1外匯指定銀行人民幣資產負債表及表外項目_YYYYMM.xlsx | ROC_YYYMM |  |  | FALSE | FALSE | FALSE |  | onlyCopy |
+| FB1 | 月報 | (FB1)國際金融業務分行人民幣業務統計_YYYYMM.xls | ROC_YYYMM | FB\(FB1)國際金融業務分行人民幣業務統計_YYYYMM.xls | ROC_YYYMM |  |  | FALSE | FALSE | FALSE |  | onlyCopy |
+| FB2 | 月報 | (FB2)國際金融業務分行人民幣資產負債_YYYYMM.xlsx | ROC_YYYMM | FB\(FB2)國際金融業務分行人民幣資產負債_YYYYMM.xlsx | ROC_YYYMM |  |  | FALSE | FALSE | FALSE |  | onlyCopy |
+| FB3 | 月報 | (FB3)國際金融業務分行與同業及聯行人2_YYYYMM.xls | ROC_YYYMM | FB\(FB3)國際金融業務分行與同業及聯行人2_YYYYMM.xls | ROC_YYYMM |  |  | FALSE | FALSE | FALSE |  | onlyCopy |
+| FB3A | 月報 | (FB3A)國際金融業務分行與境內金融機構2_YYYYMM.xls | ROC_YYYMM | FB\(FB3A)國際金融業務分行與境內金融機構2_YYYYMM.xls | ROC_YYYMM |  |  | FALSE | FALSE | FALSE |  | onlyCopy |
+| 表2 | 月報 | (002)國外資產負債月報表2_YYYYMM.xls | ROC_YYYMM | 表2表41\表2\(002)國外資產負債月報表2_YYYYMM.xls | ROC_YYYMM |  |  | FALSE | FALSE | FALSE |  | onlyCopy |
+| FM5 | 月報 | (FM5)國際金融業務分行或有、代理、備忘項目餘額地區別分析表_YYYYMM.xlsx | ROC_YYYMM | FM\FM5\(FM5)國際金融業務分行或有、代理、備忘項目餘額地區別分析表_YYYYMM.xlsx | ROC_YYYMM |  |  | FALSE | FALSE | FALSE |  | onlyCopy |
+| AI821 | 月報 | AI821-銀行辦理人民幣業務統計表_YYYYMM.xls | ROC_YYYMM | AI\AI821\AI821-銀行辦理人民幣業務統計表_YYYYMM.xls | ROC_YYYMM |  |  | FALSE | FALSE | FALSE |  | onlyCopy |
+| FB5 | 月報 | (FB5)國際金融業務分行人民幣外匯交易_YYYYMM.xlsx | ROC_YYYMM | FB\(FB5)國際金融業務分行人民幣外匯交易_YYYYMM.xlsx | ROC_YYYMM |  |  | FALSE | FALSE | FALSE |  | onlyCopy |
+| FB5A | 月報 | (FB5A)國際金融業務分行與他行OBU_YYYYMM.xlsx | ROC_YYYMM | FB\(FB5A)國際金融業務分行與他行OBU_YYYYMM.xlsx | ROC_YYYMM |  |  | FALSE | FALSE | FALSE |  | onlyCopy |
+| FM13 | 月報 | FM\FM13\(FM13)對東亞六地區債票券投資及放款餘額表(全行)底稿_YYYYMM.xlsx | ROC_YYYMM |  |  | FOA!D2 | NEW_ROC_CHINESE_YYYMM | FALSE | FALSE | FALSE |  |  |
+| FM11 | 月報 | FM\FM11\(FM11)國際金融業務分行利息、金融服務(巨集)_YYYYMM.xlsm | ROC_YYYMM |  |  | FM11!D2 | NEW_ROC_CHINESE_YYYMM | FALSE | FALSE | Module1.匯入並篩選OBUAC5411B資料 |  |  |
+| 表41 | 月報 | 表2表41\表41\YYYYMM-表41底稿(拿掉國外分行)巨集版本.xlsm | ROC_YYYMM | 表2表41\表41\041-國外利息、金融服務收支及對外衍生工具投資損益表_YYYYMM.xlsx | ROC_YYYMM | 表41!A3 | NEW_ROC_CHINESE_YYYMM | TRUE | FALSE | Module1.SortAndCopyData |  |  |
+| FM2 | 月報 | FM\FM2\YYYYMM-FM2底稿_國際金融業務分行與境內金融機構_巨集.xlsm | ROC_YYYMM | FM\FM2\(FM2)國際金融業務分行與境內金融機構_YYYYMM.xlsx | ROC_YYYMM | FM2!C2 | NEW_ROC_CHINESE_YYYMM | TRUE | FALSE | Module.ProcessFM2 |  |  |
+| FM10 | 月報 | FM\FM10\YYYYMM_FM10巨集版底稿.xlsm | ROC_YYYMM | FM\FM10\(FM10)OBU分行金融資產負債明細表_YYYYMM.xlsx | ROC_YYYMM | FM10!C2 | NEW_ROC_CHINESE_YYYMM | TRUE | FALSE | Module1.CopyAndDeleteRows |  |  |
+| F1_F2 | 月報 | F1F2\F1F2_NEW_v巨集底稿YYYYMM.xlsm | ROC_YYYMM |  |  | F1!B3 | NEW_ROC_CHINESE_YYYMM | FALSE | FALSE | Module1.MainSub |  |  |
+| AI240 | 月報 | AI\AI240\AI240巨集版本底稿_YYYYMM.xlsm | ROC_YYYMM |  |  | AI240!A2 | ROC_YYYMM | FALSE | FALSE | Module1.CopyDataToAI240 |  |  |
+| AI822 | 月報 | AI\AI822\AI822-對大陸地區之授信計算表(底稿)改_YYYYMM.xls | ROC_YYYMM | AI\AI822\AI822對大陸地區之授信投資及資金拆存總額度計算表_YYYYMM.xls | ROC_YYYMM | AI822!A2|Table1!B3 | ROC_YYYMMROCYearMonthNUMYearMonth | TRUE | FALSE | FALSE |  |  |
+
+```visual-basic
+"報表名稱
+ReportID"	"報表類型
+ReportType"	"底稿路徑
+TplPathPattern"	"底稿路徑檔名格式
+TplPathTimeFormat"	"申報檔路徑
+DeclPathPattern"	"申報檔路徑檔名格式
+DeclPathTimeFormat"	"報表日期表頭分頁及儲存格位置
+HeaderTimeSheetRange"	"報表日期表頭格式
+HeaderTimeFormat"	"是否產生申報檔
+IsToCreateDeclFile"	"是否刪除舊底稿
+IsDeleteTplPattern"	"執行底稿巨集
+ProcessingMacro"	"PDF父資料夾
+PDFParentFolder"	
+表6	月報	央行\YYYYMM 表6 主要業務概況月報表：Ａ+放款對 (3)2.xlsx	ROC_YYYMM			FOA!D4	NEW_ROC_CHINESE_YYYMM	FALSE	TRUE	FALSE	FALSE	
+表7	月報	央行\YYYYMM 表7 主要業務概況月報表：B++放款2.xlsx	ROC_YYYMM			FOA!J4	NEW_ROC_CHINESE_YYYMM	FALSE	TRUE	FALSE	FALSE	
+表10	月報	央行\YYYYMM 表10.表40.買入票券及投資簡明表-新版.xls	ROC_YYYMM	央行\(010)買入證券及投資統計表.xlsx		表10!A2	NEW_ROC_CHINESE_YYYMM	TRUE	TRUE	FALSE	FALSE	
+表15A	月報	央行\YYYYMM 表15A.可轉讓定期存單發行償還及餘額統計表.xls	ROC_YYYMM	央行\(015A)新台幣可轉讓定期存單發行、償還及餘額統計表.xlsx		新台幣可轉讓定期存單發行、償還及餘額統計表!A2	NEW_ROC_CHINESE_YYYMM	TRUE	TRUE	FALSE	FALSE	
+表15B	月報	央行\YYYYMM 表15B-外幣可轉讓定期存單發行、償還及餘額統計表.xls	ROC_YYYMM	央行\(015B)外幣可轉讓定期存單發行、償還及餘額統計表.xlsx		外幣可轉讓定期存單發行、償還及餘額統計表!A2	NEW_ROC_CHINESE_YYYMM	TRUE	TRUE	FALSE	FALSE	
+表16	月報	央行\YYYYMM 表16.可轉讓定期存單每日持有額.xls	ROC_YYYMM	央行\(016)可轉讓定期存單每日持有額.xlsx		可轉讓定期存單每日持有額!B2	NEW_ROC_CHINESE_YYYMM	TRUE	TRUE	FALSE	FALSE	
+表20	月報	央行\YYYYMM 表20.賣出附買回約定票(債)券交易餘額統計表.xls	ROC_YYYMM	央行\(020)附買回票券及債券負債餘額統計表.xlsx		表20!G3	NEW_ROC_CHINESE_YYYMM	TRUE	TRUE	FALSE	FALSE	
+表22	月報	央行\YYYYMM 表22.票券交易統計表.xls	ROC_YYYMM	央行\(022)票券交易統計表.xlsx		表22!A2	NEW_ROC_CHINESE_YYYMM	TRUE	TRUE	FALSE	FALSE	
+表23	月報	央行\YYYYMM 表23.票券利率統計表.xls	ROC_YYYMM	央行\(023)票券利率統計表.xlsx		票券利率統計表!E2	NEW_ROC_CHINESE_YYYMM	TRUE	TRUE	FALSE	FALSE	
+表24	月報	央行\YYYYMM 表24.承銷商業本票統計表.xls	ROC_YYYMM	央行\(024)承銷商業本票統計表.xlsx		表24!E2	NEW_ROC_CHINESE_YYYMM	TRUE	TRUE	FALSE	FALSE	
+表27	月報	央行\YYYYMM 表27.金融債券發行償還及餘額統計表.xls	ROC_YYYMM	央行\(027)金融債券統計表.xlsx		表27!D3	NEW_ROC_CHINESE_YYYMM	TRUE	TRUE	FALSE	FALSE	
+表36	月報	央行\YYYYMM 表36 附賣回債(票)券投資餘額統計表.xls	ROC_YYYMM	央行\(036)RS餘額統計表.xlsx		表36!E3	NEW_ROC_CHINESE_YYYMM	TRUE	TRUE	FALSE	FALSE	
+AI233	月報	AI233\YYYYMM AI233 新臺幣投資明細之利率變動情境分析表AI233.xlsx	ROC_YYYMM	AI233\AI233-新臺幣投資明細之利率變動情境分析表-EXCEL上傳檔案.xls		Table1!B3	NEW_ROC_YYYMM	TRUE	TRUE	FALSE	FALSE	
+AI345	月報	AI345\YYYYMM AI345 本國銀行不良資產彙總暨評估明細表.xls	ROC_YYYMM	AI345\11406 AI345 本國銀行不良資產彙總暨評估明細表.xls		AI345_NEW!A2	NEW_ROC_YYYMM	FALSE	TRUE	FALSE	FALSE	
+AI405	月報	AI405\YYYYMM AI405 首次買入金額交易量及持有餘額申報表.xls	ROC_YYYMM	AI405\AI405債券發行首次買入金額交易量及持有餘額資料表 - 複製.xls		Table1!B3	NEW_ROC_YYYMM	TRUE	TRUE	FALSE	FALSE	
+AI410	月報	AI410\YYYYMM AI410 票券發行及首次買入金額資料申報表.xls	ROC_YYYMM	AI410\AI410票券發行及首次買入金額資料申報表.xls		Table1!B3	NEW_ROC_YYYMM	TRUE	TRUE	FALSE	FALSE	
+AI415	月報	AI415\YYYYMM AI415 票券交易量資料.xls	ROC_YYYMM	AI415\AI415票券交易量申報表.xls		Table1!B3	NEW_ROC_YYYMM	TRUE	TRUE	FALSE	FALSE	
+AI430	月報	AI430\YYYYMM AI430 票券持有餘額資料.xls	ROC_YYYMM	AI430\AI430票券持有餘額資料申報表.xls		Table1!B3	NEW_ROC_YYYMM	TRUE	TRUE	FALSE	FALSE	
+AI601	月報	AI601\YYYYMM AI601 本國銀行投資明細表.xls	ROC_YYYMM	AI601\AI601-投資明細表.xls		Table1!B3	NEW_ROC_YYYMM	TRUE	TRUE	FALSE	FALSE	
+AI816	月報	AI816\YYYYMM AI816 銀行辦理大陸地區法人票券金融業務統計表.xls	ROC_YYYMM	AI816\AI816銀行辦理大陸地區法人票券金融業務統計表.xls		Table1!B3	NEW_ROC_YYYMM	TRUE	TRUE	FALSE	FALSE	
+AI271	季報	季報\YYYYMM-AI271-證券化與結構型商品統計表（一）發行證券化商品.xls	ROC_SEASON_YYYMM	季報\AI271-證券化與結構型商品統計表（一）發行證券化商品.xls		Table1!B3	NEW_ROC_SEASON	TRUE	TRUE	FALSE	FALSE	
+AI272	季報	季報\YYYYMM-AI272-證券化與結構型商品統計表（二）辦理結構型商品_附表1.xls	ROC_SEASON_YYYMM	季報\AI272-證券化與結構型商品統計表（二）辦理結構型商品_附表1.xls		Table1!B3	NEW_ROC_SEASON	TRUE	TRUE	FALSE	FALSE	
+AI273	季報	季報\YYYYMM-AI273-證券化與結構型商品統計表（二）辦理結構型商品_附表2.xls	ROC_SEASON_YYYMM	季報\AI273-證券化與結構型商品統計表（二）辦理結構型商品_附表2.xls		Table1!B3	NEW_ROC_SEASON	TRUE	TRUE	FALSE	FALSE	
+AI281	季報	季報\YYYYMM-AI281-證券化與結構型商品統計表（三）投資證券化商品.xls	ROC_SEASON_YYYMM	季報\AI281-證券化與結構型商品統計表（三）投資證券化商品.xls		Table1!B3	NEW_ROC_SEASON	TRUE	TRUE	FALSE	FALSE	
+AI282	季報	季報\YYYYMM-AI282-證券化與結構型商品統計表（四）投資結構型商品.xls	ROC_SEASON_YYYMM	季報\AI282-證券化與結構型商品統計表（四）投資結構型商品.xls		Table1!B3	NEW_ROC_SEASON	TRUE	TRUE	FALSE	FALSE	
+AI605	半年報	AI605_半年報\YYYYMM AI605按攤銷後成本法衡量之債務工具投資、對其他個體權益及嵌入式衍生工具統計表.xlsx	ROC_HALF_YYYMM	AI605_半年報\AI605-按攤銷後成本衡量之債務工具投資、對其他個體權益及嵌入式衍生工具統計表-new.xls		Table1!B3	NEW_ROC_SEASON	TRUE	TRUE	FALSE	FALSE	
+CNY1	月報	CNY1外匯指定銀行人民幣資產負債表及表外項目_YYYYMM.xlsx	ROC_YYYMM	CNY\CNY1外匯指定銀行人民幣資產負債表及表外項目_YYYYMM.xlsx	ROC_YYYMM			FALSE	FALSE	FALSE		onlyCopy
+FB1	月報	(FB1)國際金融業務分行人民幣業務統計_YYYYMM.xls	ROC_YYYMM	FB\(FB1)國際金融業務分行人民幣業務統計_YYYYMM.xls	ROC_YYYMM			FALSE	FALSE	FALSE		onlyCopy
+FB2	月報	(FB2)國際金融業務分行人民幣資產負債_YYYYMM.xlsx	ROC_YYYMM	FB\(FB2)國際金融業務分行人民幣資產負債_YYYYMM.xlsx	ROC_YYYMM			FALSE	FALSE	FALSE		onlyCopy
+FB3	月報	(FB3)國際金融業務分行與同業及聯行人2_YYYYMM.xls	ROC_YYYMM	FB\(FB3)國際金融業務分行與同業及聯行人2_YYYYMM.xls	ROC_YYYMM			FALSE	FALSE	FALSE		onlyCopy
+FB3A	月報	(FB3A)國際金融業務分行與境內金融機構2_YYYYMM.xls	ROC_YYYMM	FB\(FB3A)國際金融業務分行與境內金融機構2_YYYYMM.xls	ROC_YYYMM			FALSE	FALSE	FALSE		onlyCopy
+表2	月報	(002)國外資產負債月報表2_YYYYMM.xls	ROC_YYYMM	表2表41\表2\(002)國外資產負債月報表2_YYYYMM.xls	ROC_YYYMM			FALSE	FALSE	FALSE		onlyCopy
+FM5	月報	(FM5)國際金融業務分行或有、代理、備忘項目餘額地區別分析表_YYYYMM.xlsx	ROC_YYYMM	FM\FM5\(FM5)國際金融業務分行或有、代理、備忘項目餘額地區別分析表_YYYYMM.xlsx	ROC_YYYMM			FALSE	FALSE	FALSE		onlyCopy
+AI821	月報	AI821-銀行辦理人民幣業務統計表_YYYYMM.xls	ROC_YYYMM	AI\AI821\AI821-銀行辦理人民幣業務統計表_YYYYMM.xls	ROC_YYYMM			FALSE	FALSE	FALSE		onlyCopy
+FB5	月報	(FB5)國際金融業務分行人民幣外匯交易_YYYYMM.xlsx	ROC_YYYMM	FB\(FB5)國際金融業務分行人民幣外匯交易_YYYYMM.xlsx	ROC_YYYMM			FALSE	FALSE	FALSE		onlyCopy
+FB5A	月報	(FB5A)國際金融業務分行與他行OBU_YYYYMM.xlsx	ROC_YYYMM	FB\(FB5A)國際金融業務分行與他行OBU_YYYYMM.xlsx	ROC_YYYMM			FALSE	FALSE	FALSE		onlyCopy
+FM13	月報	FM\FM13\(FM13)對東亞六地區債票券投資及放款餘額表(全行)底稿_YYYYMM.xlsx	ROC_YYYMM			FOA!D2	NEW_ROC_CHINESE_YYYMM	FALSE	FALSE	FALSE		
+FM11	月報	FM\FM11\(FM11)國際金融業務分行利息、金融服務(巨集)_YYYYMM.xlsm	ROC_YYYMM			FM11!D2	NEW_ROC_CHINESE_YYYMM	FALSE	FALSE	Module1.匯入並篩選OBUAC5411B資料		
+表41	月報	表2表41\表41\YYYYMM-表41底稿(拿掉國外分行)巨集版本.xlsm	ROC_YYYMM	表2表41\表41\041-國外利息、金融服務收支及對外衍生工具投資損益表_YYYYMM.xlsx	ROC_YYYMM	表41!A3	NEW_ROC_CHINESE_YYYMM	TRUE	FALSE	Module1.SortAndCopyData		
+FM2	月報	FM\FM2\YYYYMM-FM2底稿_國際金融業務分行與境內金融機構_巨集.xlsm	ROC_YYYMM	FM\FM2\(FM2)國際金融業務分行與境內金融機構_YYYYMM.xlsx	ROC_YYYMM	FM2!C2	NEW_ROC_CHINESE_YYYMM	TRUE	FALSE	Module.ProcessFM2		
+FM10	月報	FM\FM10\YYYYMM_FM10巨集版底稿.xlsm	ROC_YYYMM	FM\FM10\(FM10)OBU分行金融資產負債明細表_YYYYMM.xlsx	ROC_YYYMM	FM10!C2	NEW_ROC_CHINESE_YYYMM	TRUE	FALSE	Module1.CopyAndDeleteRows		
+F1_F2	月報	F1F2\F1F2_NEW_v巨集底稿YYYYMM.xlsm	ROC_YYYMM			F1!B3	NEW_ROC_CHINESE_YYYMM	FALSE	FALSE	Module1.MainSub		
+AI240	月報	AI\AI240\AI240巨集版本底稿_YYYYMM.xlsm	ROC_YYYMM			AI240!A2	ROC_YYYMM	FALSE	FALSE	Module1.CopyDataToAI240		
+AI822	月報	AI\AI822\AI822-對大陸地區之授信計算表(底稿)改_YYYYMM.xls	ROC_YYYMM	AI\AI822\AI822對大陸地區之授信投資及資金拆存總額度計算表_YYYYMM.xls	ROC_YYYMM	AI822!A2|Table1!B3	"ROC_YYYMM
+ROCYearMonth
+NUMYearMonth"	TRUE	FALSE	FALSE		
+
+```
+
+- tblUpdateSheet
+
+| 報表名稱reportID | 更新分頁名稱UpdateSheet | 清除範圍ClearRange | 匯入檔案路徑ImportFilePath | 匯入檔案路徑格式ImportTimeFormat | 匯入檔案分頁ImportSheet | 匯入檔處理類型ImportProcessType | 匯入初始位置PasteTopLeftRange | 欄位篩選條件FilterFieldsAndValues |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 表6 | 票券庫存(日結) | A:AE | 批次報表\票券庫存明細表(日結).csv |  | 票券庫存明細表(日結) | CSV_Filter | A1 | 票類:CP1;CP2;TA;ABCP;BA;TB1;TB2;MN |
+| 表6 | E | CELLS | 批次報表\會計資料庫.xlsx |  | 餘額E (2) | Default_Copy | A1 |  |
+| 表7 | 票券庫存(日結) | A:AE | 批次報表\票券庫存明細表(日結).csv |  | 票券庫存明細表(日結) | CSV_Filter | A1 | 交易對手:<>中租迪和;<>中華航空|票類:CP1;CP2;TA;同業NCD;ABCP;BA;TB1;TB2;MN |
+| 表7 | E | CELLS | 批次報表\會計資料庫.xlsx |  | 餘額E (2) | Default_Copy | A1 |  |
+| 表10 | E | CELLS | 批次報表\會計資料庫.xlsx |  | 餘額E (2) | Default_Copy | A1 |  |
+| 表15A | PNCDCAL | CELLS | 批次報表\PNCDCAL.txt |  |  | PNCDCAL | A1 |  |
+| 表15B |  |  |  |  |  |  |  |  |
+| 表16 |  |  |  |  |  |  |  |  |
+| 表20 | E | CELLS | 批次報表\會計資料庫.xlsx |  | 餘額E (2) | Default_Copy | A1 |  |
+| 表22 | 票券交易明細表 | A:AD | 批次報表\票券交易明細表_交割日.csv |  | 票券交易明細表_交割日 | CSV_Filter | A1 | filterFields = Array("交易別", "票類")filterValues = Array(Array("首購", "續發", "買斷", "附買回", "附賣回", "承銷發行", "代銷買入", "賣斷", "代銷發行", "代銷賣出", "附買回續做", "附賣回續作"), Array("CP1", "CP2", "TA", "同業NCD", "ABCP", "BA", "TB1", "TB2", "MN")) |
+| 表23 | 承銷交易 | A:AD | 批次報表\票券交易明細表_交割日.csv |  | 票券交易明細表_交割日 | CSV_Filter | A1 | 交易別:承銷發行 |
+| 表24 |  |  |  |  |  |  |  |  |
+| 表27 |  |  |  |  |  |  |  |  |
+| 表36 | 票券庫存(日結) | A:AE | 批次報表\票券庫存明細表(日結).csv |  | 票券庫存明細表(日結) | CSV_Filter | A1 | 票類:CP1;CP2;TA;ABCP;BA;TB1;TB2;MN |
+| 表36 | E | CELLS | 批次報表\會計資料庫.xlsx |  | 餘額E (2) | Default_Copy | A1 |  |
+| AI233 | 餘額C | CELLS | 批次報表\會計資料庫.xlsx |  | 餘額C | Default_Copy | A1 |  |
+| AI233 | 債券風險部位餘額表 | CELLS | 批次報表\債券風險部位餘額.csv |  | 債券風險部位餘額 | Default_Copy | A1 |  |
+| AI233 | 票券風險部位餘額表 | CELLS | 批次報表\票券風險部位餘額.csv |  | 票券風險部位餘額 | Default_Copy | A1 |  |
+| AI345 | 餘額C | CELLS | 批次報表\會計資料庫.xlsx |  | 餘額C |  |  |  |
+| AI345 | 匯率 | A1:Z30 | 批次報表\*cm2610.xls |  | Sheet1 | CloseRate | A1 |  |
+| AI405 | C | CELLS | 批次報表\會計資料庫.xlsx |  | 餘額C | Default_Copy | A1 |  |
+| AI405 | 債券交易明細 | A:AC | 批次報表\債券交易明細表.csv |  | 債券交易明細表 | CSV_Filter | A1 | filterFields = Array("交易類別")filterValues = Array(Array("發行前買斷", "買斷", "附買回", "附賣回", "發行前賣斷", "賣斷", "首購", "附買回續作", "附賣回續作")) |
+| AI405 | 匯率 | A1:Z30 | 批次報表\*cm2610.xls |  | Sheet1 | CloseRate | A1 |  |
+| AI410 | 票券交易明細表選首購、承銷發行) | A:AD | 批次報表\票券交易明細表_交割日.csv |  | 票券交易明細表_交割日 | CSV_Filter | A1 | 交易別:首購;承銷發行 |
+| AI415 | Sheet1(不含履約.兌償到期) | A:AD | 批次報表\票券交易明細表_交割日.csv |  | 票券交易明細表_交割日 | CSV_Filter | A1 | filterFields = Array("交易別")filterValues = Array(Array("首購", "買斷", "附買回", "附賣回", "承銷發行", "附買回續做", "附賣回續作")) |
+| AI430 | C | CELLS | 批次報表\會計資料庫.xlsx |  | 餘額C | Default_Copy | A1 |  |
+| AI601 | 餘額C | CELLS | 批次報表\會計資料庫.xlsx |  | 餘額C | Default_Copy | A1 |  |
+| AI601 | 餘額D | CELLS | 批次報表\會計資料庫.xlsx |  | 餘額D | Default_Copy | A1 |  |
+| AI601 | 外幣債評估表 | CELLS | 批次報表\YYYYMM外幣債損益評估表(月底)對AC5100B.xlsx | NEW_AD_YYYYMMDD_END | 評估表 | 外幣債評估 | A1 |  |
+| AI601 | 債券評價表-AC-AI601 | A1:V50 | 批次報表\債券評價表.csv |  | 債券評價表 | CSV_Filter | A1 | 帳務目的:攤銷後成本衡量 |
+| AI601 | 票券評價表-AC-AI601 | A1:V50 | 批次報表\票券評價表.csv |  | 票券評價表 | CSV_Filter | A1 | 帳務目的:攤銷後成本衡量 |
+| AI601 | 匯率 | A1:Z30 | 批次報表\*cm2610.xls |  | Sheet1 | CloseRate | A1 |  |
+| AI816 |  |  |  |  |  |  |  |  |
+| AI271 |  |  |  |  |  |  |  |  |
+| AI272 |  |  |  |  |  |  |  |  |
+| AI273 |  |  |  |  |  |  |  |  |
+| AI281 |  |  |  |  |  |  |  |  |
+| AI282 |  |  |  |  |  |  |  |  |
+| AI605 | 餘額A | CELLS | 批次報表\會計資料庫.xlsx |  | 餘額A | Default_Copy | A1 |  |
+| AI605 | 餘額C | CELLS | 批次報表\會計資料庫.xlsx |  | 餘額C | Default_Copy | A1 |  |
+| AI605 | 匯率 | A1:Z30 | 批次報表\*cm2610.xls |  | Sheet1 | CloseRate | A1 |  |
+| AI605 | 持有到期債券風險餘額表 | A:V | 批次報表\債券評價表.csv |  | 債券評價表 | CSV_Filter | A1 | 帳務目的:攤銷後成本衡量 |
+| AI605 | 外幣債公允價值評估 | A:AF | 批次報表\YYYYMM外幣債損益評估表(月底)對AC5100B.xlsx | NEW_AD_YYYYMMDD_END | OutputData | 外幣債評估 | A1 |  |
+
+```visual-basic
+"報表名稱
+reportID"	"更新分頁名稱
+UpdateSheet"	"清除範圍
+ClearRange"	"匯入檔案路徑
+ImportFilePath"	"匯入檔案路徑格式
+ImportTimeFormat"	"匯入檔案分頁
+ImportSheet"	"匯入檔處理類型
+ImportProcessType"	"匯入初始位置
+PasteTopLeftRange"	"欄位篩選條件
+FilterFieldsAndValues"
+表6	票券庫存(日結)	A:AE	批次報表\票券庫存明細表(日結).csv		票券庫存明細表(日結)	CSV_Filter	A1	票類:CP1;CP2;TA;ABCP;BA;TB1;TB2;MN
+表6	E	CELLS	批次報表\會計資料庫.xlsx		餘額E (2)	Default_Copy	A1	
+表7	票券庫存(日結)	A:AE	批次報表\票券庫存明細表(日結).csv		票券庫存明細表(日結)	CSV_Filter	A1	交易對手:<>中租迪和;<>中華航空|票類:CP1;CP2;TA;同業NCD;ABCP;BA;TB1;TB2;MN
+表7	E	CELLS	批次報表\會計資料庫.xlsx		餘額E (2)	Default_Copy	A1	
+表10	E	CELLS	批次報表\會計資料庫.xlsx		餘額E (2)	Default_Copy	A1	
+表15A	PNCDCAL	CELLS	批次報表\PNCDCAL.txt			PNCDCAL	A1	
+表15B								
+表16								
+表20	E	CELLS	批次報表\會計資料庫.xlsx		餘額E (2)	Default_Copy	A1	
+表22	票券交易明細表	A:AD	批次報表\票券交易明細表_交割日.csv		票券交易明細表_交割日	CSV_Filter	A1	"filterFields = Array(""交易別"", ""票類"")
+filterValues = Array(Array(""首購"", ""續發"", ""買斷"", ""附買回"", ""附賣回"", ""承銷發行"", ""代銷買入"", ""賣斷"", ""代銷發行"", ""代銷賣出"", ""附買回續做"", ""附賣回續作""), Array(""CP1"", ""CP2"", ""TA"", ""同業NCD"", ""ABCP"", ""BA"", ""TB1"", ""TB2"", ""MN""))"
+表23	承銷交易	A:AD	批次報表\票券交易明細表_交割日.csv		票券交易明細表_交割日	CSV_Filter	A1	交易別:承銷發行
+表24								
+表27								
+表36	票券庫存(日結)	A:AE	批次報表\票券庫存明細表(日結).csv		票券庫存明細表(日結)	CSV_Filter	A1	票類:CP1;CP2;TA;ABCP;BA;TB1;TB2;MN
+表36	E	CELLS	批次報表\會計資料庫.xlsx		餘額E (2)	Default_Copy	A1	
+AI233	餘額C	CELLS	批次報表\會計資料庫.xlsx		餘額C	Default_Copy	A1	
+AI233	債券風險部位餘額表	CELLS	批次報表\債券風險部位餘額.csv		債券風險部位餘額	Default_Copy	A1	
+AI233	票券風險部位餘額表	CELLS	批次報表\票券風險部位餘額.csv		票券風險部位餘額	Default_Copy	A1	
+AI345	餘額C	CELLS	批次報表\會計資料庫.xlsx		餘額C			
+AI345	匯率	A1:Z30	批次報表\*cm2610.xls		Sheet1	CloseRate	A1	
+AI405	C	CELLS	批次報表\會計資料庫.xlsx		餘額C	Default_Copy	A1	
+AI405	債券交易明細	A:AC	批次報表\債券交易明細表.csv		債券交易明細表	CSV_Filter	A1	"filterFields = Array(""交易類別"")
+filterValues = Array(Array(""發行前買斷"", ""買斷"", ""附買回"", ""附賣回"", ""發行前賣斷"", ""賣斷"", ""首購"", ""附買回續作"", ""附賣回續作""))"
+AI405	匯率	A1:Z30	批次報表\*cm2610.xls		Sheet1	CloseRate	A1	
+AI410	票券交易明細表選首購、承銷發行)	A:AD	批次報表\票券交易明細表_交割日.csv		票券交易明細表_交割日	CSV_Filter	A1	交易別:首購;承銷發行
+AI415	Sheet1(不含履約.兌償到期)	A:AD	批次報表\票券交易明細表_交割日.csv		票券交易明細表_交割日	CSV_Filter	A1	"filterFields = Array(""交易別"")
+filterValues = Array(Array(""首購"", ""買斷"", ""附買回"", ""附賣回"", ""承銷發行"", ""附買回續做"", ""附賣回續作""))"
+AI430	C	CELLS	批次報表\會計資料庫.xlsx		餘額C	Default_Copy	A1	
+AI601	餘額C	CELLS	批次報表\會計資料庫.xlsx		餘額C	Default_Copy	A1	
+AI601	餘額D	CELLS	批次報表\會計資料庫.xlsx		餘額D	Default_Copy	A1	
+AI601	外幣債評估表	CELLS	批次報表\YYYYMM外幣債損益評估表(月底)對AC5100B.xlsx	NEW_AD_YYYYMMDD_END	評估表	外幣債評估	A1	
+AI601	債券評價表-AC-AI601	A1:V50	批次報表\債券評價表.csv		債券評價表	CSV_Filter	A1	帳務目的:攤銷後成本衡量
+AI601	票券評價表-AC-AI601	A1:V50	批次報表\票券評價表.csv		票券評價表	CSV_Filter	A1	帳務目的:攤銷後成本衡量
+AI601	匯率	A1:Z30	批次報表\*cm2610.xls		Sheet1	CloseRate	A1	
+AI816								
+AI271								
+AI272								
+AI273								
+AI281								
+AI282								
+AI605	餘額A	CELLS	批次報表\會計資料庫.xlsx		餘額A	Default_Copy	A1	
+AI605	餘額C	CELLS	批次報表\會計資料庫.xlsx		餘額C	Default_Copy	A1	
+AI605	匯率	A1:Z30	批次報表\*cm2610.xls		Sheet1	CloseRate	A1	
+AI605	持有到期債券風險餘額表	A:V	批次報表\債券評價表.csv		債券評價表	CSV_Filter	A1	帳務目的:攤銷後成本衡量
+AI605	外幣債公允價值評估	A:AF	批次報表\YYYYMM外幣債損益評估表(月底)對AC5100B.xlsx	NEW_AD_YYYYMMDD_END	OutputData	外幣債評估	A1	
+
+```
+
+- tblExportPDF
+
+| 報表名稱reportID | 分頁名稱PDFSheet | 父資料夾ParentFolder |
+| --- | --- | --- |
+
+- Mappings
+
+| 報表名稱ReportID | 目標分 頁DestSheet | 目標儲存格DestRange(逗號分隔) |
+| --- | --- | --- |
+| 表6 | FOA | D4,F9:K133 |
+| 表7 | FOA | J4,G10:X23,G24:H24,J24,L24,X24,H31:J38 |
+| 表10 | FOA | D2,D9:K69,D72:K72 |
+| 表15A | FOA | D2,D7:H14,D18:H18 |
+| 表15B | FOA | D2,D7:I10,I11,I15 |
+| 表16 | FOA | B2,D8:F40,D45:F45 |
+| 表20 | FOA | I3,F9:X17 |
+| 表22 | FOA | E2,D6:S18 |
+| 表23 | FOA | E2,D6:G15 |
+| 表24 | FOA | G2,F8:M20 |
+| 表27 | FOA | E3,E8:I19 |
+| 表36 | FOA | E2,E7:M15 |
+| AI233 | Table1 | B3,C10:L11,C13:L15,C17:L19 |
+| AI233 | Table2 | C10:L11,C13:L15,C17:L19 |
+| AI233 | Table3 | C10:L11,C13:L15,C17:L19 |
+| AI233 | Table4 | C10:H11,C13:H15,C17:H19 |
+| AI345 |  |  |
+| AI405 | Table1 | B3,C9:F12 |
+| AI410 | Table1 | B3,D9:E30 |
+| AI415 | Table1 | B3,D9:E30 |
+| AI430 | Table1 | B3,D9:D30 |
+| AI601 | Table1 | B3,C10:G49,C51:G56 |
+| AI601 | Table2 | C11:J36,C37:E47,G37:J47,F40,F42:F47,C48:C50,J48:J50,C52:C56,J52:J56,C57:J57 |
+| AI601 | Table3 | C9:C25 |
+| AI605 | Table1 | B3,C11:J12 |
+| AI605 | Table2 | A10:R10,M11:Q11 |
+| AI605 | Table3 | A11:J11,C12:D12 |
+| AI816 | Table1 | B3,C10:I11 |
+| AI271 | Table1 | B3,C11:D14,C16:D24,C26:D29 |
+| AI272 | Table1 | B3,C9:E14 |
+| AI273 | Table1 | B3,D10:I19 |
+| AI281 | Table1 | B3,A9:H10,D11:H11,A14:A18,D14:H18,A21:A25,D21:H25 |
+| AI282 | Table1 | B3,A9:C10,D9:H11,A14:A18,D14:H18 |
+| AI605 | Table1 | B3,C11:J12 |
+| AI605 | Table2 | A10:R10,M11:Q11 |
+| AI605 | Table3 | A11:J11,C12:D12 |
+
+```visual-basic
+"報表名稱
+ReportID"	"目標分 頁
+DestSheet"	"目標儲存格
+DestRange
+(逗號分隔)"
+表6	FOA	D4,F9:K133
+表7	FOA	J4,G10:X23,G24:H24,J24,L24,X24,H31:J38
+表10	FOA	D2,D9:K69,D72:K72
+表15A	FOA	D2,D7:H14,D18:H18
+表15B	FOA	D2,D7:I10,I11,I15
+表16	FOA	B2,D8:F40,D45:F45
+表20	FOA	I3,F9:X17
+表22	FOA	E2,D6:S18
+表23	FOA	E2,D6:G15
+表24	FOA	G2,F8:M20
+表27	FOA	E3,E8:I19
+表36	FOA	E2,E7:M15
+AI233	Table1	B3,C10:L11,C13:L15,C17:L19
+AI233	Table2	C10:L11,C13:L15,C17:L19
+AI233	Table3	C10:L11,C13:L15,C17:L19
+AI233	Table4	C10:H11,C13:H15,C17:H19
+AI345		
+AI405	Table1	B3,C9:F12
+AI410	Table1	B3,D9:E30
+AI415	Table1	B3,D9:E30
+AI430	Table1	B3,D9:D30
+AI601	Table1	B3,C10:G49,C51:G56
+AI601	Table2	C11:J36,C37:E47,G37:J47,F40,F42:F47,C48:C50,J48:J50,C52:C56,J52:J56,C57:J57
+AI601	Table3	C9:C25
+AI605	Table1	B3,C11:J12
+AI605	Table2	A10:R10,M11:Q11
+AI605	Table3	A11:J11,C12:D12
+AI816	Table1	B3,C10:I11
+AI271	Table1	B3,C11:D14,C16:D24,C26:D29
+AI272	Table1	B3,C9:E14
+AI273	Table1	B3,D10:I19
+AI281	Table1	B3,A9:H10,D11:H11,A14:A18,D14:H18,A21:A25,D21:H25
+AI282	Table1	B3,A9:C10,D9:H11,A14:A18,D14:H18
+AI605	Table1	B3,C11:J12
+AI605	Table2	A10:R10,M11:Q11
+AI605	Table3	A11:J11,C12:D12
+
+```
