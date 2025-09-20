@@ -301,13 +301,12 @@ Public Function ResolveImportPatternsWithMF(pattern As String, _
     Dim patternParts() As String: patternParts = Split(pattern, ",")
     Dim pIdx As Long
     For pIdx = 0 To UBound(patternParts)
-        Dim p As String: p = Trim(patternParts(pIdx))
-        If p = "" Then
+        Dim replaced As String: replaced = Trim(patternParts(pIdx))
+        If replaced = "" Then
             outIdx = outIdx + 1: ReDim Preserve results(0 To outIdx): results(outIdx) = "": GoTo ContinueLoop2
         End If
 
         ' First replace tokens using formatKey if available
-        Dim replaced As String: replaced = p
         On Error Resume Next
         If formatKey <> "" Then
             If mf.Exists(formatKey) Then replaced = Replace(replaced, "YYYYMM", mf(formatKey))
@@ -316,10 +315,19 @@ Public Function ResolveImportPatternsWithMF(pattern As String, _
 
         ' Handle wildcard: use Dir to find first matching file in basePath\replaced pattern
         If InStr(replaced, "*") > 0 Then
-            Dim f As String: f = Dir(basePath & "\" & replaced)
+            Dim f As String
+            ' 先取出資料夾部分（相對路徑的資料夾）
+            Dim folderPart As String, filePart As String
+            folderPart = Left(replaced, InStrRev(replaced, "\") - 1) ' "../批次"
+            filePart = Mid(replaced, InStrRev(replaced, "\") + 1)    ' "*cm2610*"
+            
+            ' 用 Dir 搜尋符合萬用字元的檔案
+            f = Dir(ThisWorkbook.Path & "\" & folderPart & "\" & filePart)
+            
             If f <> "" Then
                 outIdx = outIdx + 1: ReDim Preserve results(0 To outIdx)
-                results(outIdx) = fso.GetAbsolutePathName(basePath & "\" & f) ' >>> MODIFIED: 強制轉為絕對路徑
+                ' 保留資料夾，使用 GetAbsolutePathFromProject 拼完整路徑
+                results(outIdx) = GetAbsolutePathFromProject(folderPart & "\" & f)
             Else
                 LogWarn "Wildcard no match for pattern: " & replaced
                 outIdx = outIdx + 1: ReDim Preserve results(0 To outIdx)
@@ -329,12 +337,8 @@ Public Function ResolveImportPatternsWithMF(pattern As String, _
             ' >>> MODIFIED START <<< 
             ' 即使不是 wildcard，也要轉成絕對路徑
             Dim absPath As String
-            ' 如果 replaced 是相對路徑，補上 basePath
-            If InStr(replaced, ":") = 0 And Left(replaced, 1) <> "\" Then
-                absPath = fso.GetAbsolutePathName(basePath & "\" & replaced)
-            Else
-                absPath = fso.GetAbsolutePathName(replaced)
-            End If
+            absPath = GetAbsolutePathFromProject(replaced)
+            
             outIdx = outIdx + 1: ReDim Preserve results(0 To outIdx)
             results(outIdx) = absPath
             ' >>> MODIFIED END <<< 
@@ -344,6 +348,20 @@ ContinueLoop2:
 
     ResolveImportPatternsWithMF = results
 End Function
+
+Function GetAbsolutePathFromProject(ByVal relPath As String) As String
+    Dim fso As Object
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    
+    ' 如果傳入的是絕對路徑，直接回傳
+    If fso.DriveExists(fso.GetDriveName(relPath)) Then
+        GetAbsolutePathFromProject = fso.GetAbsolutePathName(relPath)
+    Else
+        ' 如果是相對路徑，就用 ThisWorkbook.Path 當基準
+        GetAbsolutePathFromProject = fso.GetAbsolutePathName(ThisWorkbook.Path & "\" & relPath)
+    End If
+End Function
+
 
 
 '------------------------------
@@ -397,7 +415,13 @@ Public Sub ProcessReport(cfg As Object, _
     ' Check report type (month/quarter/half) to decide whether to process
     Dim reportType As String: reportType = Trim(cfg("ReportType"))
     Dim newROC_MM As String
-    If mf.Exists("NEW_ROC_MM") Then newROC_MM = mf("NEW_ROC_MM") Else newROC_MM = ""
+    If mf.Exists("NEW_ROC_MM") Then
+      newROC_MM = mf("NEW_ROC_MM")
+    Else
+      ' ************LogWarn
+      Exit Sub
+    End If
+
     LogInfo "newROC_MM: " & newROC_MM
 
     Select Case reportType
@@ -413,6 +437,14 @@ Public Sub ProcessReport(cfg As Object, _
             End If
         Case "月報"
             ' always run
+        Case "月報_COPY"
+            ' ********** Logwarn
+            oldTplPathRel = Replace(cfg("TplPathPattern"), "YYYYMM", mf("NEW_" & tplTimeFormatKey))
+
+            newDeclPathRel = Replace(cfg("DeclPathPattern"), "YYYYMM", mf("NEW_" & declTimeFormatKey))
+
+            ' copy oldTplPathRel to newDeclPathRel
+            Exit Sub
         Case Else
             ' unknown -> run but warn
             LogWarn "未知報表類型 (will attempt to run): " & reportType & " ReportID=" & cfg("ReportID")
@@ -434,6 +466,7 @@ Public Sub ProcessReport(cfg As Object, _
     If tplTimeFormatKey <> "" And mf.Exists("OLD_" & tplTimeFormatKey) Then
         oldTplPathRel = Replace(cfg("TplPathPattern"), "YYYYMM", mf("OLD_" & tplTimeFormatKey))
     Else
+        oldTplPathRel = cfg("TplPathPattern")
         ' default: try OLD_AD_YYYYMM
         ' If mf.Exists("OLD_AD_YYYYMM") Then oldTplPathRel = Replace(cfg("TplPathPattern"), "YYYYMM", mf("OLD_AD_YYYYMM")) Else oldTplPathRel = Replace(cfg("TplPathPattern"), "YYYYMM", "")
         ' ***** 需要修改
@@ -444,6 +477,7 @@ Public Sub ProcessReport(cfg As Object, _
     If tplTimeFormatKey <> "" And mf.Exists("NEW_" & tplTimeFormatKey) Then
         newTplPathRel = Replace(cfg("TplPathPattern"), "YYYYMM", mf("NEW_" & tplTimeFormatKey))
     Else
+        newTplPathRel = cfg("TplPathPattern")
         ' If mf.Exists("NEW_AD_YYYYMM") Then newTplPathRel = Replace(cfg("TplPathPattern"), "YYYYMM", mf("NEW_AD_YYYYMM")) Else newTplPathRel = Replace(cfg("TplPathPattern"), "YYYYMM", "")
         ' ***** 需要修改
         ' Log紀錄這邊有問題，直接Exit Sub        
@@ -453,6 +487,7 @@ Public Sub ProcessReport(cfg As Object, _
     If declTimeFormatKey <> "" And mf.Exists("OLD_" & declTimeFormatKey) Then
         oldDeclPathRel = Replace(cfg("DeclPathPattern"), "YYYYMM", mf("OLD_" & declTimeFormatKey))
     Else
+        oldDeclPathRel = cfg("DeclPathPattern")
         ' If mf.Exists("OLD_AD_YYYYMM") Then oldDeclPathRel = Replace(cfg("DeclPathPattern"), "YYYYMM", mf("OLD_AD_YYYYMM")) Else oldDeclPathRel = Replace(cfg("DeclPathPattern"), "YYYYMM", "")
         ' ***** 需要修改
         ' Log紀錄這邊有問題，直接Exit Sub        
@@ -462,6 +497,7 @@ Public Sub ProcessReport(cfg As Object, _
     If declTimeFormatKey <> "" And mf.Exists("NEW_" & declTimeFormatKey) Then
         newDeclPathRel = Replace(cfg("DeclPathPattern"), "YYYYMM", mf("NEW_" & declTimeFormatKey))
     Else
+        newDeclPathRel = cfg("DeclPathPattern")
         ' If mf.Exists("NEW_AD_YYYYMM") Then newDeclPathRel = Replace(cfg("DeclPathPattern"), "YYYYMM", mf("NEW_AD_YYYYMM")) Else newDeclPathRel = Replace(cfg("DeclPathPattern"), "YYYYMM", "")
         ' ***** 需要修改
         ' Log紀錄這邊有問題，直接Exit Sub  
@@ -477,7 +513,7 @@ Public Sub ProcessReport(cfg As Object, _
         Exit Sub
     End If
 
-    ' Set wbOld = Workbooks.Open(basePath & "\" & oldTplPathRel, ReadOnly:=True)
+    Set wbOld = Workbooks.Open(basePath & "\" & oldTplPathRel, ReadOnly:=True)
 
     ' Fill header dates if any
     On Error Resume Next
@@ -487,6 +523,9 @@ Public Sub ProcessReport(cfg As Object, _
         If cfg.Exists("HeaderTimeFormat") Then headerFormat = Trim(cfg("HeaderTimeFormat"))
         FillHeaderDates wbOld, cfg("HeaderTimeSheetRange"), mf, headerFormat
         LogInfo "headerFormat: " & headerFormat
+    Else
+        ' ***********LogWarn
+        Exit Sub
     End If
     On Error GoTo ErrHandler
 
@@ -555,11 +594,79 @@ Public Sub ProcessReport(cfg As Object, _
     ' ------------------ 替換區段：結束 ------------------
 
     ' After all updates completed on wbOld, run processing macro if configured
+    ' If cfg.Exists("ProcessingMacro") Then
+    '     If Trim(cfg("ProcessingMacro")) <> "" Then
+    '         RunProcessingMacro cfg("ProcessingMacro"), wbOld
+    '     End If
+    ' End If
+
     If cfg.Exists("ProcessingMacro") Then
         If Trim(cfg("ProcessingMacro")) <> "" Then
-            RunProcessingMacro cfg("ProcessingMacro"), wbOld
+            Dim macroName As String
+            macroName = Trim(cfg("ProcessingMacro"))
+            Dim reportID As String
+            reportID = cfg("ReportID")
+
+            Select Case reportID
+                Case "FM11"
+                    ' wbOld, True
+                    RunProcessingMacroWithArgs macroName, wbOld, True
+
+                Case "表41"
+                    ' wbOld, True, CDate(<NEW_AD_YYYYMMDD_END>)
+                    If mf.Exists("NEW_AD_YYYYMMDD_END") Then
+                        Dim dtEnd As Date
+                        dtEnd = CDate(DateSerial( _
+                            CLng(Left(mf("NEW_AD_YYYYMMDD_END"), 4)), _
+                            CLng(Mid(mf("NEW_AD_YYYYMMDD_END"), 5, 2)), _
+                            CLng(Right(mf("NEW_AD_YYYYMMDD_END"), 2)) ))
+                        RunProcessingMacroWithArgs macroName, wbOld, Array(True, dtEnd)
+                    Else
+                        ' fallback / warning
+                        LogWarn "Missing NEW_AD_YYYYMMDD_END for ReportID=" & reportID
+                        RunProcessingMacroWithArgs macroName, wbOld, True
+                    End If
+
+                Case "FM2"
+                    ' wbOld (只有 wbOld)
+                    RunProcessingMacroWithArgs macroName, wbOld
+
+                Case "FM10"
+                    ' wbOld
+                    RunProcessingMacroWithArgs macroName, wbOld
+
+                Case "F1_F2"
+                    ' wbOld, True, mf("ROCYYYMM") (字串)
+                    If mf.Exists("ROCYYYMM") Then
+                        RunProcessingMacroWithArgs macroName, wbOld, Array(True, mf("ROCYYYMM"))
+                    Else
+                        LogWarn "Missing ROCYYYMM for ReportID=" & reportID
+                        RunProcessingMacroWithArgs macroName, wbOld, True
+                    End If
+
+                Case "AI240"
+                    ' wbOld, True, CDate(<NEW_AD_YYYYMMDD_WORKDAY_END>)
+                    If mf.Exists("NEW_AD_YYYYMMDD_WORKDAY_END") Then
+                        Dim dtWorkday As Date
+                        dtWorkday = CDate(DateSerial( _
+                            CLng(Left(mf("NEW_AD_YYYYMMDD_WORKDAY_END"), 4)), _
+                            CLng(Mid(mf("NEW_AD_YYYYMMDD_WORKDAY_END"), 5, 2)), _
+                            CLng(Right(mf("NEW_AD_YYYYMMDD_WORKDAY_END"), 2)) ))
+                        RunProcessingMacroWithArgs macroName, wbOld, Array(True, dtWorkday)
+                    Else
+                        LogWarn "Missing NEW_AD_YYYYMMDD_WORKDAY_END for ReportID=" & reportID
+                        RunProcessingMacroWithArgs macroName, wbOld, True
+                    End If
+
+                Case Else
+                    ' 預設：只傳 wbOld（如果你要改成預設傳 wbOld, True 可改這裡）
+                    RunProcessingMacroWithArgs macroName, wbOld
+            End Select
         End If
     End If
+
+
+
 
     ' SaveCopyAs new template
     On Error Resume Next
@@ -600,6 +707,9 @@ Public Sub ProcessReport(cfg As Object, _
         Dim exportList As Object: Set exportList = cfg("ExportPDFList")
         If exportList.Exists("Count") Then
             If exportList("Count") > 0 Then
+
+                ' 這邊要寫一個 for 迴圈去處理，不能這樣處理
+
                 ' Use first row's PDFSheets as default for now (you may adapt to multiple)
                 Dim arrPDFs() As String
                 arrPDFs = Split(exportList("PDFSheetsArr")(0), ",")
@@ -642,7 +752,7 @@ Public Function ImportDataToTpl(impFullPath As String, _
                                 filterRaw As String) As Boolean
     On Error GoTo ErrHandler
     ImportDataToTpl = False
-    Select Case LCase(Trim(importType))
+    Select Case Trim(importType)
         Case "Default_Copy"
             If Dir(impFullPath) = "" Then
                 LogWarn "File not found for copy: " & impFullPath
@@ -775,6 +885,59 @@ ErrHandler:
     LogError "RunProcessingMacro error: " & Err.Number & " " & Err.Description & " macro=" & macroSpec
 End Sub
 
+
+' --- Helper: 呼叫 macro 並支援可變參數
+Public Sub RunProcessingMacroWithArgs(macroName As String, wbOld As Workbook, Optional extraArgs As Variant)
+    On Error GoTo ErrHandler
+
+    If Trim(macroName) = "" Then Exit Sub
+
+    ' 確保以 workbook 為前綴，避免 Application.Run 找不到正確的 Macro
+    Dim fullMacroName As String
+    fullMacroName = "'" & wbOld.Name & "'!" & macroName
+
+    ' 構建參數陣列：第一個參數一律是 wbOld
+    Dim args() As Variant
+    Dim argCount As Long
+    argCount = 0
+    ReDim args(0 To 0)
+    args(0) = wbOld
+
+    ' 如果有 extraArgs（可能是單一值，也可能是陣列），把它們加入 args
+    If Not IsEmpty(extraArgs) Then
+        Dim i As Long
+        If IsArray(extraArgs) Then
+            For i = LBound(extraArgs) To UBound(extraArgs)
+                argCount = argCount + 1
+                ReDim Preserve args(0 To argCount)
+                args(argCount) = extraArgs(i)
+            Next i
+        Else
+            argCount = argCount + 1
+            ReDim Preserve args(0 To argCount)
+            args(argCount) = extraArgs
+        End If
+    End If
+
+    ' 依參數數量用 Application.Run 呼叫（避免傳入陣列直接當參數失敗）
+    Select Case UBound(args)
+        Case 0: Application.Run fullMacroName, args(0)
+        Case 1: Application.Run fullMacroName, args(0), args(1)
+        Case 2: Application.Run fullMacroName, args(0), args(1), args(2)
+        Case 3: Application.Run fullMacroName, args(0), args(1), args(2), args(3)
+        Case 4: Application.Run fullMacroName, args(0), args(1), args(2), args(3), args(4)
+        Case Else
+            ' 若有更多參數，可再擴充上面 Case 或改為 CallByName 等複雜方法
+            Application.Run fullMacroName, args(0)
+    End Select
+
+    Exit Sub
+ErrHandler:
+    LogError "RunProcessingMacroWithArgs error: " & Err.Number & " " & Err.Description & " macro=" & macroName
+End Sub
+
+
+
 '------------------------------
 ' ApplyMappings (unchanged)
 '------------------------------
@@ -788,14 +951,18 @@ Public Sub ApplyMappings(wbNew As Workbook, _
     For r = 2 To lastRow
         If Trim(wsMap.Cells(r, "A").Value) = reportID Then
             Dim srcSh As String: srcSh = Trim(wsMap.Cells(r, "B").Value)
-            Dim srcAddr As String: srcAddr = Trim(wsMap.Cells(r, "C").Value)
-            Dim dstSh As String: dstSh = Trim(wsMap.Cells(r, "D").Value)
-            Dim dstAddr As String: dstAddr = Trim(wsMap.Cells(r, "E").Value)
-            On Error Resume Next
-            Dim v As Variant
-            v = wbNew.Sheets(srcSh).Range(srcAddr).Value
-            wbDecl.Sheets(dstSh).Range(dstAddr).Value = v
+            Dim rngStrings As String(): rngStrings = Split(wsMap.Cells(r, "C").Value, ",")
+
+            For Each srcAddr In rngStrings
+                srcAddr = Trim(srcAddr)
+                Set rngSrc = wbNew.Sheets(srcSh).Range(srcAddr)
+                Set rngDst = wbDecl.Sheets(srcSh).Range(srcAddr)
+
+                ' 直接以值貼值，保留大小一致
+                rngDst.Value = rngSrc.Value
+
             On Error GoTo 0
+            Next srcAddr
         End If
     Next r
     Exit Sub
@@ -845,63 +1012,6 @@ ErrHandler:
     LogError "ExportPDFs error: " & Err.Number & " " & Err.Description
 End Sub
 
-'------------------------------
-' FindBatchFilterFieldsForReport (kept for reference if you still use tblBatchFilters)
-'------------------------------
-Public Function FindBatchFilterFieldsForReport(impRelPath As String, _
-                                               reportID As String, _
-                                               batchFilters As Collection) As Variant
-    Dim dict As Object: Set dict = CreateObject("Scripting.Dictionary")
-    Dim i As Long
-    For i = 1 To batchFilters.Count
-        Dim e As Object: Set e = batchFilters(i)
-        Dim patt As String: patt = e("ImportPathPattern")
-        If patt <> "" Then
-            On Error Resume Next
-            If LCase(impRelPath) = LCase(patt) Or LCase(impRelPath) Like LCase(patt) Or LCase(patt) Like LCase(impRelPath) Then
-                If Not dict.Exists(e("FieldName")) Then dict(e("FieldName")) = True
-            Else
-                Dim f1 As String: f1 = Mid(impRelPath, InStrRev(impRelPath, "\") + 1)
-                If InStr(1, LCase(f1), LCase(patt)) > 0 Or InStr(1, LCase(patt), LCase(f1)) > 0 Then
-                    If Not dict.Exists(e("FieldName")) Then dict(e("FieldName")) = True
-                End If
-            End If
-            On Error GoTo 0
-        End If
-    Next i
-    If dict.Count = 0 Then
-        Dim a0() As String
-        FindBatchFilterFieldsForReport = a0
-    Else
-        Dim arr() As String
-        ReDim arr(0 To dict.Count - 1)
-        Dim idx As Long: idx = 0
-        Dim key
-        For Each key In dict.Keys
-            arr(idx) = key: idx = idx + 1
-        Next key
-        FindBatchFilterFieldsForReport = arr
-    End If
-End Function
-
-'------------------------------
-' Test harness: run F1_F2
-'------------------------------
-Public Sub Run_Test_F1F2()
-    Dim allCfgs As Object: Set allCfgs = LoadAllReportConfigs()
-    If Not allCfgs.Exists("F1_F2") Then
-        MsgBox "F1_F2 config not found in tblReports", vbExclamation
-        Exit Sub
-    End If
-    Dim cfg As Object: Set cfg = allCfgs("F1_F2")
-
-    ' Build mf using YearMonth name
-    Dim ymROC As String: ymROC = ThisWorkbook.Names("YearMonth").RefersToRange.Value
-    Dim mf As Object: Set mf = BuildTimeStringFormats(ymROC)
-
-    ProcessReport cfg, mf
-    MsgBox "Test run finished for F1_F2 (check logs)", vbInformation
-End Sub
 
 Public Function BuildTimeStringFormats(ByVal ymROC As String) As Object
     Dim d As Object: Set d = CreateObject("Scripting.Dictionary")
@@ -1145,20 +1255,22 @@ Public Sub FillHeaderDates(wb As Workbook, _
     If Trim(headerTimeFormat & "") <> "" Then
         If mf.Exists(headerTimeFormat) Then
             valueToWrite = mf(headerTimeFormat)
+        Else
+          ' ************Logwarn
+          Exit Function
         End If
+    Else
+        ' *************LogWarn
+        Exit Function
     End If
-    ' 如果沒取得，退回常見的 NEW_AD_YYYYMM（若存在）
-    If valueToWrite = "" Then
-        If mf.Exists("NEW_ROC_YYYMM") Then valueToWrite = mf("NEW_ROC_YYYMM")
-    End If
-    ' 若仍沒值，保持空字串（不寫入非預期內容）
 
     ' 2) 支援 headerRefs 為單一字串或陣列
     Dim refs As Variant
     If IsArray(headerRefs) Then
         refs = headerRefs
     Else
-        refs = Array(headerRefs)
+        ' *********LogWarn
+        Exit Function
     End If
 
     Dim i As Long
